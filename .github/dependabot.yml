@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directories:
+      - "/backend/common/"
+      - "/backend/console/"
+      - "/backend/testing/"
+      - "/backend/migration/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "📦 Type: Dependencies"
+      - "⏳ Status: Waiting for review"
