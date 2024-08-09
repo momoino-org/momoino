@@ -61,6 +61,13 @@ linters-settings:
           - allowedPackages:
               - github.com/onsi/ginkgo/v2
               - github.com/onsi/gomega
+  ireturn:
+    allow:
+      - anon
+      - error
+      - empty
+      - stdlib
+      - fx.Option
 
 linters:
   disable-all: true
@@ -149,6 +156,7 @@ linters:
     # - err113
 
     - wsl
+    - ireturn
 
 issues:
   max-issues-per-linter: 0
