@@ -1,0 +1,109 @@
+name: backend
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+  push:
+    paths:
+      - "backend/**"
+    branches:
+      - "main"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  detect-modules-apps:
+    runs-on: ubuntu-24.04
+    outputs:
+      modules: ${{ steps.set-modules-apps.outputs.modules }}
+      apps: ${{ steps.set-modules-apps.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.work
+          cache: false
+      - id: set-modules-apps
+        working-directory: backend
+        run: bash ../build/roles/github-actions/set-modules-apps.sh
+
+  go-mod:
+    needs: detect-modules-apps
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.work
+          cache: false
+      - working-directory: backend
+        run: bash ../build/roles/github-actions/verify-go-mod.sh '${{ needs.detect-modules-apps.outputs.modules }}'
+
+  golangci-lint:
+    needs: detect-modules-apps
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJSON(needs.detect-modules-apps.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ matrix.module }}/../go.work
+          cache-dependency-path: ${{ matrix.module }}/go.sum
+      - name: golangci-lint ${{ matrix.module }}
+        uses: golangci/golangci-lint-action@v6
+        env:
+          GOLANGCI_LINT_VERSION: v1.59
+        with:
+          version: ${{ env.GOLANGCI_LINT_VERSION }}
+          working-directory: ${{ matrix.module }}
+
+  unit-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: ./backend/go.work
+          cache-dependency-path: ./backend/testing/go.sum
+      - name: unit test
+        working-directory: backend
+        env:
+          GINKGO_VERSION: v2.19.0
+        run: bash ../build/roles/github-actions/unit-test.sh
+
+  build:
+    needs:
+      - go-mod
+      - detect-modules-apps
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: true
+      matrix:
+        app: ${{ fromJSON(needs.detect-modules-apps.outputs.apps) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: ${{ matrix.app }}/../go.work
+          cache-dependency-path: ${{ matrix.app }}/go.sum
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - id: get-version
+        name: Get APP_VERSION
+        run: bash build/roles/github-actions/get-app-name-version.sh "${{ matrix.app }}"
+      - name: Build ${{ matrix.app }}
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: ${{ matrix.app }}/Dockerfile
+          load: true
+          push: false
+          tags: x-operation/${{ steps.get-version.outputs.app_name }}:${{ steps.get-version.outputs.app_version }}
