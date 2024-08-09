@@ -8,18 +8,18 @@ import (
 	"go.uber.org/fx"
 )
 
-type createSwaggerUIHandler struct {
+type swaggerUIHandler struct {
 }
 
-func newCreateSwaggerUIHandler() core.HTTPRoute {
-	return &createSwaggerUIHandler{}
+func newSwaggerUIHandler() *swaggerUIHandler {
+	return &swaggerUIHandler{}
 }
 
-func (handler *createSwaggerUIHandler) Pattern() string {
+func (handler *swaggerUIHandler) Pattern() string {
 	return "GET /swagger"
 }
 
-func (handler *createSwaggerUIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (handler *swaggerUIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	render.HTML(w, r, `<!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>
 <html lang="en">
@@ -45,11 +45,6 @@ func (handler *createSwaggerUIHandler) ServeHTTP(w http.ResponseWriter, r *http.
 func NewSwaggerModule() fx.Option {
 	return fx.Module(
 		"Swagger Module",
-		fx.Provide(
-			fx.Annotate(
-				newCreateSwaggerUIHandler,
-				fx.ResultTags(`group:"http_routes"`),
-			),
-		),
+		fx.Provide(core.AsRoute(newSwaggerUIHandler)),
 	)
 }
