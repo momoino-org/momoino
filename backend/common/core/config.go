@@ -58,6 +58,10 @@ type AppConfig interface {
 	// GetDatabaseConfig retrieves the database configuration from the application's configuration source.
 	// It returns a pointer to a DatabaseConfig struct containing the database configuration details.
 	GetDatabaseConfig() *DatabaseConfig
+
+	// GetJWTConfig retrieves the JWT configuration from the application's configuration source.
+	// It returns a pointer to a JWTConfig struct containing the JWT configuration details.
+	GetJWTConfig() *JWTConfig
 }
 
 // DatabaseConfig is a struct that holds the database configuration details.
@@ -68,6 +72,14 @@ type DatabaseConfig struct {
 	Username     string
 	Password     string
 	MaxAttempts  uint
+}
+
+// JWTConfig holds the configuration details for JSON Web Tokens (JWT).
+type JWTConfig struct {
+	PublicKey             []byte
+	PrivateKey            []byte
+	AccessTokenExpiresIn  int64
+	RefreshTokenExpiresIn int64
 }
 
 // AppConfig is a struct that holds the application's configuration.
@@ -114,6 +126,15 @@ func (appCfg *appConfig) GetDatabaseConfig() *DatabaseConfig {
 	}
 
 	return databaseCfg
+}
+
+func (appCfg *appConfig) GetJWTConfig() *JWTConfig {
+	return &JWTConfig{
+		PublicKey:             []byte(appCfg.configSource.GetString("jwt.public-key")),
+		PrivateKey:            []byte(appCfg.configSource.GetString("jwt.private-key")),
+		AccessTokenExpiresIn:  appCfg.configSource.GetInt64("jwt.access-token.expires-in"),
+		RefreshTokenExpiresIn: appCfg.configSource.GetInt64("jwt.refresh-token.expires-in"),
+	}
 }
 
 // NewConfigModule returns an fx.Option that provides a new AppConfig instance.

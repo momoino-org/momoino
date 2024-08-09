@@ -4,6 +4,22 @@ info:
   title: wano-island/wano
   version: 1.0.0
 
+paths:
+  /api/v1/login:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login_RequestBody'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login_200'
+
 components:
   schemas:
     Response:
@@ -16,3 +32,25 @@ components:
         timestamp:
           type: string
           format: date-time
+
+    Login_RequestBody:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    Login_200:
+      allOf:
+        - $ref: '#/components/schemas/Response'
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                accessToken:
+                  type: string
+                refreshToken:
+                  type: string

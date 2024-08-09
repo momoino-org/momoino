@@ -26,12 +26,11 @@ func newRouter(params routeParams) http.Handler {
 	r := chi.NewRouter()
 
 	httplogger := httplog.NewLogger("x-operation/console", httplog.Options{
-		JSON:             params.Config.IsDevelopment(),
-		LogLevel:         lo.Ternary(params.Config.IsProduction(), slog.LevelInfo, slog.LevelDebug),
-		RequestHeaders:   true,
-		MessageFieldName: "message",
-		TimeFieldFormat:  time.RFC3339,
-		TimeFieldName:    "time",
+		JSON:            params.Config.IsDevelopment(),
+		LogLevel:        lo.Ternary(params.Config.IsProduction(), slog.LevelInfo, slog.LevelDebug),
+		RequestHeaders:  true,
+		TimeFieldFormat: time.RFC3339Nano,
+		TimeFieldName:   "time",
 		Tags: map[string]string{
 			"version": params.Config.GetAppVersion(),
 			"mode":    params.Config.GetMode(),
