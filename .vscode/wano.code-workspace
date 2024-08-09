@@ -31,4 +31,26 @@
 			"redhat.vscode-yaml"
 		]
 	},
+  "launch": {
+    "version": "0.2.0",
+    "compounds": [],
+    "configurations": [
+      {
+				"name": "Run [console] project",
+				"type": "go",
+				"request": "launch",
+				"mode": "auto",
+				"program": "${workspaceRoot}/backend/console",
+				"buildFlags": "-ldflags='-X wano-island/common/core.AppVersion=1.0.0 -X wano-island/common/core.CompatibleVersion= -X wano-island/common/core.AppMode=development -X wano-island/common/core.AppRevision=000000'",
+				"env": {
+					"APP_DATABASE_HOST": "localhost",
+					"APP_DATABASE_USERNAME": "x-movie-api",
+					"APP_DATABASE_PASSWORD": "Keep!t5ecret",
+					"APP_DATABASE_NAME": "x-block-builder",
+					"APP_DATABASE_PORT": "5432",
+					"APP_DATABASE_MAX-ATTEMPTS": "3",
+				}
+			},
+    ],
+  }
 }
