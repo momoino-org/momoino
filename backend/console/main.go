@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"net/http"
 	"time"
 	"wano-island/common/core"
@@ -12,6 +13,9 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/fx"
 )
+
+//go:embed static
+var staticFiles embed.FS
 
 func main() {
 	time.Local = time.UTC
@@ -27,7 +31,7 @@ func main() {
 		usermgt.NewUserMgtModule(),
 
 		// Console
-		filesystem.NewFileSystemModule(),
+		filesystem.NewFileSystemModule(staticFiles),
 		swagger.NewSwaggerModule(),
 		httpsrv.NewHTTPServerModule(),
 

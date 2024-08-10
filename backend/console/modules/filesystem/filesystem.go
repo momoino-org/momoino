@@ -1,9 +1,9 @@
 package filesystem
 
 import (
+	"embed"
+	"io/fs"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strings"
 	"wano-island/common/core"
 
@@ -12,12 +12,15 @@ import (
 )
 
 type createFileSystemHandler struct {
+	staticFiles embed.FS
 }
 
 var _ core.HTTPRoute = (*createFileSystemHandler)(nil)
 
-func newCreateFileSystemHandler() *createFileSystemHandler {
-	return &createFileSystemHandler{}
+func newCreateFileSystemHandler(staticFiles embed.FS) *createFileSystemHandler {
+	return &createFileSystemHandler{
+		staticFiles: staticFiles,
+	}
 }
 
 func (handler *createFileSystemHandler) Pattern() string {
@@ -25,17 +28,18 @@ func (handler *createFileSystemHandler) Pattern() string {
 }
 
 func (handler *createFileSystemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	workDir, _ := os.Getwd()
-	filesDir := http.Dir(filepath.Join(workDir, "static"))
+	fSys, _ := fs.Sub(handler.staticFiles, "static")
 	rctx := chi.RouteContext(r.Context())
 	pathPrefix := strings.TrimSuffix(rctx.RoutePattern(), "/*")
-	fs := http.StripPrefix(pathPrefix, http.FileServer(filesDir))
+	fs := http.StripPrefix(pathPrefix, http.FileServer(http.FS(fSys)))
 	fs.ServeHTTP(w, r)
 }
 
-func NewFileSystemModule() fx.Option {
+func NewFileSystemModule(staticFiles embed.FS) fx.Option {
 	return fx.Module(
 		"File System Module",
-		fx.Provide(core.AsRoute(newCreateFileSystemHandler)),
+		fx.Provide(core.AsRoute(func() *createFileSystemHandler {
+			return newCreateFileSystemHandler(staticFiles)
+		})),
 	)
 }
