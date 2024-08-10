@@ -68,6 +68,23 @@ linters-settings:
       - empty
       - stdlib
       - fx.Option
+  ginkgolinter:
+    forbid-focus-container: true
+    force-expect-to: true
+    validate-async-intervals: true
+    forbid-spec-pollution: true
+  decorder:
+    dec-order:
+      - type
+      - const
+      - var
+      - func
+    disable-dec-order-check: false
+    disable-init-func-first-check: true
+    disable-dec-num-check: true
+    disable-type-dec-num-check: true
+    disable-const-dec-num-check: true
+    disable-var-dec-num-check: true
 
 linters:
   disable-all: true
@@ -157,6 +174,8 @@ linters:
 
     - wsl
     - ireturn
+    - ginkgolinter
+    - decorder
 
 issues:
   max-issues-per-linter: 0
