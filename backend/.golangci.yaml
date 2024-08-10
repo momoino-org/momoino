@@ -85,6 +85,10 @@ linters-settings:
     disable-type-dec-num-check: true
     disable-const-dec-num-check: true
     disable-var-dec-num-check: true
+  gomoddirectives:
+    replace-allow-list:
+      # TODO: Please remove this when the official package allows any type of `contextKey`.
+      - github.com/orandin/slog-gorm
 
 linters:
   disable-all: true

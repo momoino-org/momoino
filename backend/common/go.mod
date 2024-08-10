@@ -2,6 +2,8 @@ module wano-island/common
 
 go 1.22.5
 
+replace github.com/orandin/slog-gorm => github.com/chucamphong/slog-gorm v0.0.0-20240810113846-c392509a877c
+
 require (
 	github.com/avast/retry-go/v4 v4.6.0
 	github.com/go-chi/render v1.0.3

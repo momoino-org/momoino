@@ -4,6 +4,8 @@ go 1.22.5
 
 replace wano-island/common => ../common
 
+replace github.com/orandin/slog-gorm => github.com/chucamphong/slog-gorm v0.0.0-20240810113846-c392509a877c
+
 require (
 	github.com/samber/lo v1.46.0
 	go.uber.org/fx v1.22.2
