@@ -2,32 +2,9 @@ package core
 
 import (
 	"slices"
-	"strings"
 
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
-)
-
-const (
-	// developmentMode: Indicates that the application is running in development mode.
-	developmentMode = "development"
-
-	// productionMode: Indicates that the application is running in production mode.
-	productionMode = "production"
-)
-
-var (
-	// AppVersion is the current version of the migration application.
-	AppVersion string
-
-	// CompatibleVersion is the version of the database schema that the migration application is compatible with.
-	CompatibleVersion string
-
-	// AppMode is the mode in which the application is running (ex., "development", "production").
-	AppMode string
-
-	// AppRevision is the revision of the application.
-	AppRevision string
 )
 
 type AppConfig interface {
@@ -87,6 +64,28 @@ type appConfig struct {
 	configSource *viper.Viper
 }
 
+const (
+	// developmentMode: Indicates that the application is running in development mode.
+	developmentMode = "development"
+
+	// productionMode: Indicates that the application is running in production mode.
+	productionMode = "production"
+)
+
+var (
+	// AppVersion is the current version of the migration application.
+	AppVersion string
+
+	// CompatibleVersion is the version of the database schema that the migration application is compatible with.
+	CompatibleVersion string
+
+	// AppMode is the mode in which the application is running (ex., "development", "production").
+	AppMode string
+
+	// AppRevision is the revision of the application.
+	AppRevision string
+)
+
 func (appCfg *appConfig) GetAppVersion() string {
 	return AppVersion
 }
@@ -117,12 +116,12 @@ func (appCfg *appConfig) GetRevision() string {
 
 func (appCfg *appConfig) GetDatabaseConfig() *DatabaseConfig {
 	databaseCfg := &DatabaseConfig{
-		Host:         appCfg.configSource.GetString("database.host"),
-		Port:         appCfg.configSource.GetUint16("database.port"),
-		DatabaseName: appCfg.configSource.GetString("database.name"),
-		Username:     appCfg.configSource.GetString("database.username"),
-		Password:     appCfg.configSource.GetString("database.password"),
-		MaxAttempts:  appCfg.configSource.GetUint("database.max-attempts"),
+		Host:         appCfg.configSource.GetString("database_host"),
+		Port:         appCfg.configSource.GetUint16("database_port"),
+		DatabaseName: appCfg.configSource.GetString("database_name"),
+		Username:     appCfg.configSource.GetString("database_username"),
+		Password:     appCfg.configSource.GetString("database_password"),
+		MaxAttempts:  appCfg.configSource.GetUint("database_max_attempts"),
 	}
 
 	return databaseCfg
@@ -130,10 +129,10 @@ func (appCfg *appConfig) GetDatabaseConfig() *DatabaseConfig {
 
 func (appCfg *appConfig) GetJWTConfig() *JWTConfig {
 	return &JWTConfig{
-		PublicKey:             []byte(appCfg.configSource.GetString("jwt.public-key")),
-		PrivateKey:            []byte(appCfg.configSource.GetString("jwt.private-key")),
-		AccessTokenExpiresIn:  appCfg.configSource.GetInt64("jwt.access-token.expires-in"),
-		RefreshTokenExpiresIn: appCfg.configSource.GetInt64("jwt.refresh-token.expires-in"),
+		PublicKey:             []byte(appCfg.configSource.GetString("jwt_public_key")),
+		PrivateKey:            []byte(appCfg.configSource.GetString("jwt_private_key")),
+		AccessTokenExpiresIn:  appCfg.configSource.GetInt64("jwt_access_token_expires_in"),
+		RefreshTokenExpiresIn: appCfg.configSource.GetInt64("jwt_refresh_token_expires_in"),
 	}
 }
 
@@ -145,7 +144,7 @@ func NewConfigModule() fx.Option {
 		fx.Provide(func() AppConfig {
 			viperInstance := viper.New()
 			viperInstance.SetEnvPrefix("app")
-			viperInstance.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+			// viperInstance.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 			viperInstance.AutomaticEnv()
 
 			return &appConfig{
