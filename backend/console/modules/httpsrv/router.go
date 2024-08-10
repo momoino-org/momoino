@@ -1,15 +1,12 @@
 package httpsrv
 
 import (
-	"log/slog"
 	"net/http"
 	"time"
 	"wano-island/common/core"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/httplog/v2"
-	"github.com/samber/lo"
 	"go.uber.org/fx"
 )
 
@@ -25,24 +22,23 @@ type routeParams struct {
 func newRouter(params routeParams) http.Handler {
 	r := chi.NewRouter()
 
-	httplogger := httplog.NewLogger("x-operation/console", httplog.Options{
-		JSON:            params.Config.IsDevelopment(),
-		LogLevel:        lo.Ternary(params.Config.IsProduction(), slog.LevelInfo, slog.LevelDebug),
-		RequestHeaders:  true,
-		TimeFieldFormat: time.RFC3339Nano,
-		TimeFieldName:   "time",
-		Tags: map[string]string{
-			"version": params.Config.GetAppVersion(),
-			"mode":    params.Config.GetMode(),
-			"rev":     params.Config.GetRevision(),
-		},
-	})
-
 	r.Use(
 		middleware.CleanPath,
-		middleware.RequestID,
-		httplog.Handler(httplogger),
-		middleware.Recoverer,
+		requestID,
+		requestLogger(&HTTPLoggerConfig{
+			IgnoredPaths: []string{
+				"/swagger",
+				"/static",
+			},
+			Tags: map[string]string{
+				"version": params.Config.GetAppVersion(),
+				"mode":    params.Config.GetMode(),
+				"rev":     params.Config.GetRevision(),
+			},
+		}),
+		//nolint:mnd // I don't think we need to named this number here
+		middleware.Compress(5),
+		httpRecover,
 		middleware.Timeout(time.Minute),
 	)
 

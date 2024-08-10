@@ -6,9 +6,8 @@ replace wano-island/common => ../common
 
 require (
 	github.com/go-chi/chi/v5 v5.1.0
-	github.com/go-chi/httplog/v2 v2.1.1
 	github.com/go-chi/render v1.0.3
-	github.com/samber/lo v1.46.0
+	github.com/google/uuid v1.6.0
 	go.uber.org/fx v1.22.2
 	wano-island/common v0.0.0-00010101000000-000000000000
 )
@@ -18,7 +17,6 @@ require (
 	github.com/avast/retry-go/v4 v4.6.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/schema v1.4.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

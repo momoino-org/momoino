@@ -20,6 +20,8 @@ type Logger interface {
 	Error(msg string, args ...any)
 	ErrorContext(ctx context.Context, msg string, args ...any)
 	Unwrap() *slog.Logger
+	Replace(logger *slog.Logger)
+	Log(ctx context.Context, level slog.Level, msg string, args ...any)
 }
 
 type LoggerConfig struct {
@@ -33,22 +35,31 @@ type logger struct {
 
 var _ Logger = (*logger)(nil)
 
-func (l logger) Unwrap() *slog.Logger {
+func (l *logger) Unwrap() *slog.Logger {
 	return l.slog
 }
 
-func (l logger) Handler() slog.Handler {
+func (l *logger) Handler() slog.Handler {
 	return l.slog.Handler()
 }
 
-func (l logger) Info(msg string, args ...any) {
+func (l *logger) Replace(slogInstance *slog.Logger) {
+	l.slog = slogInstance
+}
+
+func (l *logger) Log(ctx context.Context, level slog.Level, msg string, args ...any) {
+	//nolint:sloglint // Should accept kv-only and attr-only.
+	l.slog.Log(ctx, level, msg, args...)
+}
+
+func (l *logger) Info(msg string, args ...any) {
 	//nolint:sloglint // Should accept kv-only and attr-only.
 	l.slog.Info(msg, args...)
 }
 
-func (l logger) InfoContext(ctx context.Context, msg string, args ...any) {
+func (l *logger) InfoContext(ctx context.Context, msg string, args ...any) {
 	if l.cfg != nil {
-		if requestID, ok := ctx.Value(l.cfg.RequestHeaderID).(string); ok && requestID != "" {
+		if requestID := GetRequestIDInContext(ctx); requestID != "" {
 			args = append([]any{
 				slog.String("request-id", requestID),
 			}, args...)
@@ -59,14 +70,14 @@ func (l logger) InfoContext(ctx context.Context, msg string, args ...any) {
 	l.slog.InfoContext(ctx, msg, args...)
 }
 
-func (l logger) Error(msg string, args ...any) {
+func (l *logger) Error(msg string, args ...any) {
 	//nolint:sloglint // Should accept kv-only and attr-only.
 	l.slog.Error(msg, args...)
 }
 
-func (l logger) ErrorContext(ctx context.Context, msg string, args ...any) {
+func (l *logger) ErrorContext(ctx context.Context, msg string, args ...any) {
 	if l.cfg != nil {
-		if requestID, ok := ctx.Value(l.cfg.RequestHeaderID).(string); ok && requestID != "" {
+		if requestID := GetRequestIDInContext(ctx); requestID != "" {
 			args = append([]any{
 				slog.String("request-id", requestID),
 			}, args...)
