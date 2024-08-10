@@ -8,10 +8,13 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/schema v1.4.1
+	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/orandin/slog-gorm v1.3.2
 	github.com/spf13/viper v1.19.0
 	go.uber.org/fx v1.22.2
 	golang.org/x/crypto v0.21.0
+	golang.org/x/text v0.16.0
+	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.11
 )
@@ -43,7 +46,5 @@ require (
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

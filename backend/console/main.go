@@ -17,11 +17,15 @@ import (
 //go:embed static
 var staticFiles embed.FS
 
+//go:embed resources
+var resourceFS embed.FS
+
 func main() {
 	time.Local = time.UTC
 
 	app := fx.New(
 		// Common
+		core.NewI18nModule(resourceFS),
 		core.NewConfigModule(),
 		core.NewLoggerModuleWithConfig(&core.LoggerConfig{
 			RequestHeaderID: middleware.RequestIDHeader,
