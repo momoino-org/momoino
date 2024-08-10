@@ -54,6 +54,7 @@ func OpenDatabase(
 		Logger: slogGorm.New(
 			slogGorm.WithHandler(logger.Handler()),
 			slogGorm.WithTraceAll(),
+			slogGorm.WithContextValue("request-id", RequestIDKey),
 		),
 	})
 }

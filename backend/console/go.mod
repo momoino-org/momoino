@@ -4,6 +4,8 @@ go 1.22.5
 
 replace wano-island/common => ../common
 
+replace github.com/orandin/slog-gorm => github.com/chucamphong/slog-gorm v0.0.0-20240810113846-c392509a877c
+
 require (
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/render v1.0.3
