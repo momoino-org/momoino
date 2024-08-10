@@ -45,11 +45,6 @@ type LoginResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-var (
-	ErrInvalidUserOrPassword = errors.New("invalid user or password")
-	ErrCannotGenerateToken   = errors.New("cannot generate token")
-)
-
 func NewLoginHandler(params LoginHandlerParams) *loginHandler {
 	handler := loginHandler{
 		config:         params.Config,
@@ -82,14 +77,14 @@ func (h *loginHandler) Pattern() string {
 
 func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	responseBuilder := core.NewResponseBuilder()
+	responseBuilder := core.NewResponseBuilder(r)
 
 	var requestBody LoginRequestBody
 
 	if err := render.DecodeJSON(r.Body, &requestBody); err != nil {
-		h.logger.ErrorContext(ctx, "Something went wrong when trying to decode request body", slog.Any("error", err))
-		render.Status(r, http.StatusUnprocessableEntity)
-		render.JSON(w, r, responseBuilder.MessageID("S0400").Build())
+		h.logger.ErrorContext(ctx, "Something went wrong when trying to decode request body", slog.Any("details", err))
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgFailedToDecodeRequestBody).Build())
 
 		return
 	}
@@ -97,30 +92,30 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	loggedUser, err := h.userRepository.FindUserByEmail(ctx, h.db, requestBody.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			render.Status(r, http.StatusUnprocessableEntity)
-			render.JSON(w, r, responseBuilder.MessageID("E-0001").Build())
+			render.Status(r, http.StatusUnauthorized)
+			render.JSON(w, r, responseBuilder.MessageID(core.MsgInvalidEmailOrPassword).Build())
 
 			return
 		}
 
-		h.logger.ErrorContext(ctx, "Something went wrong when getting the user by email", slog.Any("error", err))
+		h.logger.ErrorContext(ctx, "Something went wrong when getting the user by email", slog.Any("details", err))
 		render.Status(r, http.StatusInternalServerError)
-		render.JSON(w, r, responseBuilder.MessageID("U-0001").Build())
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
 
 		return
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(loggedUser.Password), []byte(requestBody.Password)); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			render.Status(r, http.StatusUnprocessableEntity)
-			render.JSON(w, r, responseBuilder.MessageID("E-0001").Build())
+			render.Status(r, http.StatusUnauthorized)
+			render.JSON(w, r, responseBuilder.MessageID(core.MsgInvalidEmailOrPassword).Build())
 
 			return
 		}
 
-		h.logger.ErrorContext(ctx, "Something went wrong when comparing password", slog.Any("error", err))
+		h.logger.ErrorContext(ctx, "Something went wrong when comparing password", slog.Any("details", err))
 		render.Status(r, http.StatusInternalServerError)
-		render.JSON(w, r, responseBuilder.MessageID("U-0001").Build())
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
 
 		return
 	}
@@ -135,9 +130,9 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	tokenString, err := token.SignedString(h.jwtPrivateKey)
 	if err != nil {
-		h.logger.ErrorContext(r.Context(), "Cannot sign access token", slog.Any("error", err))
+		h.logger.ErrorContext(r.Context(), "Cannot sign access token", slog.Any("details", err))
 		render.Status(r, http.StatusInternalServerError)
-		render.JSON(w, r, responseBuilder.MessageID("U-0001").Build())
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
 
 		return
 	}
@@ -150,9 +145,9 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	refreshTokenString, err := refreshToken.SignedString(h.jwtPrivateKey)
 	if err != nil {
-		h.logger.ErrorContext(r.Context(), "Cannot sign refresh token", slog.Any("error", err))
+		h.logger.ErrorContext(r.Context(), "Cannot sign refresh token", slog.Any("details", err))
 		render.Status(r, http.StatusInternalServerError)
-		render.JSON(w, r, responseBuilder.MessageID("U-0001").Build())
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
 
 		return
 	}

@@ -2,7 +2,10 @@ package core
 
 import (
 	"math"
+	"net/http"
 	"time"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
 type Pagination struct {
@@ -21,6 +24,7 @@ type Response[T any] struct {
 }
 
 type ResponseBuilder struct {
+	request  *http.Request
 	response *Response[any]
 }
 
@@ -47,18 +51,26 @@ func (r *ResponseBuilder) Pagination(page int, limit int, totalRows int64) *Resp
 }
 
 func (r *ResponseBuilder) Build() *Response[any] {
+	localizer := GetLocalizer(r.request)
+
 	if r.response.MessageID == "" {
-		r.response.MessageID = "S0200"
-		r.response.Message = "Success"
+		r.response.MessageID = MsgSuccess
 	}
+
+	r.response.Message = localizer.MustLocalize(&i18n.LocalizeConfig{
+		DefaultMessage: &i18n.Message{
+			ID: r.response.MessageID,
+		},
+	})
 
 	r.response.Timestamp = time.Now()
 
 	return r.response
 }
 
-func NewResponseBuilder() *ResponseBuilder {
+func NewResponseBuilder(request *http.Request) *ResponseBuilder {
 	return &ResponseBuilder{
+		request:  request,
 		response: &Response[any]{},
 	}
 }
