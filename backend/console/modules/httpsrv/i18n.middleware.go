@@ -1,7 +1,6 @@
 package httpsrv
 
 import (
-	"context"
 	"net/http"
 	"wano-island/common/core"
 
@@ -15,7 +14,7 @@ func i18nMiddleware(bundle *i18n.Bundle) func(next http.Handler) http.Handler {
 			acceptLanguages := r.Header.Get("Accept-Language")
 			localizer := i18n.NewLocalizer(bundle, lang, acceptLanguages)
 
-			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), core.LocalizerCtxID, localizer)))
+			next.ServeHTTP(w, core.WithLocalizer(r, localizer))
 		})
 	}
 }
