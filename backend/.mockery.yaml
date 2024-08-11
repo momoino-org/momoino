@@ -1,0 +1,11 @@
+with-expecter: True
+dir: testing/mocks/{{ replaceAll .InterfaceDirRelative "internal" "internal_" }}
+mockname: "{{.Mock}}{{.InterfaceName}}"
+outpkg: "mock{{.PackageName}}"
+filename: "{{.InterfaceName}}.go"
+all: true
+packages:
+  wano-island/common/core:
+  wano-island/common/usermgt:
+  wano-island/console:
+  wano-island/migration:

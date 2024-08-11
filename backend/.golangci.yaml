@@ -61,6 +61,8 @@ linters-settings:
           - allowedPackages:
               - github.com/onsi/ginkgo/v2
               - github.com/onsi/gomega
+              - github.com/onsi/gomega/gstruct
+              - github.com/onsi/gomega/gleak
   ireturn:
     allow:
       - anon
@@ -68,6 +70,7 @@ linters-settings:
       - empty
       - stdlib
       - fx.Option
+      - sqlmock.Sqlmock
   ginkgolinter:
     forbid-focus-container: true
     force-expect-to: true
@@ -89,6 +92,10 @@ linters-settings:
     replace-allow-list:
       # TODO: Please remove this when the official package allows any type of `contextKey`.
       - github.com/orandin/slog-gorm
+  stylecheck:
+    checks:
+      - all
+      - -ST1001
 
 linters:
   disable-all: true

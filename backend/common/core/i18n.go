@@ -2,7 +2,7 @@ package core
 
 import (
 	"context"
-	"embed"
+	"io/fs"
 	"net/http"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -13,7 +13,14 @@ import (
 
 type LocalizerCtxKey string
 
-const LocalizerCtxID LocalizerCtxKey = "LocalizerCtxID"
+type I18nBundleParams struct {
+	fx.In
+
+	AppLifeCycle fx.Lifecycle
+	LocaleFS     fs.FS
+}
+
+const localizerCtxID LocalizerCtxKey = "LocalizerCtxID"
 
 const (
 	MsgSuccess                   = "S-0000"
@@ -23,28 +30,39 @@ const (
 )
 
 func GetLocalizer(r *http.Request) *i18n.Localizer {
-	if localizer, ok := r.Context().Value(LocalizerCtxID).(*i18n.Localizer); ok {
+	if localizer, ok := r.Context().Value(localizerCtxID).(*i18n.Localizer); ok {
 		return localizer
 	}
 
 	return nil
 }
 
-func NewI18nModule(fs embed.FS) fx.Option {
+func WithLocalizer(r *http.Request, localizer *i18n.Localizer) *http.Request {
+	return r.WithContext(context.WithValue(r.Context(), localizerCtxID, localizer))
+}
+
+func NewI18nBundle(params I18nBundleParams) *i18n.Bundle {
+	bundle := i18n.NewBundle(language.English)
+	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+
+	params.AppLifeCycle.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			_, err := bundle.LoadMessageFileFS(params.LocaleFS, "resources/trans/locale.en.yaml")
+			return err
+		},
+	})
+
+	return bundle
+}
+
+func NewI18nModule(fs fs.FS) fx.Option {
 	return fx.Module(
 		"I18n Module",
 		fx.Provide(func(appLifeCycle fx.Lifecycle) *i18n.Bundle {
-			bundle := i18n.NewBundle(language.English)
-			bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
-
-			appLifeCycle.Append(fx.Hook{
-				OnStart: func(ctx context.Context) error {
-					_, err := bundle.LoadMessageFileFS(fs, "resources/trans/locale.en.yaml")
-					return err
-				},
+			return NewI18nBundle(I18nBundleParams{
+				AppLifeCycle: appLifeCycle,
+				LocaleFS:     fs,
 			})
-
-			return bundle
 		}),
 	)
 }
