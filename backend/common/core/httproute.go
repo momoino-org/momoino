@@ -11,6 +11,7 @@ type HTTPRoute interface {
 	http.Handler
 
 	Pattern() string
+	IsPrivateRoute() bool
 }
 
 func AsRoute(function any) any {

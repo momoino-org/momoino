@@ -85,6 +85,66 @@ func (_c *MockUserRepository_FindUserByEmail_Call) RunAndReturn(run func(context
 	return _c
 }
 
+// FindUserByID provides a mock function with given fields: ctx, db, userID
+func (_m *MockUserRepository) FindUserByID(ctx context.Context, db *gorm.DB, userID string) (*usermgt.UserModel, error) {
+	ret := _m.Called(ctx, db, userID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindUserByID")
+	}
+
+	var r0 *usermgt.UserModel
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *gorm.DB, string) (*usermgt.UserModel, error)); ok {
+		return rf(ctx, db, userID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *gorm.DB, string) *usermgt.UserModel); ok {
+		r0 = rf(ctx, db, userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*usermgt.UserModel)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *gorm.DB, string) error); ok {
+		r1 = rf(ctx, db, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockUserRepository_FindUserByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindUserByID'
+type MockUserRepository_FindUserByID_Call struct {
+	*mock.Call
+}
+
+// FindUserByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - db *gorm.DB
+//   - userID string
+func (_e *MockUserRepository_Expecter) FindUserByID(ctx interface{}, db interface{}, userID interface{}) *MockUserRepository_FindUserByID_Call {
+	return &MockUserRepository_FindUserByID_Call{Call: _e.mock.On("FindUserByID", ctx, db, userID)}
+}
+
+func (_c *MockUserRepository_FindUserByID_Call) Run(run func(ctx context.Context, db *gorm.DB, userID string)) *MockUserRepository_FindUserByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*gorm.DB), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *MockUserRepository_FindUserByID_Call) Return(_a0 *usermgt.UserModel, _a1 error) *MockUserRepository_FindUserByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockUserRepository_FindUserByID_Call) RunAndReturn(run func(context.Context, *gorm.DB, string) (*usermgt.UserModel, error)) *MockUserRepository_FindUserByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockUserRepository creates a new instance of MockUserRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockUserRepository(t interface {

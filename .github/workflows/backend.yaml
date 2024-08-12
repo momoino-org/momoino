@@ -43,7 +43,7 @@ jobs:
           go install github.com/vektra/mockery/v2@v2.44.1
           rm -rf mocks
           mockery
-          git diff --exit-code --quiet -- ./testing/mocks
+          git diff --exit-code -- ./testing/mocks
 
   go-mod:
     needs: detect-modules-apps

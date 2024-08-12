@@ -44,14 +44,37 @@ func newRouter(params routeParams) http.Handler {
 		middleware.Compress(5),
 		httpRecover(func(w http.ResponseWriter, r *http.Request) {
 			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, core.NewResponseBuilder(r).MessageID("U-0001").Build())
+			render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
 		}),
 		middleware.Timeout(time.Minute),
 	)
 
+	publicRoutes := []core.HTTPRoute{}
+	privateRoutes := []core.HTTPRoute{}
+
 	for _, route := range params.Routes {
-		r.Handle(route.Pattern(), route)
+		if route.IsPrivateRoute() {
+			privateRoutes = append(privateRoutes, route)
+		} else {
+			publicRoutes = append(publicRoutes, route)
+		}
 	}
+
+	// Public routes
+	r.Group(func(r chi.Router) {
+		for _, route := range publicRoutes {
+			r.Handle(route.Pattern(), route)
+		}
+	})
+
+	// Private routes
+	r.Group(func(r chi.Router) {
+		r.Use(jwtMiddleware(params.Logger))
+
+		for _, route := range privateRoutes {
+			r.Handle(route.Pattern(), route)
+		}
+	})
 
 	return r
 }
