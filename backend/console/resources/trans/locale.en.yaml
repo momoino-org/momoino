@@ -4,6 +4,8 @@ S-0000: Success
 # Error messages
 E-0000: Invalid email or password
 E-0001: Cannot decode the request body, please re-check the request body
+E-0002: You must be authenticated to use this feature
+E-0003: We couldn't process your login. Please log out and try logging in again. If the issue continues, please contact the system administrator for help
 
 # Unknown messages (for internal server errors)
 U-0000: An error has occurred. Please try again. If the problem continues, kindly reach out to the system administrator for support

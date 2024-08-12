@@ -19,6 +19,10 @@ func (handler *swaggerUIHandler) Pattern() string {
 	return "GET /swagger"
 }
 
+func (handler *swaggerUIHandler) IsPrivateRoute() bool {
+	return false
+}
+
 func (handler *swaggerUIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	render.HTML(w, r, `<!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>

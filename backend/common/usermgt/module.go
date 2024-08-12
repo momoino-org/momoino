@@ -12,6 +12,7 @@ func NewUserMgtModule() fx.Option {
 		fx.Provide(
 			fx.Annotate(NewUserRepository, fx.As(new(UserRepository))),
 			core.AsRoute(NewLoginHandler),
+			core.AsRoute(NewProfileHandler),
 		),
 	)
 }

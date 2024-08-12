@@ -11,16 +11,40 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Login_RequestBody'
+              $ref: "#/components/schemas/Login_RequestBody"
       responses:
-        '200':
+        "200":
           description: Login successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Login_200'
+                $ref: "#/components/schemas/Login_200"
+
+  /api/v1/profile:
+    get:
+      security:
+        - jwt: []
+      responses:
+        "200":
+          description: Get user profile successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile_200"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
 
 components:
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Response:
       type: object
@@ -44,7 +68,7 @@ components:
 
     Login_200:
       allOf:
-        - $ref: '#/components/schemas/Response'
+        - $ref: "#/components/schemas/Response"
         - type: object
           properties:
             data:
@@ -54,3 +78,30 @@ components:
                   type: string
                 refreshToken:
                   type: string
+
+    Profile_200:
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                username:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                createdAt:
+                  type: string
+                  format: date-time
+                updatedAt:
+                  type: string
+                  format: date-time

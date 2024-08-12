@@ -27,6 +27,10 @@ func (handler *createFileSystemHandler) Pattern() string {
 	return "GET /static/*"
 }
 
+func (handler *createFileSystemHandler) IsPrivateRoute() bool {
+	return false
+}
+
 func (handler *createFileSystemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fSys, _ := fs.Sub(handler.staticFiles, "static")
 	rctx := chi.RouteContext(r.Context())

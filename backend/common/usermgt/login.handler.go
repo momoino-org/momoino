@@ -45,6 +45,12 @@ type LoginResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
+type JWTCustomClaims struct {
+	jwt.RegisteredClaims
+	Roles       []string `json:"roles"`
+	Permissions []string `json:"permissions"`
+}
+
 func NewLoginHandler(params LoginHandlerParams) *loginHandler {
 	handler := loginHandler{
 		config:         params.Config,
@@ -73,6 +79,10 @@ func NewLoginHandler(params LoginHandlerParams) *loginHandler {
 
 func (h *loginHandler) Pattern() string {
 	return "POST /api/v1/login"
+}
+
+func (h *loginHandler) IsPrivateRoute() bool {
+	return false
 }
 
 func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -122,10 +132,15 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"sub":       loggedUser.ID,
-		"exp":       now.Add(time.Duration(h.jwtConfig.AccessTokenExpiresIn)).Unix(),
-		"auth_time": now.Unix(),
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, JWTCustomClaims{
+		Roles:       []string{},
+		Permissions: []string{},
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   loggedUser.ID.String(),
+			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(h.jwtConfig.AccessTokenExpiresIn))),
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+		},
 	})
 
 	tokenString, err := token.SignedString(h.jwtPrivateKey)
@@ -137,10 +152,11 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	refreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
-		"sub":       loggedUser.ID,
-		"exp":       now.Add(time.Duration(h.jwtConfig.RefreshTokenExpiresIn)).Unix(),
-		"auth_time": now.Unix(),
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.RegisteredClaims{
+		Subject:   loggedUser.ID.String(),
+		ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(h.jwtConfig.AccessTokenExpiresIn))),
+		IssuedAt:  jwt.NewNumericDate(now),
+		NotBefore: jwt.NewNumericDate(now),
 	})
 
 	refreshTokenString, err := refreshToken.SignedString(h.jwtPrivateKey)
