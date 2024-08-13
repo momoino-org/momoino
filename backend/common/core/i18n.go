@@ -23,12 +23,14 @@ type I18nBundleParams struct {
 const localizerCtxID LocalizerCtxKey = "LocalizerCtxID"
 
 const (
-	MsgSuccess                   = "S-0000"
-	MsgInvalidEmailOrPassword    = "E-0000"
-	MsgFailedToDecodeRequestBody = "E-0001"
-	MsgNeedToLogin               = "E-0002"
-	MsgCannotProcessYourLogin    = "E-0003"
-	MsgInternalServerError       = "U-0000"
+	MsgSuccess                              = "S-0000"
+	MsgInvalidEmailOrPassword               = "E-0000"
+	MsgFailedToDecodeRequestBody            = "E-0001"
+	MsgNeedToLogin                          = "E-0002"
+	MsgCannotProcessYourLogin               = "E-0003"
+	MsgPasswordChangeErrorDueToUserNotFound = "E-0004"
+	MsgValidationFailed                     = "E-0005"
+	MsgInternalServerError                  = "U-0000"
 )
 
 func GetLocalizer(r *http.Request) *i18n.Localizer {

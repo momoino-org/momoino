@@ -19,10 +19,8 @@ func WithAuthUser(r *http.Request, user *AuthUser) *http.Request {
 	return r.WithContext(context.WithValue(r.Context(), authUserCtxID, user))
 }
 
-func GetAuthUser(r *http.Request) *AuthUser {
-	if authUser, ok := r.Context().Value(authUserCtxID).(*AuthUser); ok {
-		return authUser
-	}
+func GetAuthUserFromRequest(r *http.Request) (*AuthUser, bool) {
+	authUser, ok := r.Context().Value(authUserCtxID).(*AuthUser)
 
-	return nil
+	return authUser, ok
 }

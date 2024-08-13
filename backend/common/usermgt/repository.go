@@ -2,7 +2,9 @@ package usermgt
 
 import (
 	"context"
+	"wano-island/common/core"
 
+	"github.com/google/uuid"
 	"go.uber.org/fx"
 	"gorm.io/gorm"
 )
@@ -10,6 +12,7 @@ import (
 type UserRepository interface {
 	FindUserByID(ctx context.Context, db *gorm.DB, userID string) (*UserModel, error)
 	FindUserByEmail(ctx context.Context, db *gorm.DB, email string) (*UserModel, error)
+	ChangePassword(ctx context.Context, db *gorm.DB, userID string, password string) (*UserModel, error)
 }
 
 type userRepository struct{}
@@ -42,4 +45,24 @@ func (u userRepository) FindUserByEmail(ctx context.Context, db *gorm.DB, email 
 	}
 
 	return &user, nil
+}
+
+func (u userRepository) ChangePassword(
+	ctx context.Context,
+	db *gorm.DB,
+	userID string,
+	password string,
+) (*UserModel, error) {
+	user := &UserModel{
+		Model: core.Model{
+			ID: uuid.MustParse(userID),
+		},
+	}
+
+	result := db.Model(&user).Update("password", password)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user, nil
 }
