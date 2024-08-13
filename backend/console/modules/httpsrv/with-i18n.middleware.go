@@ -12,9 +12,14 @@ import (
 func withI18nMiddleware(bundle *i18n.Bundle) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			lang := r.FormValue("lang")
-			acceptLanguages := r.Header.Get("Accept-Language")
-			localizer := i18n.NewLocalizer(bundle, lang, acceptLanguages)
+			authUser := core.GetAuthUserFromRequest(r)
+			lang := r.URL.Query().Get("lang")
+
+			if lang != "" && authUser.Locale != lang {
+				authUser.Locale = lang
+			}
+
+			localizer := i18n.NewLocalizer(bundle, lang, authUser.Locale)
 
 			next.ServeHTTP(w, core.WithLocalizer(r, localizer))
 		})

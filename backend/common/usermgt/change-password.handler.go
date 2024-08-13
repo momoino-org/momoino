@@ -8,6 +8,7 @@ import (
 	"log/slog"
 
 	"github.com/go-chi/render"
+	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/fx"
 	"golang.org/x/crypto/bcrypt"
@@ -15,25 +16,40 @@ import (
 )
 
 type changePasswordHandler struct {
+	db                  *gorm.DB
 	logger              *slog.Logger
+	validator           *validator.Validate
+	universalTranslator *ut.UniversalTranslator
+	userService         UserService
+	userRepository      UserRepository
 }
 
 type ChangePasswordHandlerParams struct {
 	fx.In
+	DB                  *gorm.DB
 	Logger              *slog.Logger
+	Validator           *validator.Validate
+	UniversalTranslator *ut.UniversalTranslator
+	UserService         UserService
+	UserRepository      UserRepository
 }
 
 type ChangePasswordRequest struct {
 	CurrentPassword    string `json:"currentPassword" validate:"required"`
 	NewPassword        string `json:"newPassword" validate:"required"`
-	ConfirmNewPassword string `json:"confirmNewPassword" validate:"required,eqfield=NewPassword"`
+	ConfirmNewPassword string `json:"confirmNewPassword" validate:"required,eqfield=newPassword"`
 }
 
 var _ core.HTTPRoute = (*changePasswordHandler)(nil)
 
 func NewChangePasswordHandler(params ChangePasswordHandlerParams) *changePasswordHandler {
 	return &changePasswordHandler{
+		db:                  params.DB,
 		logger:              params.Logger,
+		validator:           params.Validator,
+		universalTranslator: params.UniversalTranslator,
+		userService:         params.UserService,
+		userRepository:      params.UserRepository,
 	}
 }
 
@@ -56,18 +72,14 @@ func (h *changePasswordHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	authUser, ok := core.GetAuthUserFromRequest(r)
-	if !ok {
-		logger.ErrorContext(r.Context(), "Cannot get auth user from the request context")
-		render.Status(r, http.StatusInternalServerError)
-		render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
-
-		return
-	}
+	authUser := core.GetAuthUserFromRequest(r)
 
 	if err := h.validator.Struct(request); err != nil {
 		render.Status(r, http.StatusBadRequest)
-		render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgValidationFailed).Build())
+		render.JSON(w, r, core.NewResponseBuilder(r).
+			MessageID(core.MsgValidationFailed).
+			Data(core.TranslateValidationErrors(r, h.universalTranslator, err)).
+			Build())
 
 		return
 	}
@@ -97,7 +109,7 @@ func (h *changePasswordHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			render.Status(r, http.StatusBadRequest)
-			render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInvalidEmailOrPassword).Build())
+			render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInvalidCurrentPassword).Build())
 
 			return
 		}

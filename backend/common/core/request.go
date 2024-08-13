@@ -1,7 +1,6 @@
 package core
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gorilla/schema"
@@ -10,18 +9,11 @@ import (
 
 type requestIDCtxKey string
 
+const RequestIDHeader = "X-Request-Id"
 const RequestIDKey requestIDCtxKey = "RequestIDKey"
 
-func GetRequestIDInContext(ctx context.Context) string {
-	if requestID, ok := ctx.Value(RequestIDKey).(string); ok {
-		return requestID
-	}
-
-	return ""
-}
-
 func GetRequestID(r *http.Request) string {
-	return GetRequestIDInContext(r.Context())
+	return r.Header.Get(RequestIDHeader)
 }
 
 func NewRequestModule() fx.Option {
