@@ -13,14 +13,14 @@ import (
 )
 
 type profileHandler struct {
-	logger         core.Logger
+	logger         *slog.Logger
 	db             *gorm.DB
 	userRepository UserRepository
 }
 
 type ProfileHandlerParams struct {
 	fx.In
-	Logger         core.Logger
+	Logger         *slog.Logger
 	DB             *gorm.DB
 	UserRepository UserRepository
 }
@@ -39,6 +39,7 @@ var _ core.HTTPRoute = (*profileHandler)(nil)
 
 func NewProfileHandler(params ProfileHandlerParams) *profileHandler {
 	return &profileHandler{
+		logger:         params.Logger,
 		db:             params.DB,
 		userRepository: params.UserRepository,
 	}
@@ -58,7 +59,7 @@ func (h *profileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	authUser, ok := core.GetAuthUserFromRequest(r)
 	if !ok {
-		h.logger.ErrorContext(r.Context(), "Cannot get auth user from the request context")
+		logger.ErrorContext(r.Context(), "Cannot get auth user from the request context")
 		render.Status(r, http.StatusInternalServerError)
 		render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
 

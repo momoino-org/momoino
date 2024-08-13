@@ -5,119 +5,84 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"go.uber.org/fx"
 )
 
-type Logger interface {
-	Handler() slog.Handler
-	// Debug(msg string, args ...any)
-	// DebugContext(ctx context.Context, msg string, args ...any)
-	Info(msg string, args ...any)
-	InfoContext(ctx context.Context, msg string, args ...any)
-	// Warn(msg string, args ...any)
-	// WarnContext(ctx context.Context, msg string, args ...any)
-	Error(msg string, args ...any)
-	ErrorContext(ctx context.Context, msg string, args ...any)
-	Unwrap() *slog.Logger
-	Replace(logger *slog.Logger)
-	Log(ctx context.Context, level slog.Level, msg string, args ...any)
+type slogFieldsCtxKey int
+
+type contextHandler struct {
+	slog.Handler
 }
 
-type LoggerConfig struct {
-	RequestHeaderID string
-}
+const slogFieldsCtxID slogFieldsCtxKey = 0
 
-type logger struct {
-	slog *slog.Logger
-	cfg  *LoggerConfig
-}
-
-var _ Logger = (*logger)(nil)
-
-func (l *logger) Unwrap() *slog.Logger {
-	return l.slog
-}
-
-func (l *logger) Handler() slog.Handler {
-	return l.slog.Handler()
-}
-
-func (l *logger) Replace(slogInstance *slog.Logger) {
-	l.slog = slogInstance
-}
-
-func (l *logger) Log(ctx context.Context, level slog.Level, msg string, args ...any) {
-	//nolint:sloglint // Should accept kv-only and attr-only.
-	l.slog.Log(ctx, level, msg, args...)
-}
-
-func (l *logger) Info(msg string, args ...any) {
-	//nolint:sloglint // Should accept kv-only and attr-only.
-	l.slog.Info(msg, args...)
-}
-
-func (l *logger) InfoContext(ctx context.Context, msg string, args ...any) {
-	if l.cfg != nil {
-		if requestID := GetRequestIDInContext(ctx); requestID != "" {
-			args = append([]any{
-				slog.String("request-id", requestID),
-			}, args...)
+// Handle adds contextual attributes to the Record before calling the underlying.
+func (h contextHandler) Handle(ctx context.Context, r slog.Record) error {
+	if attrs, ok := ctx.Value(slogFieldsCtxID).([]slog.Attr); ok {
+		for _, v := range attrs {
+			r.AddAttrs(v)
 		}
 	}
 
-	//nolint:sloglint // Should accept kv-only and attr-only.
-	l.slog.InfoContext(ctx, msg, args...)
+	return h.Handler.Handle(ctx, r)
 }
 
-func (l *logger) Error(msg string, args ...any) {
-	//nolint:sloglint // Should accept kv-only and attr-only.
-	l.slog.Error(msg, args...)
-}
-
-func (l *logger) ErrorContext(ctx context.Context, msg string, args ...any) {
-	if l.cfg != nil {
-		if requestID := GetRequestIDInContext(ctx); requestID != "" {
-			args = append([]any{
-				slog.String("request-id", requestID),
-			}, args...)
-		}
+// WithLogAttr adds an slog attribute to the provided context so that it will be
+// included in any Record created with such context.
+func WithLogAttr(parent context.Context, attr slog.Attr) context.Context {
+	if parent == nil {
+		parent = context.Background()
 	}
 
-	//nolint:sloglint // Should accept kv-only and attr-only.
-	l.slog.ErrorContext(ctx, msg, args...)
+	if v, ok := parent.Value(slogFieldsCtxID).([]slog.Attr); ok {
+		v = append(v, attr)
+		return context.WithValue(parent, slogFieldsCtxID, v)
+	}
+
+	v := []slog.Attr{}
+	v = append(v, attr)
+
+	return context.WithValue(parent, slogFieldsCtxID, v)
 }
 
 // newLogger creates a new slog logger with the specified writer and handler options.
 // It uses the slog.NewJSONHandler to format log messages as JSON.
 func newLogger(writer io.Writer, cfg *slog.HandlerOptions) *slog.Logger {
-	return slog.New(slog.NewJSONHandler(writer, cfg))
+	return slog.New(&contextHandler{slog.NewJSONHandler(writer, cfg)})
 }
 
 // NewNoopLogger returns a logger that discards all log messages.
 // It can be used for testing or when no logging is required.
-func NewNoopLogger() *logger {
-	return &logger{
-		slog: newLogger(io.Discard, nil),
-	}
+func NewNoopLogger() *slog.Logger {
+	return newLogger(io.Discard, nil)
 }
 
 // NewStdoutLogger returns a logger that writes log messages to the standard output (os.Stdout).
-// The logger includes source information and has a debug log level by default.
-func NewStdoutLogger(loggerCfg *LoggerConfig) *logger {
-	return &logger{
-		cfg:  loggerCfg,
-		slog: newLogger(os.Stdout, nil),
-	}
+func NewStdoutLogger() *slog.Logger {
+	return newLogger(os.Stdout, &slog.HandlerOptions{
+		AddSource: true,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			if a.Key == slog.SourceKey {
+				source, _ := a.Value.Any().(*slog.Source)
+				a.Value = slog.AnyValue(slog.Source{
+					Function: source.Function,
+					File:     filepath.Base(source.File),
+					Line:     source.Line,
+				})
+			}
+
+			return a
+		},
+	})
 }
 
 // NewLoggerModuleWithConfig is an fx.Option that provides a new stdout logger for the application.
 // It uses the slog library for structured logging and provides a module for dependency injection.
-func NewLoggerModuleWithConfig(loggerCfg *LoggerConfig) fx.Option {
+func NewLoggerModuleWithConfig() fx.Option {
 	return fx.Module(
 		"Logger Module",
-		fx.Provide(func() Logger {
-			return NewStdoutLogger(loggerCfg)
-		}),
+		fx.Provide(NewStdoutLogger),
 	)
 }

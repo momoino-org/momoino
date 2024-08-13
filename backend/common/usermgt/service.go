@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"wano-island/common/core"
 
 	"go.uber.org/fx"
 	"golang.org/x/crypto/bcrypt"
@@ -16,12 +15,12 @@ type UserService interface {
 }
 
 type userService struct {
-	logger core.Logger
+	logger *slog.Logger
 }
 
 type UserServiceParams struct {
 	fx.In
-	Logger core.Logger
+	Logger *slog.Logger
 }
 
 func NewUserService(params UserServiceParams) *userService {

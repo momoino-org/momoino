@@ -15,20 +15,12 @@ import (
 )
 
 type changePasswordHandler struct {
-	db             *gorm.DB
-	validator      *validator.Validate
-	logger         core.Logger
-	userService    UserService
-	userRepository UserRepository
+	logger              *slog.Logger
 }
 
 type ChangePasswordHandlerParams struct {
 	fx.In
-	DB             *gorm.DB
-	Validator      *validator.Validate
-	Logger         core.Logger
-	UserService    UserService
-	UserRepository UserRepository
+	Logger              *slog.Logger
 }
 
 type ChangePasswordRequest struct {
@@ -41,11 +33,7 @@ var _ core.HTTPRoute = (*changePasswordHandler)(nil)
 
 func NewChangePasswordHandler(params ChangePasswordHandlerParams) *changePasswordHandler {
 	return &changePasswordHandler{
-		db:             params.DB,
-		validator:      params.Validator,
-		logger:         params.Logger,
-		userService:    params.UserService,
-		userRepository: params.UserRepository,
+		logger:              params.Logger,
 	}
 }
 
@@ -61,6 +49,7 @@ func (h *changePasswordHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	var request ChangePasswordRequest
 
 	if err := render.DecodeJSON(r.Body, &request); err != nil {
+		h.logger.ErrorContext(r.Context(), "Cannot decode the request body", slog.Any("details", err))
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgFailedToDecodeRequestBody).Build())
 
@@ -69,7 +58,7 @@ func (h *changePasswordHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 
 	authUser, ok := core.GetAuthUserFromRequest(r)
 	if !ok {
-		h.logger.ErrorContext(r.Context(), "Cannot get auth user from the request context")
+		logger.ErrorContext(r.Context(), "Cannot get auth user from the request context")
 		render.Status(r, http.StatusInternalServerError)
 		render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
 

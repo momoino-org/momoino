@@ -1,7 +1,7 @@
 package versions
 
 import (
-	"wano-island/common/core"
+	"log/slog"
 	"wano-island/common/usermgt"
 	migrationCore "wano-island/migration/core"
 	"wano-island/migration/versions/initialization"
@@ -13,13 +13,13 @@ import (
 // initializationMigration is a struct that implements the Migration interface from the core package.
 // It is responsible for initializing the database schema.
 type initializationMigration struct {
-	logger core.Logger
+	logger *slog.Logger
 }
 
 var _ migrationCore.Migration = (*initializationMigration)(nil)
 
 // NewInitializationMigration returns a new instance of initMigration.
-func NewInitializationMigration(logger core.Logger) *initializationMigration {
+func NewInitializationMigration(logger *slog.Logger) *initializationMigration {
 	return &initializationMigration{
 		logger: logger,
 	}

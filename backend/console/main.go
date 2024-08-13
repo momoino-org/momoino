@@ -10,7 +10,6 @@ import (
 	"wano-island/console/modules/httpsrv"
 	"wano-island/console/modules/swagger"
 
-	"github.com/go-chi/chi/v5/middleware"
 	"go.uber.org/fx"
 )
 
@@ -28,9 +27,7 @@ func main() {
 		core.NewI18nModule(resourceFS),
 		core.NewValidationModule(),
 		core.NewConfigModule(),
-		core.NewLoggerModuleWithConfig(&core.LoggerConfig{
-			RequestHeaderID: middleware.RequestIDHeader,
-		}),
+		core.NewLoggerModuleWithConfig(),
 		core.NewRequestModule(),
 		core.NewDatabaseModule(),
 		usermgt.NewUserMgtModule(),

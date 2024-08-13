@@ -15,12 +15,12 @@ import (
 func main() {
 	fx.New(
 		core.NewConfigModule(),
-		core.NewLoggerModuleWithConfig(nil),
+		core.NewLoggerModuleWithConfig(),
 		core.NewDatabaseModule(),
 		versions.NewDBMigrationModule(),
 		fx.Invoke(func(
 			appLifeCycle fx.Lifecycle,
-			logger core.Logger,
+			logger *slog.Logger,
 			shutdowner fx.Shutdowner,
 			dbMigration *versions.DBMigration,
 			config core.AppConfig,
