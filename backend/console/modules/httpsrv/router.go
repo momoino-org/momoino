@@ -26,30 +26,6 @@ type routeParams struct {
 func newRouter(params routeParams) http.Handler {
 	r := chi.NewRouter()
 
-	r.Use(
-		middleware.CleanPath,
-		withRequestIDMiddleware,
-		withI18nMiddleware(params.I18nBundle),
-		withRequestLoggerMiddleware(&HTTPLoggerConfig{
-			IgnoredPaths: []string{
-				"/swagger",
-				"/static",
-			},
-			Tags: map[string]string{
-				"version": params.Config.GetAppVersion(),
-				"mode":    params.Config.GetMode(),
-				"rev":     params.Config.GetRevision(),
-			},
-		}),
-		//nolint:mnd // I don't think we need to named this number here
-		middleware.Compress(5),
-		withRecoverMiddleware(func(w http.ResponseWriter, r *http.Request) {
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
-		}),
-		middleware.Timeout(time.Minute),
-	)
-
 	publicRoutes := []core.HTTPRoute{}
 	privateRoutes := []core.HTTPRoute{}
 
@@ -63,6 +39,30 @@ func newRouter(params routeParams) http.Handler {
 
 	// Public routes
 	r.Group(func(r chi.Router) {
+		r.Use(
+			middleware.CleanPath,
+			withRequestIDMiddleware,
+			withI18nMiddleware(params.I18nBundle),
+			withRequestLoggerMiddleware(&HTTPLoggerConfig{
+				IgnoredPaths: []string{
+					"/swagger",
+					"/static",
+				},
+				Tags: map[string]string{
+					"version": params.Config.GetAppVersion(),
+					"mode":    params.Config.GetMode(),
+					"rev":     params.Config.GetRevision(),
+				},
+			}),
+			//nolint:mnd // I don't think we need to named this number here
+			middleware.Compress(5),
+			withRecoverMiddleware(func(w http.ResponseWriter, r *http.Request) {
+				render.Status(r, http.StatusInternalServerError)
+				render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
+			}),
+			middleware.Timeout(time.Minute),
+		)
+
 		for _, route := range publicRoutes {
 			r.Handle(route.Pattern(), route)
 		}
@@ -70,7 +70,30 @@ func newRouter(params routeParams) http.Handler {
 
 	// Private routes
 	r.Group(func(r chi.Router) {
-		r.Use(withJwtMiddleware(params.Logger))
+		r.Use(
+			middleware.CleanPath,
+			withRequestIDMiddleware,
+			withJwtMiddleware(params.Logger),
+			withI18nMiddleware(params.I18nBundle),
+			withRequestLoggerMiddleware(&HTTPLoggerConfig{
+				IgnoredPaths: []string{
+					"/swagger",
+					"/static",
+				},
+				Tags: map[string]string{
+					"version": params.Config.GetAppVersion(),
+					"mode":    params.Config.GetMode(),
+					"rev":     params.Config.GetRevision(),
+				},
+			}),
+			//nolint:mnd // I don't think we need to named this number here
+			middleware.Compress(5),
+			withRecoverMiddleware(func(w http.ResponseWriter, r *http.Request) {
+				render.Status(r, http.StatusInternalServerError)
+				render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
+			}),
+			middleware.Timeout(time.Minute),
+		)
 
 		for _, route := range privateRoutes {
 			r.Handle(route.Pattern(), route)

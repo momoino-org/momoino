@@ -57,14 +57,7 @@ func (h *profileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	responseBuilder := core.NewResponseBuilder(r)
 
-	authUser, ok := core.GetAuthUserFromRequest(r)
-	if !ok {
-		logger.ErrorContext(r.Context(), "Cannot get auth user from the request context")
-		render.Status(r, http.StatusInternalServerError)
-		render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
-
-		return
-	}
+	authUser := core.GetAuthUserFromRequest(r)
 
 	user, err := h.userRepository.FindUserByID(ctx, h.db, authUser.ID)
 

@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/render"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/samber/lo"
+	"golang.org/x/text/language"
 )
 
 // convertInterfaceSliceToStringSlice converts a slice of interface{} to a slice of string.
@@ -35,7 +36,9 @@ func convertInterfaceSliceToStringSlice(data []interface{}) ([]string, error) {
 // It extracts the user ID, roles, and permissions from the claims and constructs an AuthUser object.
 // If any required claim is missing or cannot be converted to the expected type, an error is returned.
 func toAuthUser(mapClaims jwt.MapClaims) (*core.AuthUser, error) {
-	authUser := core.AuthUser{}
+	authUser := core.AuthUser{
+		Locale: language.English.String(),
+	}
 
 	userID, err := mapClaims.GetSubject()
 	if err != nil {

@@ -30,6 +30,7 @@ func main() {
 		core.NewLoggerModuleWithConfig(),
 		core.NewRequestModule(),
 		core.NewDatabaseModule(),
+        core.NewTranslationModule(),
 		usermgt.NewUserMgtModule(),
 
 		// Console
