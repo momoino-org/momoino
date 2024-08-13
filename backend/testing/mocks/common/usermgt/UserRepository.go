@@ -25,6 +25,67 @@ func (_m *MockUserRepository) EXPECT() *MockUserRepository_Expecter {
 	return &MockUserRepository_Expecter{mock: &_m.Mock}
 }
 
+// ChangePassword provides a mock function with given fields: ctx, db, userID, password
+func (_m *MockUserRepository) ChangePassword(ctx context.Context, db *gorm.DB, userID string, password string) (*usermgt.UserModel, error) {
+	ret := _m.Called(ctx, db, userID, password)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ChangePassword")
+	}
+
+	var r0 *usermgt.UserModel
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *gorm.DB, string, string) (*usermgt.UserModel, error)); ok {
+		return rf(ctx, db, userID, password)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *gorm.DB, string, string) *usermgt.UserModel); ok {
+		r0 = rf(ctx, db, userID, password)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*usermgt.UserModel)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *gorm.DB, string, string) error); ok {
+		r1 = rf(ctx, db, userID, password)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// MockUserRepository_ChangePassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ChangePassword'
+type MockUserRepository_ChangePassword_Call struct {
+	*mock.Call
+}
+
+// ChangePassword is a helper method to define mock.On call
+//   - ctx context.Context
+//   - db *gorm.DB
+//   - userID string
+//   - password string
+func (_e *MockUserRepository_Expecter) ChangePassword(ctx interface{}, db interface{}, userID interface{}, password interface{}) *MockUserRepository_ChangePassword_Call {
+	return &MockUserRepository_ChangePassword_Call{Call: _e.mock.On("ChangePassword", ctx, db, userID, password)}
+}
+
+func (_c *MockUserRepository_ChangePassword_Call) Run(run func(ctx context.Context, db *gorm.DB, userID string, password string)) *MockUserRepository_ChangePassword_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*gorm.DB), args[2].(string), args[3].(string))
+	})
+	return _c
+}
+
+func (_c *MockUserRepository_ChangePassword_Call) Return(_a0 *usermgt.UserModel, _a1 error) *MockUserRepository_ChangePassword_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *MockUserRepository_ChangePassword_Call) RunAndReturn(run func(context.Context, *gorm.DB, string, string) (*usermgt.UserModel, error)) *MockUserRepository_ChangePassword_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // FindUserByEmail provides a mock function with given fields: ctx, db, email
 func (_m *MockUserRepository) FindUserByEmail(ctx context.Context, db *gorm.DB, email string) (*usermgt.UserModel, error) {
 	ret := _m.Called(ctx, db, email)

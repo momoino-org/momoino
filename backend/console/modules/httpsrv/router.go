@@ -1,6 +1,7 @@
 package httpsrv
 
 import (
+	"log/slog"
 	"net/http"
 	"time"
 	"wano-island/common/core"
@@ -16,7 +17,7 @@ type routeParams struct {
 	fx.In
 
 	Config     core.AppConfig
-	Logger     core.Logger
+	Logger     *slog.Logger
 	Routes     []core.HTTPRoute `group:"http_routes"`
 	I18nBundle *i18n.Bundle
 }
@@ -27,9 +28,9 @@ func newRouter(params routeParams) http.Handler {
 
 	r.Use(
 		middleware.CleanPath,
-		requestID,
-		i18nMiddleware(params.I18nBundle),
-		requestLogger(&HTTPLoggerConfig{
+		withRequestIDMiddleware,
+		withI18nMiddleware(params.I18nBundle),
+		withRequestLoggerMiddleware(&HTTPLoggerConfig{
 			IgnoredPaths: []string{
 				"/swagger",
 				"/static",
@@ -42,7 +43,7 @@ func newRouter(params routeParams) http.Handler {
 		}),
 		//nolint:mnd // I don't think we need to named this number here
 		middleware.Compress(5),
-		httpRecover(func(w http.ResponseWriter, r *http.Request) {
+		withRecoverMiddleware(func(w http.ResponseWriter, r *http.Request) {
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
 		}),
@@ -69,7 +70,7 @@ func newRouter(params routeParams) http.Handler {
 
 	// Private routes
 	r.Group(func(r chi.Router) {
-		r.Use(jwtMiddleware(params.Logger))
+		r.Use(withJwtMiddleware(params.Logger))
 
 		for _, route := range privateRoutes {
 			r.Handle(route.Pattern(), route)

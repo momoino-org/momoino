@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"wano-island/common/core"
 
 	"go.uber.org/fx"
 )
@@ -15,7 +14,7 @@ import (
 func newHTTPServer(
 	appLifeCycle fx.Lifecycle,
 	httpHandler http.Handler,
-	logger core.Logger,
+	logger *slog.Logger,
 ) *http.Server {
 	const readHeaderTimeout = 5 * time.Second
 

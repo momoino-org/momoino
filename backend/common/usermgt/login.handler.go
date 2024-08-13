@@ -18,7 +18,7 @@ import (
 
 type loginHandler struct {
 	config         core.AppConfig
-	logger         core.Logger
+	logger         *slog.Logger
 	db             *gorm.DB
 	userService    UserService
 	userRepository UserRepository
@@ -30,8 +30,8 @@ type LoginHandlerParams struct {
 	fx.In
 
 	AppLifeCycle   fx.Lifecycle
+	Logger         *slog.Logger
 	Config         core.AppConfig
-	Logger         core.Logger
 	DB             *gorm.DB
 	UserService    UserService
 	UserRepository UserRepository

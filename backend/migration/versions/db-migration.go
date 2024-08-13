@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"wano-island/common/core"
 	migrationCore "wano-island/migration/core"
@@ -19,14 +20,14 @@ import (
 type DBMigration struct {
 	config core.AppConfig
 	db     *gorm.DB
-	logger core.Logger
+	logger *slog.Logger
 }
 
 // newDBMigration creates a new instance of dbMigration.
 func NewDBMigration(
 	config core.AppConfig,
 	db *gorm.DB,
-	logger core.Logger,
+	logger *slog.Logger,
 ) *DBMigration {
 	return &DBMigration{
 		config: config,

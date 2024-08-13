@@ -41,15 +41,17 @@ var _ = Describe("Login Handler", func() {
 		config = mockcore.NewMockAppConfig(GinkgoT())
 		config.EXPECT().GetJWTConfig().Return(generateJWTConfig())
 		userRepository = usermgt.NewUserRepository(usermgt.UserRepositoryParams{})
+		userService := usermgt.NewUserService(usermgt.UserServiceParams{})
 		localizer = i18n.NewLocalizer(core.NewI18nBundle(core.I18nBundleParams{
 			AppLifeCycle: appLifeCycle,
 			LocaleFS:     internal.GetResourceFS(),
 		}), language.English.String())
 		handler = usermgt.NewLoginHandler(usermgt.LoginHandlerParams{
 			AppLifeCycle:   appLifeCycle,
+			Logger:         core.NewNoopLogger(),
 			Config:         config,
-			Logger:         core.NewStdoutLogger(nil),
 			DB:             db,
+			UserService:    userService,
 			UserRepository: userRepository,
 		})
 

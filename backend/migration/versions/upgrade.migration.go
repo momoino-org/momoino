@@ -1,7 +1,7 @@
 package versions
 
 import (
-	"wano-island/common/core"
+	"log/slog"
 	migrationCore "wano-island/migration/core"
 
 	"gorm.io/gorm"
@@ -10,13 +10,13 @@ import (
 // upgradeMigration is a struct that implements the core.Migration interface.
 // It is responsible for performing database migrations related to upgrading the system.
 type upgradeMigration struct {
-	logger core.Logger
+	logger *slog.Logger
 }
 
 var _ migrationCore.Migration = (*upgradeMigration)(nil)
 
 // NewUpgradeMigration creates a new instance of upgradeMigration.
-func NewUpgradeMigration(logger core.Logger) *upgradeMigration {
+func NewUpgradeMigration(logger *slog.Logger) *upgradeMigration {
 	return &upgradeMigration{
 		logger: logger,
 	}

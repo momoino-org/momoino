@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/avast/retry-go/v4"
@@ -47,7 +48,7 @@ func (u *Model) BeforeCreate(tx *gorm.DB) error {
 
 // OpenDatabase establishes a connection to a PostgreSQL database using GORM.
 func OpenDatabase(
-	logger Logger,
+	logger *slog.Logger,
 	cfg postgres.Config,
 ) (*gorm.DB, error) {
 	return gorm.Open(postgres.New(cfg), &gorm.Config{
@@ -62,7 +63,7 @@ func OpenDatabase(
 // newGormDatabase initializes a new GORM database connection with retry mechanism.
 // It also sets up lifecycle hooks for starting and stopping the database connection.
 func newGormDatabase(
-	logger Logger,
+	logger *slog.Logger,
 	config AppConfig,
 	appLifeCycle fx.Lifecycle,
 ) *gorm.DB {
