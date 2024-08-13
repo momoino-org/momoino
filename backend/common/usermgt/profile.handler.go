@@ -54,8 +54,16 @@ func (h *profileHandler) IsPrivateRoute() bool {
 
 func (h *profileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	authUser := core.GetAuthUser(r)
 	responseBuilder := core.NewResponseBuilder(r)
+
+	authUser, ok := core.GetAuthUserFromRequest(r)
+	if !ok {
+		h.logger.ErrorContext(r.Context(), "Cannot get auth user from the request context")
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
+
+		return
+	}
 
 	user, err := h.userRepository.FindUserByID(ctx, h.db, authUser.ID)
 

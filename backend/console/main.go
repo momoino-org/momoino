@@ -26,6 +26,7 @@ func main() {
 	app := fx.New(
 		// Common
 		core.NewI18nModule(resourceFS),
+		core.NewValidationModule(),
 		core.NewConfigModule(),
 		core.NewLoggerModuleWithConfig(&core.LoggerConfig{
 			RequestHeaderID: middleware.RequestIDHeader,

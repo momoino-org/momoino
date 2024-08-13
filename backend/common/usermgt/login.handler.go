@@ -20,6 +20,7 @@ type loginHandler struct {
 	config         core.AppConfig
 	logger         core.Logger
 	db             *gorm.DB
+	userService    UserService
 	userRepository UserRepository
 	jwtConfig      *core.JWTConfig
 	jwtPrivateKey  *rsa.PrivateKey
@@ -32,6 +33,7 @@ type LoginHandlerParams struct {
 	Config         core.AppConfig
 	Logger         core.Logger
 	DB             *gorm.DB
+	UserService    UserService
 	UserRepository UserRepository
 }
 
@@ -56,6 +58,7 @@ func NewLoginHandler(params LoginHandlerParams) *loginHandler {
 		config:         params.Config,
 		logger:         params.Logger,
 		db:             params.DB,
+		userService:    params.UserService,
 		userRepository: params.UserRepository,
 		jwtConfig:      params.Config.GetJWTConfig(),
 	}
@@ -90,7 +93,6 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	responseBuilder := core.NewResponseBuilder(r)
 
 	var requestBody LoginRequestBody
-
 	if err := render.DecodeJSON(r.Body, &requestBody); err != nil {
 		h.logger.ErrorContext(ctx, "Something went wrong when trying to decode request body", slog.Any("details", err))
 		render.Status(r, http.StatusBadRequest)
@@ -115,7 +117,11 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = bcrypt.CompareHashAndPassword([]byte(loggedUser.Password), []byte(requestBody.Password)); err != nil {
+	if err = h.userService.ComparePassword(
+		r.Context(),
+		[]byte(requestBody.Password),
+		[]byte(loggedUser.Password),
+	); err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			render.Status(r, http.StatusUnauthorized)
 			render.JSON(w, r, responseBuilder.MessageID(core.MsgInvalidEmailOrPassword).Build())
@@ -123,7 +129,6 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		h.logger.ErrorContext(ctx, "Something went wrong when comparing password", slog.Any("details", err))
 		render.Status(r, http.StatusInternalServerError)
 		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
 
