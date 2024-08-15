@@ -2,8 +2,6 @@ module wano-island/testing
 
 go 1.22.5
 
-replace github.com/orandin/slog-gorm => github.com/chucamphong/slog-gorm v0.0.0-20240810113846-c392509a877c
-
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/nicksnyder/go-i18n/v2 v2.4.0

@@ -2,8 +2,6 @@ module wano-island/common
 
 go 1.22.5
 
-replace github.com/orandin/slog-gorm => github.com/chucamphong/slog-gorm v0.0.0-20240810113846-c392509a877c
-
 require (
 	github.com/avast/retry-go/v4 v4.6.0
 	github.com/go-chi/render v1.0.3
@@ -14,7 +12,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/schema v1.4.1
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
-	github.com/orandin/slog-gorm v1.3.2
+	github.com/orandin/slog-gorm v1.4.0
 	github.com/spf13/viper v1.19.0
 	go.uber.org/fx v1.22.2
 	golang.org/x/crypto v0.26.0

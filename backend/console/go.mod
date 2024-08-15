@@ -4,8 +4,6 @@ go 1.22.5
 
 replace wano-island/common => ../common
 
-replace github.com/orandin/slog-gorm => github.com/chucamphong/slog-gorm v0.0.0-20240810113846-c392509a877c
-
 require (
 	github.com/go-chi/chi/v5 v5.1.0
 	github.com/go-chi/render v1.0.3
@@ -37,7 +35,7 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/orandin/slog-gorm v1.3.2 // indirect
+	github.com/orandin/slog-gorm v1.4.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
