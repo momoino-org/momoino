@@ -72,7 +72,7 @@ func (h *changePasswordHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	authUser := core.GetAuthUserFromRequest(r)
+	authUser := core.MustGetAuthUserFromRequest(r)
 
 	if err := h.validator.Struct(request); err != nil {
 		render.Status(r, http.StatusBadRequest)

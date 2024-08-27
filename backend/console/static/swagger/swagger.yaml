@@ -23,7 +23,7 @@ paths:
   /api/v1/profile:
     get:
       security:
-        - jwt: []
+        - accessToken: []
       responses:
         "200":
           description: Get user profile successfully
@@ -41,7 +41,7 @@ paths:
   /api/v1/profile/change-password:
     post:
       security:
-        - jwt: []
+        - accessToken: []
       requestBody:
         content:
           application/json:
@@ -76,10 +76,10 @@ paths:
 
 components:
   securitySchemes:
-    jwt:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    accessToken:
+      type: apiKey
+      name: X-Auth-Access-Token
+      in: header
 
   schemas:
     Response:
