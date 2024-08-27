@@ -5,6 +5,7 @@ import (
 	"wano-island/common/core"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"golang.org/x/text/language"
 )
 
 // withI18nMiddleware is a middleware function that adds internationalization support to an HTTP server.
@@ -12,14 +13,26 @@ import (
 func withI18nMiddleware(bundle *i18n.Bundle) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			authUser := core.GetAuthUserFromRequest(r)
+			languages := []string{}
 			lang := r.URL.Query().Get("lang")
 
-			if lang != "" && authUser.Locale != lang {
-				authUser.Locale = lang
+			// Give the highest priority for the language specified in the query parameters
+			if t, err := language.Parse(lang); err == nil {
+				languages = append(languages, t.String())
 			}
 
-			localizer := i18n.NewLocalizer(bundle, lang, authUser.Locale)
+			if authUser, err := core.GetAuthUserFromRequest(r); err == nil {
+				if t, err := language.Parse(authUser.Locale); err == nil {
+					languages = append(languages, t.String())
+				}
+			}
+
+			// If no language is specified, fall back to English
+			if len(languages) == 0 {
+				languages = append(languages, language.English.String())
+			}
+
+			localizer := i18n.NewLocalizer(bundle, languages...)
 
 			next.ServeHTTP(w, core.WithLocalizer(r, localizer))
 		})

@@ -57,7 +57,7 @@ func (h *profileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	responseBuilder := core.NewResponseBuilder(r)
 
-	authUser := core.GetAuthUserFromRequest(r)
+	authUser := core.MustGetAuthUserFromRequest(r)
 
 	user, err := h.userRepository.FindUserByID(ctx, h.db, authUser.ID)
 

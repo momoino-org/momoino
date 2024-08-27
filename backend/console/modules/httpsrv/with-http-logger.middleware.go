@@ -42,7 +42,10 @@ const loggerCtxID loggerCtxKey = 0
 // The method redacts sensitive headers (e.g., "Authorization") by replacing their values with "[REDACTED]".
 func (c customHeader) LogValue() slog.Value {
 	// Define a list of headers to be filtered out and redacted.
-	filteredHeaders := []string{"Authorization"}
+	filteredHeaders := []string{
+		"Authorization",
+		core.AuthorizationHeader,
+	}
 
 	// Convert the customHeader into a slice of slog.Attr, filtering out sensitive headers.
 	attrs := lo.MapToSlice(c, func(key string, value []string) slog.Attr {

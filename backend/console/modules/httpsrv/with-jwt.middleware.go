@@ -80,7 +80,7 @@ func withJwtMiddleware(logger *slog.Logger) func(next http.Handler) http.Handler
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Extract the access token from the request header.
-			accessToken := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+			accessToken := strings.TrimPrefix(r.Header.Get(core.AuthorizationHeader), "Bearer ")
 
 			// If the access token is missing, return an unauthorized response.
 			if accessToken == "" {
