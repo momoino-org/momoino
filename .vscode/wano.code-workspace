@@ -41,8 +41,9 @@
 				"request": "launch",
 				"mode": "auto",
 				"program": "${workspaceRoot}/backend/console",
-				"buildFlags": "-ldflags='-X wano-island/common/core.AppVersion=1.0.0 -X wano-island/common/core.CompatibleVersion= -X wano-island/common/core.AppMode=development -X wano-island/common/core.AppRevision=000000'",
+				"buildFlags": "-ldflags='-X wano-island/common/core.AppVersion=1.0.0 -X wano-island/common/core.CompatibleVersion= -X wano-island/common/core.AppRevision=000000'",
 				"env": {
+          "APP_MODE": "development",
 					"APP_DATABASE_HOST": "localhost",
 					"APP_DATABASE_USERNAME": "x-movie-api",
 					"APP_DATABASE_PASSWORD": "Keep!t5ecret",
@@ -61,8 +62,9 @@
 				"request": "launch",
 				"mode": "auto",
 				"program": "${workspaceRoot}/backend/migration",
-				"buildFlags": "-ldflags='-X wano-island/common/core.AppVersion=1.0.0 -X wano-island/common/core.CompatibleVersion= -X wano-island/common/core.AppMode=development -X wano-island/common/core.AppRevision=000000'",
+				"buildFlags": "-ldflags='-X wano-island/common/core.AppVersion=1.0.0 -X wano-island/common/core.CompatibleVersion= -X wano-island/common/core.AppRevision=000000'",
 				"env": {
+          "APP_MODE": "development",
 					"APP_DATABASE_HOST": "localhost",
 					"APP_DATABASE_USERNAME": "x-movie-api",
 					"APP_DATABASE_PASSWORD": "Keep!t5ecret",

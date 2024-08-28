@@ -3,24 +3,22 @@ package usermgt_test
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
 	"time"
 	"wano-island/common/core"
 	"wano-island/common/usermgt"
+	"wano-island/console/modules/httpsrv"
 	"wano-island/testing/internal"
 	mockcore "wano-island/testing/mocks/common/core"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gleak"
 	. "github.com/onsi/gomega/gstruct"
 	"go.uber.org/fx/fxtest"
-	"golang.org/x/text/language"
 	"gorm.io/gorm"
 )
 
@@ -31,28 +29,38 @@ var _ = Describe("Login Handler", func() {
 		appLifeCycle   *fxtest.Lifecycle
 		config         *mockcore.MockAppConfig
 		userRepository usermgt.UserRepository
-		localizer      *i18n.Localizer
-		handler        core.HTTPRoute
+		handler        http.Handler
 	)
 
 	BeforeEach(func() {
 		db, mockedDB = internal.CreateTestDBInstance()
 		appLifeCycle = fxtest.NewLifecycle(GinkgoT())
 		config = mockcore.NewMockAppConfig(GinkgoT())
+		config.EXPECT().GetAppVersion().Return("1.0.0-testing")
+		config.EXPECT().GetRevision().Return("testing")
+		config.EXPECT().GetMode().Return(core.TestingMode)
+		config.EXPECT().IsTesting().Return(true)
 		config.EXPECT().GetJWTConfig().Return(generateJWTConfig())
 		userRepository = usermgt.NewUserRepository(usermgt.UserRepositoryParams{})
 		userService := usermgt.NewUserService(usermgt.UserServiceParams{})
-		localizer = i18n.NewLocalizer(core.NewI18nBundle(core.I18nBundleParams{
-			AppLifeCycle: appLifeCycle,
-			LocaleFS:     internal.GetResourceFS(),
-		}), language.English.String())
-		handler = usermgt.NewLoginHandler(usermgt.LoginHandlerParams{
-			AppLifeCycle:   appLifeCycle,
-			Logger:         core.NewNoopLogger(),
-			Config:         config,
-			DB:             db,
-			UserService:    userService,
-			UserRepository: userRepository,
+		logger := core.NewNoopLogger()
+		handler = httpsrv.NewRouter(httpsrv.RouteParams{
+			Config: config,
+			Logger: logger,
+			I18nBundle: core.NewI18nBundle(core.I18nBundleParams{
+				AppLifeCycle: appLifeCycle,
+				LocaleFS:     internal.GetResourceFS(),
+			}),
+			Routes: []core.HTTPRoute{
+				usermgt.NewLoginHandler(usermgt.LoginHandlerParams{
+					AppLifeCycle:   appLifeCycle,
+					Logger:         logger,
+					Config:         config,
+					DB:             db,
+					UserService:    userService,
+					UserRepository: userRepository,
+				}),
+			},
 		})
 
 		appLifeCycle.RequireStart()
@@ -66,15 +74,11 @@ var _ = Describe("Login Handler", func() {
 		Eventually(Goroutines).ShouldNot(HaveLeaked())
 	})
 
-	It("ensures API login is not changed", func() {
-		Expect(handler.Pattern()).To(Equal(fmt.Sprintf("%s %s", http.MethodPost, "/api/v1/login")))
-	})
-
 	It("returns an error if cannot decode request body", func(ctx SpecContext) {
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewReader([]byte("{,}")))
 		recorder := httptest.NewRecorder()
 
-		handler.ServeHTTP(recorder, core.WithLocalizer(req, localizer))
+		handler.ServeHTTP(recorder, req)
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -100,7 +104,7 @@ var _ = Describe("Login Handler", func() {
         }`)))
 		recorder := httptest.NewRecorder()
 
-		handler.ServeHTTP(recorder, core.WithLocalizer(req, localizer))
+		handler.ServeHTTP(recorder, req)
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -128,7 +132,7 @@ var _ = Describe("Login Handler", func() {
         }`)))
 		recorder := httptest.NewRecorder()
 
-		handler.ServeHTTP(recorder, core.WithLocalizer(req, localizer))
+		handler.ServeHTTP(recorder, req)
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -156,7 +160,7 @@ var _ = Describe("Login Handler", func() {
         }`)))
 		recorder := httptest.NewRecorder()
 
-		handler.ServeHTTP(recorder, core.WithLocalizer(req, localizer))
+		handler.ServeHTTP(recorder, req)
 
 		var response core.Response[usermgt.LoginResponse]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)

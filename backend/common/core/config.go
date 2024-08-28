@@ -32,6 +32,10 @@ type AppConfig interface {
 	// It returns true if the mode is set to production, and false otherwise.
 	IsProduction() bool
 
+	// IsTesting checks if the application is running in testing mode.
+	// It returns true if the mode is set to testing, and false otherwise.
+	IsTesting() bool
+
 	// GetDatabaseConfig retrieves the database configuration from the application's configuration source.
 	// It returns a pointer to a DatabaseConfig struct containing the database configuration details.
 	GetDatabaseConfig() *DatabaseConfig
@@ -65,11 +69,14 @@ type appConfig struct {
 }
 
 const (
-	// developmentMode: Indicates that the application is running in development mode.
-	developmentMode = "development"
+	// TestingMode: Indicates that the application is running in testing mode.
+	TestingMode = "testing"
 
-	// productionMode: Indicates that the application is running in production mode.
-	productionMode = "production"
+	// DevelopmentMode: Indicates that the application is running in development mode.
+	DevelopmentMode = "development"
+
+	// ProductionMode: Indicates that the application is running in production mode.
+	ProductionMode = "production"
 )
 
 var (
@@ -78,9 +85,6 @@ var (
 
 	// CompatibleVersion is the version of the database schema that the migration application is compatible with.
 	CompatibleVersion string
-
-	// AppMode is the mode in which the application is running (ex., "development", "production").
-	AppMode string
 
 	// AppRevision is the revision of the application.
 	AppRevision string
@@ -95,19 +99,25 @@ func (appCfg *appConfig) GetCompatibleVersion() string {
 }
 
 func (appCfg *appConfig) GetMode() string {
-	if slices.Contains([]string{developmentMode, productionMode}, AppMode) {
-		return AppMode
+	appMode := appCfg.configSource.GetString("mode")
+
+	if slices.Contains([]string{TestingMode, DevelopmentMode, ProductionMode}, appMode) {
+		return appMode
 	}
 
-	return developmentMode
+	return DevelopmentMode
 }
 
 func (appCfg *appConfig) IsDevelopment() bool {
-	return AppMode == developmentMode
+	return appCfg.GetMode() == DevelopmentMode
 }
 
 func (appCfg *appConfig) IsProduction() bool {
-	return AppMode == productionMode
+	return appCfg.GetMode() == ProductionMode
+}
+
+func (appCfg *appConfig) IsTesting() bool {
+	return appCfg.GetMode() == TestingMode
 }
 
 func (appCfg *appConfig) GetRevision() string {
