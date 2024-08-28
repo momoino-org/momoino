@@ -27,6 +27,9 @@ type HTTPLoggerConfig struct {
 	// IgnoredPaths is a slice of strings representing paths that should be ignored when logging requests.
 	// The logger ignores requests with paths that start with any of the ignored paths.
 	IgnoredPaths []string
+
+	// Silent is a boolean indicating whether the logger should be silent (i.e., not log any messages).
+	Silent bool
 }
 
 // httpLogger is a struct that encapsulates a slog.Logger for logging HTTP requests and responses.
@@ -68,6 +71,11 @@ func (c customHeader) LogValue() slog.Value {
 func withRequestLoggerMiddleware(httpLoggerConfig *HTTPLoggerConfig) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if httpLoggerConfig.Silent {
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			if slices.ContainsFunc(httpLoggerConfig.IgnoredPaths, func(ignoredPath string) bool {
 				return strings.HasPrefix(r.URL.Path, ignoredPath)
 			}) {

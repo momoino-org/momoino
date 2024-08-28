@@ -13,7 +13,7 @@ import (
 	"go.uber.org/fx"
 )
 
-type routeParams struct {
+type RouteParams struct {
 	fx.In
 
 	Config     core.AppConfig
@@ -22,8 +22,8 @@ type routeParams struct {
 	I18nBundle *i18n.Bundle
 }
 
-// newRouter initializes and returns a new HTTP router instance.
-func newRouter(params routeParams) http.Handler {
+// NewRouter initializes and returns a new HTTP router instance.
+func NewRouter(params RouteParams) http.Handler {
 	r := chi.NewRouter()
 
 	publicRoutes := []core.HTTPRoute{}
@@ -44,6 +44,7 @@ func newRouter(params routeParams) http.Handler {
 			withRequestIDMiddleware,
 			withI18nMiddleware(params.I18nBundle),
 			withRequestLoggerMiddleware(&HTTPLoggerConfig{
+				Silent: params.Config.IsTesting(),
 				IgnoredPaths: []string{
 					"/swagger",
 					"/static",

@@ -4,12 +4,10 @@ go 1.22.5
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
-	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/onsi/ginkgo/v2 v2.20.0
 	github.com/onsi/gomega v1.34.1
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/fx v1.22.2
-	golang.org/x/text v0.17.0
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.11
 )
@@ -38,6 +36,7 @@ require (
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.23.0 // indirect
+	golang.org/x/text v0.17.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
