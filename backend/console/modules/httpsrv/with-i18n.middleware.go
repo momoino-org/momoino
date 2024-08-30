@@ -8,9 +8,9 @@ import (
 	"golang.org/x/text/language"
 )
 
-// withI18nMiddleware is a middleware function that adds internationalization support to an HTTP server.
+// WithI18nMiddleware is a middleware function that adds internationalization support to an HTTP server.
 // It uses the provided i18n.Bundle to create a localizer based on the language specified in the request.
-func withI18nMiddleware(bundle *i18n.Bundle) func(next http.Handler) http.Handler {
+func WithI18nMiddleware(bundle *i18n.Bundle) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			languages := []string{}

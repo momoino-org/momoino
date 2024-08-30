@@ -1,4 +1,4 @@
-package internal
+package testutils
 
 import (
 	"io/fs"

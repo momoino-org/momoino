@@ -10,8 +10,8 @@ import (
 	"wano-island/common/core"
 	"wano-island/common/usermgt"
 	"wano-island/console/modules/httpsrv"
-	"wano-island/testing/internal"
 	mockcore "wano-island/testing/mocks/common/core"
+	"wano-island/testing/testutils"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	. "github.com/onsi/ginkgo/v2"
@@ -33,7 +33,7 @@ var _ = Describe("Login Handler", func() {
 	)
 
 	BeforeEach(func() {
-		db, mockedDB = internal.CreateTestDBInstance()
+		db, mockedDB = testutils.CreateTestDBInstance()
 		appLifeCycle = fxtest.NewLifecycle(GinkgoT())
 		config = mockcore.NewMockAppConfig(GinkgoT())
 		config.EXPECT().GetAppVersion().Return("1.0.0-testing")
@@ -49,7 +49,7 @@ var _ = Describe("Login Handler", func() {
 			Logger: logger,
 			I18nBundle: core.NewI18nBundle(core.I18nBundleParams{
 				AppLifeCycle: appLifeCycle,
-				LocaleFS:     internal.GetResourceFS(),
+				LocaleFS:     testutils.GetResourceFS(),
 			}),
 			Routes: []core.HTTPRoute{
 				usermgt.NewLoginHandler(usermgt.LoginHandlerParams{
@@ -69,7 +69,7 @@ var _ = Describe("Login Handler", func() {
 	AfterEach(func() {
 		appLifeCycle.RequireStop()
 		mockedDB.ExpectClose()
-		internal.CloseGormDB(db)
+		testutils.CloseGormDB(db)
 		Expect(mockedDB.ExpectationsWereMet()).NotTo(HaveOccurred())
 		Eventually(Goroutines).ShouldNot(HaveLeaked())
 	})

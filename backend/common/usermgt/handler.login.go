@@ -49,6 +49,7 @@ type LoginResponse struct {
 
 type JWTCustomClaims struct {
 	jwt.RegisteredClaims
+	Locale      string   `json:"locale"`
 	Roles       []string `json:"roles"`
 	Permissions []string `json:"permissions"`
 }
@@ -140,6 +141,7 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, JWTCustomClaims{
 		Roles:       []string{},
 		Permissions: []string{},
+		Locale:      loggedUser.Locale,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   loggedUser.ID.String(),
 			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(h.jwtConfig.AccessTokenExpiresIn))),
