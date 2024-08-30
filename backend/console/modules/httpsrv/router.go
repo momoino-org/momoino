@@ -43,7 +43,7 @@ func NewRouter(params RouteParams) http.Handler {
 			middleware.CleanPath,
 			withRequestIDMiddleware,
 			withI18nMiddleware(params.I18nBundle),
-			withRequestLoggerMiddleware(&HTTPLoggerConfig{
+			withRequestLoggerMiddleware(params.Config, &HTTPLoggerConfig{
 				Silent: params.Config.IsTesting(),
 				IgnoredPaths: []string{
 					"/swagger",
@@ -74,9 +74,10 @@ func NewRouter(params RouteParams) http.Handler {
 		r.Use(
 			middleware.CleanPath,
 			withRequestIDMiddleware,
-			withJwtMiddleware(params.Logger),
 			withI18nMiddleware(params.I18nBundle),
-			withRequestLoggerMiddleware(&HTTPLoggerConfig{
+			withJwtMiddleware(params.I18nBundle, params.Logger),
+			withRequestLoggerMiddleware(params.Config, &HTTPLoggerConfig{
+				Silent: params.Config.IsTesting(),
 				IgnoredPaths: []string{
 					"/swagger",
 					"/static",

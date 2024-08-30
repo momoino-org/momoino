@@ -60,9 +60,22 @@ func NewNoopLogger() *slog.Logger {
 }
 
 // NewStdoutLogger returns a logger that writes log messages to the standard output (os.Stdout).
-func NewStdoutLogger() *slog.Logger {
-	return newLogger(os.Stdout, &slog.HandlerOptions{
+func NewStdoutLogger(config AppConfig) *slog.Logger {
+	// In production mode, log level is "info"
+	logLevel := slog.LevelInfo
+
+	switch config.GetMode() {
+	case DevelopmentMode:
+		// In development mode, we want to see all logs
+		logLevel = slog.LevelDebug
+	case TestingMode:
+		// In testing mode, we only want to see warning/error logs
+		logLevel = slog.LevelWarn
+	}
+
+	logger := newLogger(os.Stdout, &slog.HandlerOptions{
 		AddSource: true,
+		Level:     logLevel,
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
 			if a.Key == slog.SourceKey {
 				source, _ := a.Value.Any().(*slog.Source)
@@ -76,6 +89,10 @@ func NewStdoutLogger() *slog.Logger {
 			return a
 		},
 	})
+
+	slog.SetDefault(logger)
+
+	return logger
 }
 
 // NewLoggerModuleWithConfig is an fx.Option that provides a new stdout logger for the application.
