@@ -21,12 +21,6 @@ func withI18nMiddleware(bundle *i18n.Bundle) func(next http.Handler) http.Handle
 				languages = append(languages, t.String())
 			}
 
-			if authUser, err := core.GetAuthUserFromRequest(r); err == nil {
-				if t, err := language.Parse(authUser.Locale); err == nil {
-					languages = append(languages, t.String())
-				}
-			}
-
 			// If no language is specified, fall back to English
 			if len(languages) == 0 {
 				languages = append(languages, language.English.String())

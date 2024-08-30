@@ -68,7 +68,10 @@ func (c customHeader) LogValue() slog.Value {
 // withRequestLoggerMiddleware is a middleware function that logs incoming HTTP requests and outgoing HTTP responses.
 // It wraps the provided http.Handler and logs the request details, including method, path, headers,
 // and elapsed time. It also logs the response details, including status code, bytes written, and headers.
-func withRequestLoggerMiddleware(httpLoggerConfig *HTTPLoggerConfig) func(next http.Handler) http.Handler {
+func withRequestLoggerMiddleware(
+	appConfig core.AppConfig,
+	httpLoggerConfig *HTTPLoggerConfig,
+) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if httpLoggerConfig.Silent {
@@ -87,7 +90,7 @@ func withRequestLoggerMiddleware(httpLoggerConfig *HTTPLoggerConfig) func(next h
 			ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
 			httpLogger := &httpLogger{
-				logger: core.NewStdoutLogger(),
+				logger: core.NewStdoutLogger(appConfig),
 			}
 
 			requestAttrs := []any{

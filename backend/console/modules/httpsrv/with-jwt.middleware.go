@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-chi/render"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/samber/lo"
 	"golang.org/x/text/language"
 )
@@ -76,7 +77,7 @@ func toAuthUser(mapClaims jwt.MapClaims) (*core.AuthUser, error) {
 // It extracts the access token from the request header, verifies it, and converts the claims into an AuthUser object.
 // If the access token is missing or invalid, it returns an appropriate HTTP response.
 // Otherwise, it sets the AuthUser object in the request context and calls the next handler.
-func withJwtMiddleware(logger *slog.Logger) func(next http.Handler) http.Handler {
+func withJwtMiddleware(bundle *i18n.Bundle, logger *slog.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Extract the access token from the request header.
@@ -112,8 +113,10 @@ func withJwtMiddleware(logger *slog.Logger) func(next http.Handler) http.Handler
 				return
 			}
 
+			localizer := i18n.NewLocalizer(bundle, authUser.Locale)
+
 			// Set the AuthUser object in the request context and call the next handler.
-			next.ServeHTTP(w, core.WithAuthUser(r, authUser))
+			next.ServeHTTP(w, core.WithLocalizer(core.WithAuthUser(r, authUser), localizer))
 		})
 	}
 }
