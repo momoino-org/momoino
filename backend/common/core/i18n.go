@@ -4,6 +4,8 @@ import (
 	"context"
 	"io/fs"
 	"net/http"
+	"path/filepath"
+	"strings"
 
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"go.uber.org/fx"
@@ -52,8 +54,18 @@ func NewI18nBundle(params I18nBundleParams) *i18n.Bundle {
 
 	params.AppLifeCycle.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
-			_, err := bundle.LoadMessageFileFS(params.LocaleFS, "resources/trans/locale.en.yaml")
-			return err
+			files, err := glob(params.LocaleFS, "resources/trans/locale.*.yaml")
+			if err != nil {
+				return err
+			}
+
+			for _, file := range files {
+				if _, err := bundle.LoadMessageFileFS(params.LocaleFS, file); err != nil {
+					return err
+				}
+			}
+
+			return nil
 		},
 	})
 
@@ -70,4 +82,38 @@ func NewI18nModule(fs fs.FS) fx.Option {
 			})
 		}),
 	)
+}
+
+// glob is a function that performs a glob-style pattern matching on a given file system (fs.FS)
+// and returns a list of matching file paths. It uses fs.WalkDir to traverse the file system
+// and filepath.Match to check if each file path matches the provided pattern.
+func glob(f fs.FS, pattern string) ([]string, error) {
+	var matches []string
+
+	err := fs.WalkDir(f, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if d.IsDir() && !strings.HasSuffix(pattern, "/**") {
+			return nil
+		}
+
+		matched, err := filepath.Match(pattern, path)
+		if err != nil {
+			return err
+		}
+
+		if matched {
+			matches = append(matches, path)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return matches, nil
 }

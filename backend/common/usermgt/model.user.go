@@ -12,6 +12,7 @@ type UserModel struct {
 	Password  string `gorm:"type:string;size:256;not null"`
 	FirstName string `gorm:"type:string;size:64"`
 	LastName  string `gorm:"type:string;size:64"`
+	Locale    string `gorm:"type:string;not null;default:en"`
 }
 
 func (UserModel) TableName() string {

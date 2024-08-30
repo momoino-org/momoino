@@ -41,6 +41,12 @@ func toAuthUser(mapClaims jwt.MapClaims) (*core.AuthUser, error) {
 		Locale: language.English.String(),
 	}
 
+	if lo.HasKey(mapClaims, "locale") {
+		if locale, ok := mapClaims["locale"].(string); ok {
+			authUser.Locale = locale
+		}
+	}
+
 	userID, err := mapClaims.GetSubject()
 	if err != nil {
 		return nil, errors.New("cannot get subject from claims")
@@ -73,11 +79,11 @@ func toAuthUser(mapClaims jwt.MapClaims) (*core.AuthUser, error) {
 	return &authUser, nil
 }
 
-// withJwtMiddleware is a middleware function that handles JWT authentication for HTTP requests.
+// WithJwtMiddleware is a middleware function that handles JWT authentication for HTTP requests.
 // It extracts the access token from the request header, verifies it, and converts the claims into an AuthUser object.
 // If the access token is missing or invalid, it returns an appropriate HTTP response.
 // Otherwise, it sets the AuthUser object in the request context and calls the next handler.
-func withJwtMiddleware(bundle *i18n.Bundle, logger *slog.Logger) func(next http.Handler) http.Handler {
+func WithJwtMiddleware(bundle *i18n.Bundle, logger *slog.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Extract the access token from the request header.
@@ -113,10 +119,13 @@ func withJwtMiddleware(bundle *i18n.Bundle, logger *slog.Logger) func(next http.
 				return
 			}
 
-			localizer := i18n.NewLocalizer(bundle, authUser.Locale)
-
-			// Set the AuthUser object in the request context and call the next handler.
-			next.ServeHTTP(w, core.WithLocalizer(core.WithAuthUser(r, authUser), localizer))
+			if r.URL.Query().Has("lang") {
+				// Set the AuthUser object in the request context and call the next handler.
+				next.ServeHTTP(w, core.WithAuthUser(r, authUser))
+			} else {
+				localizer := i18n.NewLocalizer(bundle, authUser.Locale)
+				next.ServeHTTP(w, core.WithLocalizer(core.WithAuthUser(r, authUser), localizer))
+			}
 		})
 	}
 }
