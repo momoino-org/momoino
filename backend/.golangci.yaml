@@ -52,7 +52,7 @@ linters-settings:
   importas:
     no-unaliased: true
     alias:
-      - pkg: x-operation/migration/core
+      - pkg: wano-island/migration/core
         alias: migrationCore
   revive:
     rules:

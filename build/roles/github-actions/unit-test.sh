@@ -18,7 +18,7 @@ function main() {
     --cover \
     --coverprofile="$cover_profile" \
     -coverpkg="$cover_packages" \
-    --race
+    --race \
     --trace \
     --json-report=report.json \
     --timeout=5m \
