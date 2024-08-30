@@ -3,11 +3,11 @@
 set -eu
 
 function main() {
-  local cover_packages="x-operation/common/...,x-operation/console/...,x-operation/migration/..."
-  local cover_profile="cover.profile"
-  local testing_module="./testing/..."
+  local cover_packages="wano-island/common/...,wano-island/console/...,wano-island/migration/..."
+  local cover_profile="coverage.txt"
+  local testing_module="./..."
 
-  go run "github.com/onsi/ginkgo/v2/ginkgo@$GINKGO_VERSION" \
+  go run github.com/onsi/ginkgo/v2/ginkgo \
     -v \
     --procs=4 \
     --randomize-all \
@@ -18,7 +18,7 @@ function main() {
     --cover \
     --coverprofile="$cover_profile" \
     -coverpkg="$cover_packages" \
-    --race \
+    --race
     --trace \
     --json-report=report.json \
     --timeout=5m \

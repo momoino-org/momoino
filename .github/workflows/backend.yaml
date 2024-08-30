@@ -87,10 +87,12 @@ jobs:
           go-version-file: ./backend/go.work
           cache-dependency-path: ./backend/testing/go.sum
       - name: unit test
-        working-directory: backend
-        env:
-          GINKGO_VERSION: v2.19.0
-        run: bash ../build/roles/github-actions/unit-test.sh
+        working-directory: backend/testing
+        run: bash ../../build/roles/github-actions/unit-test.sh
+      - uses: codecov/codecov-action@v4
+        with:
+          directory: backend/testing
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   build:
     needs:

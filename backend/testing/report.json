@@ -1,0 +1,1880 @@
+[
+  {
+    "SuitePath": "D:\\workspace\\wano\\backend\\testing\\console\\modules\\httpsrv",
+    "SuiteDescription": "httpsrv suite",
+    "SuiteLabels": [],
+    "SuiteSucceeded": true,
+    "SuiteHasProgrammaticFocus": false,
+    "SpecialSuiteFailureReasons": [],
+    "PreRunStats": {
+      "TotalSpecs": 5,
+      "SpecsThatWillRun": 5
+    },
+    "StartTime": "2024-08-30T21:37:20.5568599+07:00",
+    "EndTime": "2024-08-30T21:37:21.4846433+07:00",
+    "RunTime": 927783400,
+    "SuiteConfig": {
+      "RandomSeed": 1725028637,
+      "RandomizeAllSpecs": true,
+      "FocusStrings": null,
+      "SkipStrings": null,
+      "FocusFiles": null,
+      "SkipFiles": null,
+      "LabelFilter": "",
+      "FailOnPending": true,
+      "FailOnEmpty": true,
+      "FailFast": false,
+      "FlakeAttempts": 0,
+      "MustPassRepeatedly": 0,
+      "DryRun": false,
+      "PollProgressAfter": 120000000000,
+      "PollProgressInterval": 30000000000,
+      "Timeout": 297239100800,
+      "EmitSpecProgress": false,
+      "OutputInterceptorMode": "",
+      "SourceRoots": null,
+      "GracePeriod": 30000000000,
+      "ParallelProcess": 1,
+      "ParallelTotal": 4,
+      "ParallelHost": "127.0.0.1:65361"
+    },
+    "SpecReports": [
+      {
+        "ContainerHierarchyTexts": null,
+        "ContainerHierarchyLocations": null,
+        "ContainerHierarchyLabels": null,
+        "LeafNodeType": "BeforeSuite",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+          "LineNumber": 11
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:20.570741+07:00",
+        "EndTime": "2024-08-30T21:37:21.0915688+07:00",
+        "RunTime": 520827800,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+              "LineNumber": 11
+            },
+            "TimelineLocation": {
+              "Order": 1,
+              "Time": "2024-08-30T21:37:21.0882333+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "NodeType": "BeforeSuite"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+              "LineNumber": 11
+            },
+            "TimelineLocation": {
+              "Order": 3,
+              "Time": "2024-08-30T21:37:21.0915688+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "Duration": 3335500,
+            "NodeType": "BeforeSuite"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "withJwtMiddleware",
+          "Localizer"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+            "LineNumber": 23
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          [],
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+          "LineNumber": 65
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "should use the preferred language of the logged-in user if the request does not contain the lang query parameter",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:21.3235434+07:00",
+        "EndTime": "2024-08-30T21:37:21.3275334+07:00",
+        "RunTime": 3990000,
+        "ParallelProcess": 1,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 0s\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+              "LineNumber": 65
+            },
+            "TimelineLocation": {
+              "Order": 4,
+              "Time": "2024-08-30T21:37:21.3235434+07:00"
+            },
+            "Message": "should use the preferred language of the logged-in user if the request does not contain the lang query parameter",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+              "LineNumber": 65
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 6,
+              "Time": "2024-08-30T21:37:21.3252321+07:00"
+            },
+            "Message": "should use the preferred language of the logged-in user if the request does not contain the lang query parameter",
+            "Duration": 1688700,
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+              "LineNumber": 19
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 7,
+              "Time": "2024-08-30T21:37:21.3252321+07:00"
+            },
+            "Message": "withJwtMiddleware",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+              "LineNumber": 19
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 9,
+              "Time": "2024-08-30T21:37:21.3275334+07:00"
+            },
+            "Message": "withJwtMiddleware",
+            "Duration": 2301300,
+            "NodeType": "AfterEach"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": null,
+        "ContainerHierarchyLocations": null,
+        "ContainerHierarchyLabels": null,
+        "LeafNodeType": "BeforeSuite",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+          "LineNumber": 11
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:21.0882333+07:00",
+        "EndTime": "2024-08-30T21:37:21.0910364+07:00",
+        "RunTime": 2803100,
+        "ParallelProcess": 3,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+              "LineNumber": 11
+            },
+            "TimelineLocation": {
+              "Order": 1,
+              "Time": "2024-08-30T21:37:21.0894471+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "NodeType": "BeforeSuite"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+              "LineNumber": 11
+            },
+            "TimelineLocation": {
+              "Order": 3,
+              "Time": "2024-08-30T21:37:21.0910364+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "Duration": 1589300,
+            "NodeType": "BeforeSuite"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "withI18nMiddleware",
+          "Localizer"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+            "LineNumber": 23
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          null,
+          null
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+          "LineNumber": 58
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "should return the default message in English when the user is not logged in and when the \"lang\" query parameter is not provided",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:21.3235434+07:00",
+        "EndTime": "2024-08-30T21:37:21.3287706+07:00",
+        "RunTime": 5227200,
+        "ParallelProcess": 3,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 523.7µs\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 58
+            },
+            "TimelineLocation": {
+              "Order": 4,
+              "Time": "2024-08-30T21:37:21.3235434+07:00"
+            },
+            "Message": "should return the default message in English when the user is not logged in and when the \"lang\" query parameter is not provided",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 58
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 6,
+              "Time": "2024-08-30T21:37:21.3252321+07:00"
+            },
+            "Message": "should return the default message in English when the user is not logged in and when the \"lang\" query parameter is not provided",
+            "Duration": 1688700,
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 19
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 7,
+              "Time": "2024-08-30T21:37:21.3260875+07:00"
+            },
+            "Message": "withI18nMiddleware",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 19
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 9,
+              "Time": "2024-08-30T21:37:21.3287706+07:00"
+            },
+            "Message": "withI18nMiddleware",
+            "Duration": 2683100,
+            "NodeType": "AfterEach"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": null,
+        "ContainerHierarchyLocations": null,
+        "ContainerHierarchyLabels": null,
+        "LeafNodeType": "BeforeSuite",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+          "LineNumber": 11
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:20.5713735+07:00",
+        "EndTime": "2024-08-30T21:37:21.090509+07:00",
+        "RunTime": 519135500,
+        "ParallelProcess": 4,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+              "LineNumber": 11
+            },
+            "TimelineLocation": {
+              "Order": 1,
+              "Time": "2024-08-30T21:37:21.0882333+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "NodeType": "BeforeSuite"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+              "LineNumber": 11
+            },
+            "TimelineLocation": {
+              "Order": 3,
+              "Time": "2024-08-30T21:37:21.090509+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "Duration": 2275700,
+            "NodeType": "BeforeSuite"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "withI18nMiddleware",
+          "Localizer"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+            "LineNumber": 23
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          null,
+          null
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+          "LineNumber": 69
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "should return the English message if the specified lang in the query parameter is not supported",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:21.3240711+07:00",
+        "EndTime": "2024-08-30T21:37:21.3834633+07:00",
+        "RunTime": 59392200,
+        "ParallelProcess": 4,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 1.9576ms\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 69
+            },
+            "TimelineLocation": {
+              "Order": 4,
+              "Time": "2024-08-30T21:37:21.3242019+07:00"
+            },
+            "Message": "should return the English message if the specified lang in the query parameter is not supported",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 69
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 6,
+              "Time": "2024-08-30T21:37:21.3287706+07:00"
+            },
+            "Message": "should return the English message if the specified lang in the query parameter is not supported",
+            "Duration": 4568700,
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 19
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 7,
+              "Time": "2024-08-30T21:37:21.3829325+07:00"
+            },
+            "Message": "withI18nMiddleware",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 19
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 9,
+              "Time": "2024-08-30T21:37:21.3834633+07:00"
+            },
+            "Message": "withI18nMiddleware",
+            "Duration": 530800,
+            "NodeType": "AfterEach"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": null,
+        "ContainerHierarchyLocations": null,
+        "ContainerHierarchyLabels": null,
+        "LeafNodeType": "BeforeSuite",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+          "LineNumber": 11
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:20.5713735+07:00",
+        "EndTime": "2024-08-30T21:37:21.0903842+07:00",
+        "RunTime": 519010700,
+        "ParallelProcess": 2,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+              "LineNumber": 11
+            },
+            "TimelineLocation": {
+              "Order": 1,
+              "Time": "2024-08-30T21:37:21.0882333+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "NodeType": "BeforeSuite"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/httpsrv_suite_test.go",
+              "LineNumber": 11
+            },
+            "TimelineLocation": {
+              "Order": 3,
+              "Time": "2024-08-30T21:37:21.0903842+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "Duration": 2150900,
+            "NodeType": "BeforeSuite"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "withJwtMiddleware",
+          "Localizer"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+            "LineNumber": 23
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          null,
+          null
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+          "LineNumber": 74
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "should always display the translated message based on the lang query parameter, even if the user is logged in with a different preferred language",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:21.3235434+07:00",
+        "EndTime": "2024-08-30T21:37:21.3280371+07:00",
+        "RunTime": 4493700,
+        "ParallelProcess": 2,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 1.0424ms\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+              "LineNumber": 74
+            },
+            "TimelineLocation": {
+              "Order": 4,
+              "Time": "2024-08-30T21:37:21.3235434+07:00"
+            },
+            "Message": "should always display the translated message based on the lang query parameter, even if the user is logged in with a different preferred language",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+              "LineNumber": 74
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 6,
+              "Time": "2024-08-30T21:37:21.3260875+07:00"
+            },
+            "Message": "should always display the translated message based on the lang query parameter, even if the user is logged in with a different preferred language",
+            "Duration": 2544100,
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+              "LineNumber": 19
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 7,
+              "Time": "2024-08-30T21:37:21.3260875+07:00"
+            },
+            "Message": "withJwtMiddleware",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-jwt.middleware_test.go",
+              "LineNumber": 19
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 9,
+              "Time": "2024-08-30T21:37:21.3280371+07:00"
+            },
+            "Message": "withJwtMiddleware",
+            "Duration": 1949600,
+            "NodeType": "AfterEach"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "withI18nMiddleware",
+          "Localizer"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+            "LineNumber": 18
+          },
+          {
+            "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+            "LineNumber": 23
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          null,
+          null
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+          "LineNumber": 64
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "should return the translated message according to the language specified in the \"lang\" query parameter",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:21.4105782+07:00",
+        "EndTime": "2024-08-30T21:37:21.4406736+07:00",
+        "RunTime": 30095400,
+        "ParallelProcess": 2,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 1.0058ms\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 64
+            },
+            "TimelineLocation": {
+              "Order": 10,
+              "Time": "2024-08-30T21:37:21.4391631+07:00"
+            },
+            "Message": "should return the translated message according to the language specified in the \"lang\" query parameter",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 64
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 12,
+              "Time": "2024-08-30T21:37:21.4401689+07:00"
+            },
+            "Message": "should return the translated message according to the language specified in the \"lang\" query parameter",
+            "Duration": 1005800,
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 19
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 13,
+              "Time": "2024-08-30T21:37:21.4401689+07:00"
+            },
+            "Message": "withI18nMiddleware",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/console/modules/httpsrv/with-i18n.middleware_test.go",
+              "LineNumber": 19
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 15,
+              "Time": "2024-08-30T21:37:21.4406736+07:00"
+            },
+            "Message": "withI18nMiddleware",
+            "Duration": 504700,
+            "NodeType": "AfterEach"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "SuitePath": "D:\\workspace\\wano\\backend\\testing\\common\\usermgt",
+    "SuiteDescription": "Usermgt Suite",
+    "SuiteLabels": [],
+    "SuiteSucceeded": true,
+    "SuiteHasProgrammaticFocus": false,
+    "SpecialSuiteFailureReasons": [],
+    "PreRunStats": {
+      "TotalSpecs": 6,
+      "SpecsThatWillRun": 6
+    },
+    "StartTime": "2024-08-30T21:37:24.4483025+07:00",
+    "EndTime": "2024-08-30T21:37:24.8716401+07:00",
+    "RunTime": 423337600,
+    "SuiteConfig": {
+      "RandomSeed": 1725028637,
+      "RandomizeAllSpecs": true,
+      "FocusStrings": null,
+      "SkipStrings": null,
+      "FocusFiles": null,
+      "SkipFiles": null,
+      "LabelFilter": "",
+      "FailOnPending": true,
+      "FailOnEmpty": true,
+      "FailFast": false,
+      "FlakeAttempts": 0,
+      "MustPassRepeatedly": 0,
+      "DryRun": false,
+      "PollProgressAfter": 120000000000,
+      "PollProgressInterval": 30000000000,
+      "Timeout": 293304296500,
+      "EmitSpecProgress": false,
+      "OutputInterceptorMode": "",
+      "SourceRoots": null,
+      "GracePeriod": 30000000000,
+      "ParallelProcess": 1,
+      "ParallelTotal": 4,
+      "ParallelHost": "127.0.0.1:65372"
+    },
+    "SpecReports": [
+      {
+        "ContainerHierarchyTexts": null,
+        "ContainerHierarchyLocations": null,
+        "ContainerHierarchyLabels": null,
+        "LeafNodeType": "BeforeSuite",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+          "LineNumber": 16
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:24.4509303+07:00",
+        "EndTime": "2024-08-30T21:37:24.4519829+07:00",
+        "RunTime": 1052600,
+        "ParallelProcess": 1,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+              "LineNumber": 16
+            },
+            "TimelineLocation": {
+              "Order": 1,
+              "Time": "2024-08-30T21:37:24.4514586+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "NodeType": "BeforeSuite"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+              "LineNumber": 16
+            },
+            "TimelineLocation": {
+              "Order": 3,
+              "Time": "2024-08-30T21:37:24.4519829+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "Duration": 524300,
+            "NodeType": "BeforeSuite"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "handler.profile.go"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+            "LineNumber": 26
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+          "LineNumber": 75
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "returns an error if there is no access token",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:24.452514+07:00",
+        "EndTime": "2024-08-30T21:37:24.5173682+07:00",
+        "RunTime": 64854200,
+        "ParallelProcess": 1,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 519.8µs\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 36
+            },
+            "TimelineLocation": {
+              "Order": 4,
+              "Time": "2024-08-30T21:37:24.4530479+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 36
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 6,
+              "Time": "2024-08-30T21:37:24.5007925+07:00"
+            },
+            "Message": "handler.profile.go",
+            "Duration": 47744600,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 75
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 7,
+              "Time": "2024-08-30T21:37:24.5073246+07:00"
+            },
+            "Message": "returns an error if there is no access token",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 75
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 9,
+              "Time": "2024-08-30T21:37:24.5073246+07:00"
+            },
+            "Message": "returns an error if there is no access token",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 67
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 10,
+              "Time": "2024-08-30T21:37:24.5073246+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 67
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 12,
+              "Time": "2024-08-30T21:37:24.5084703+07:00"
+            },
+            "Message": "handler.profile.go",
+            "Duration": 1145700,
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/usermgt/UserRepository.go",
+              "LineNumber": 218
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 13,
+              "Time": "2024-08-30T21:37:24.5173682+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "DeferCleanup (Each)"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/usermgt/UserRepository.go",
+              "LineNumber": 218
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 15,
+              "Time": "2024-08-30T21:37:24.5173682+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "DeferCleanup (Each)"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 16,
+              "Time": "2024-08-30T21:37:24.5173682+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "DeferCleanup (Each)"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 267,
+              "Order": 18,
+              "Time": "2024-08-30T21:37:24.5173682+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "DeferCleanup (Each)"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Login Handler"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+            "LineNumber": 25
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          []
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+          "LineNumber": 96
+        },
+        "LeafNodeLabels": [],
+        "LeafNodeText": "returns an error if email is incorrect",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:24.5444033+07:00",
+        "EndTime": "2024-08-30T21:37:24.8016598+07:00",
+        "RunTime": 257256500,
+        "ParallelProcess": 1,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 520.4µs\n\n[Fx] HOOK OnStart\t\twano-island/common/usermgt.NewLoginHandler.func1() executing (caller: wano-island/common/usermgt.NewLoginHandler)\n\n[Fx] HOOK OnStart\t\twano-island/common/usermgt.NewLoginHandler.func1() called by wano-island/common/usermgt.NewLoginHandler ran successfully in 0s\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 35
+            },
+            "TimelineLocation": {
+              "Order": 19,
+              "Time": "2024-08-30T21:37:24.5444033+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 35
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 21,
+              "Time": "2024-08-30T21:37:24.8000787+07:00"
+            },
+            "Message": "Login Handler",
+            "Duration": 255675400,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 96
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 22,
+              "Time": "2024-08-30T21:37:24.8000787+07:00"
+            },
+            "Message": "returns an error if email is incorrect",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 96
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 24,
+              "Time": "2024-08-30T21:37:24.8006016+07:00"
+            },
+            "Message": "returns an error if email is incorrect",
+            "Duration": 522900,
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 69
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 25,
+              "Time": "2024-08-30T21:37:24.80113+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 69
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 27,
+              "Time": "2024-08-30T21:37:24.80113+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 28,
+              "Time": "2024-08-30T21:37:24.8016598+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "DeferCleanup (Each)"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 30,
+              "Time": "2024-08-30T21:37:24.8016598+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "DeferCleanup (Each)"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": null,
+        "ContainerHierarchyLocations": null,
+        "ContainerHierarchyLabels": null,
+        "LeafNodeType": "BeforeSuite",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+          "LineNumber": 16
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:24.5073246+07:00",
+        "EndTime": "2024-08-30T21:37:24.5078643+07:00",
+        "RunTime": 539700,
+        "ParallelProcess": 4,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+              "LineNumber": 16
+            },
+            "TimelineLocation": {
+              "Order": 1,
+              "Time": "2024-08-30T21:37:24.5073246+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "NodeType": "BeforeSuite"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+              "LineNumber": 16
+            },
+            "TimelineLocation": {
+              "Order": 3,
+              "Time": "2024-08-30T21:37:24.5078643+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "Duration": 539700,
+            "NodeType": "BeforeSuite"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Login Handler"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+            "LineNumber": 25
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          null
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+          "LineNumber": 122
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "returns an error if password is incorrect",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:24.5173682+07:00",
+        "EndTime": "2024-08-30T21:37:24.6984888+07:00",
+        "RunTime": 181120600,
+        "ParallelProcess": 4,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 0s\n\n[Fx] HOOK OnStart\t\twano-island/common/usermgt.NewLoginHandler.func1() executing (caller: wano-island/common/usermgt.NewLoginHandler)\n\n[Fx] HOOK OnStart\t\twano-island/common/usermgt.NewLoginHandler.func1() called by wano-island/common/usermgt.NewLoginHandler ran successfully in 504.8µs\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 35
+            },
+            "TimelineLocation": {
+              "Order": 4,
+              "Time": "2024-08-30T21:37:24.5179204+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 35
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 6,
+              "Time": "2024-08-30T21:37:24.6421474+07:00"
+            },
+            "Message": "Login Handler",
+            "Duration": 124227000,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 122
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 7,
+              "Time": "2024-08-30T21:37:24.6421474+07:00"
+            },
+            "Message": "returns an error if password is incorrect",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 122
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 9,
+              "Time": "2024-08-30T21:37:24.6979679+07:00"
+            },
+            "Message": "returns an error if password is incorrect",
+            "Duration": 55820500,
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 69
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 10,
+              "Time": "2024-08-30T21:37:24.6984888+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 69
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 12,
+              "Time": "2024-08-30T21:37:24.6984888+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 13,
+              "Time": "2024-08-30T21:37:24.6984888+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "DeferCleanup (Each)"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 15,
+              "Time": "2024-08-30T21:37:24.6984888+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "DeferCleanup (Each)"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": null,
+        "ContainerHierarchyLocations": null,
+        "ContainerHierarchyLabels": null,
+        "LeafNodeType": "BeforeSuite",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+          "LineNumber": 16
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:24.4540987+07:00",
+        "EndTime": "2024-08-30T21:37:24.454638+07:00",
+        "RunTime": 539300,
+        "ParallelProcess": 3,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+              "LineNumber": 16
+            },
+            "TimelineLocation": {
+              "Order": 1,
+              "Time": "2024-08-30T21:37:24.4540987+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "NodeType": "BeforeSuite"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+              "LineNumber": 16
+            },
+            "TimelineLocation": {
+              "Order": 3,
+              "Time": "2024-08-30T21:37:24.454638+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "Duration": 539300,
+            "NodeType": "BeforeSuite"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Login Handler"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+            "LineNumber": 25
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          null
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+          "LineNumber": 77
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "returns an error if cannot decode request body",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:24.4551633+07:00",
+        "EndTime": "2024-08-30T21:37:24.6577127+07:00",
+        "RunTime": 202549400,
+        "ParallelProcess": 3,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 516.5µs\n\n[Fx] HOOK OnStart\t\twano-island/common/usermgt.NewLoginHandler.func1() executing (caller: wano-island/common/usermgt.NewLoginHandler)\n\n[Fx] HOOK OnStart\t\twano-island/common/usermgt.NewLoginHandler.func1() called by wano-island/common/usermgt.NewLoginHandler ran successfully in 0s\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 35
+            },
+            "TimelineLocation": {
+              "Order": 4,
+              "Time": "2024-08-30T21:37:24.4556822+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 35
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 6,
+              "Time": "2024-08-30T21:37:24.6568363+07:00"
+            },
+            "Message": "Login Handler",
+            "Duration": 201154100,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 77
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 7,
+              "Time": "2024-08-30T21:37:24.6568363+07:00"
+            },
+            "Message": "returns an error if cannot decode request body",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 77
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 9,
+              "Time": "2024-08-30T21:37:24.6568363+07:00"
+            },
+            "Message": "returns an error if cannot decode request body",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 69
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 10,
+              "Time": "2024-08-30T21:37:24.6568363+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 69
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 12,
+              "Time": "2024-08-30T21:37:24.6577127+07:00"
+            },
+            "Message": "Login Handler",
+            "Duration": 876400,
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 13,
+              "Time": "2024-08-30T21:37:24.6577127+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "DeferCleanup (Each)"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 548,
+              "Order": 15,
+              "Time": "2024-08-30T21:37:24.6577127+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "DeferCleanup (Each)"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "handler.profile.go"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+            "LineNumber": 26
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          null
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+          "LineNumber": 94
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "returns a user profile if there is valid access token",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:24.6984888+07:00",
+        "EndTime": "2024-08-30T21:37:24.7468289+07:00",
+        "RunTime": 48340100,
+        "ParallelProcess": 3,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 0s\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 36
+            },
+            "TimelineLocation": {
+              "Order": 16,
+              "Time": "2024-08-30T21:37:24.6984888+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 36
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 18,
+              "Time": "2024-08-30T21:37:24.7442089+07:00"
+            },
+            "Message": "handler.profile.go",
+            "Duration": 45720100,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 94
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 19,
+              "Time": "2024-08-30T21:37:24.7447373+07:00"
+            },
+            "Message": "returns a user profile if there is valid access token",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 94
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 21,
+              "Time": "2024-08-30T21:37:24.745792+07:00"
+            },
+            "Message": "returns a user profile if there is valid access token",
+            "Duration": 1054700,
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 67
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 22,
+              "Time": "2024-08-30T21:37:24.7463118+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.profile_test.go",
+              "LineNumber": 67
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 24,
+              "Time": "2024-08-30T21:37:24.7463118+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/usermgt/UserRepository.go",
+              "LineNumber": 218
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 25,
+              "Time": "2024-08-30T21:37:24.7468289+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "DeferCleanup (Each)"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/usermgt/UserRepository.go",
+              "LineNumber": 218
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 27,
+              "Time": "2024-08-30T21:37:24.7468289+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "DeferCleanup (Each)"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 28,
+              "Time": "2024-08-30T21:37:24.7468289+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "DeferCleanup (Each)"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 261,
+              "Order": 30,
+              "Time": "2024-08-30T21:37:24.7468289+07:00"
+            },
+            "Message": "handler.profile.go",
+            "NodeType": "DeferCleanup (Each)"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": null,
+        "ContainerHierarchyLocations": null,
+        "ContainerHierarchyLabels": null,
+        "LeafNodeType": "BeforeSuite",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+          "LineNumber": 16
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:24.4509303+07:00",
+        "EndTime": "2024-08-30T21:37:24.4519829+07:00",
+        "RunTime": 1052600,
+        "ParallelProcess": 2,
+        "NumAttempts": 0,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+              "LineNumber": 16
+            },
+            "TimelineLocation": {
+              "Order": 1,
+              "Time": "2024-08-30T21:37:24.4509303+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "NodeType": "BeforeSuite"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/usermgt_suite_test.go",
+              "LineNumber": 16
+            },
+            "TimelineLocation": {
+              "Order": 3,
+              "Time": "2024-08-30T21:37:24.4519829+07:00"
+            },
+            "Message": "TOP-LEVEL",
+            "Duration": 1052600,
+            "NodeType": "BeforeSuite"
+          }
+        ]
+      },
+      {
+        "ContainerHierarchyTexts": [
+          "Login Handler"
+        ],
+        "ContainerHierarchyLocations": [
+          {
+            "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+            "LineNumber": 25
+          }
+        ],
+        "ContainerHierarchyLabels": [
+          null
+        ],
+        "LeafNodeType": "It",
+        "LeafNodeLocation": {
+          "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+          "LineNumber": 150
+        },
+        "LeafNodeLabels": null,
+        "LeafNodeText": "returns an accessToken and refreshToken if the user inputs the correct credentials.",
+        "State": "passed",
+        "StartTime": "2024-08-30T21:37:24.452514+07:00",
+        "EndTime": "2024-08-30T21:37:24.835369+07:00",
+        "RunTime": 382855000,
+        "ParallelProcess": 2,
+        "NumAttempts": 1,
+        "MaxFlakeAttempts": 0,
+        "MaxMustPassRepeatedly": 0,
+        "CapturedGinkgoWriterOutput": "[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() executing (caller: wano-island/common/core.NewI18nBundle)\n\n[Fx] HOOK OnStart\t\twano-island/common/core.NewI18nBundle.func1() called by wano-island/common/core.NewI18nBundle ran successfully in 0s\n\n[Fx] HOOK OnStart\t\twano-island/common/usermgt.NewLoginHandler.func1() executing (caller: wano-island/common/usermgt.NewLoginHandler)\n\n[Fx] HOOK OnStart\t\twano-island/common/usermgt.NewLoginHandler.func1() called by wano-island/common/usermgt.NewLoginHandler ran successfully in 0s\n\n",
+        "SpecEvents": [
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 35
+            },
+            "TimelineLocation": {
+              "Order": 4,
+              "Time": "2024-08-30T21:37:24.4530479+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 35
+            },
+            "TimelineLocation": {
+              "Offset": 542,
+              "Order": 6,
+              "Time": "2024-08-30T21:37:24.7284877+07:00"
+            },
+            "Message": "Login Handler",
+            "Duration": 275439800,
+            "NodeType": "BeforeEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 150
+            },
+            "TimelineLocation": {
+              "Offset": 542,
+              "Order": 7,
+              "Time": "2024-08-30T21:37:24.7414009+07:00"
+            },
+            "Message": "returns an accessToken and refreshToken if the user inputs the correct credentials.",
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 150
+            },
+            "TimelineLocation": {
+              "Offset": 542,
+              "Order": 9,
+              "Time": "2024-08-30T21:37:24.8021947+07:00"
+            },
+            "Message": "returns an accessToken and refreshToken if the user inputs the correct credentials.",
+            "Duration": 60793800,
+            "NodeType": "It"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 69
+            },
+            "TimelineLocation": {
+              "Offset": 542,
+              "Order": 10,
+              "Time": "2024-08-30T21:37:24.8348473+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/common/usermgt/handler.login_test.go",
+              "LineNumber": 69
+            },
+            "TimelineLocation": {
+              "Offset": 542,
+              "Order": 12,
+              "Time": "2024-08-30T21:37:24.835369+07:00"
+            },
+            "Message": "Login Handler",
+            "Duration": 521700,
+            "NodeType": "AfterEach"
+          },
+          {
+            "SpecEventType": "Node",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 542,
+              "Order": 13,
+              "Time": "2024-08-30T21:37:24.835369+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "DeferCleanup (Each)"
+          },
+          {
+            "SpecEventType": "Node (End)",
+            "CodeLocation": {
+              "FileName": "D:/workspace/wano/backend/testing/mocks/common/core/AppConfig.go",
+              "LineNumber": 442
+            },
+            "TimelineLocation": {
+              "Offset": 542,
+              "Order": 15,
+              "Time": "2024-08-30T21:37:24.835369+07:00"
+            },
+            "Message": "Login Handler",
+            "NodeType": "DeferCleanup (Each)"
+          }
+        ]
+      }
+    ]
+  }
+]
