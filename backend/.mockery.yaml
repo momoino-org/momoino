@@ -8,4 +8,4 @@ packages:
   wano-island/common/core:
   wano-island/common/usermgt:
   wano-island/console:
-  wano-island/migration:
+  wano-island/migration/core:
