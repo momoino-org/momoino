@@ -3,6 +3,7 @@ package versions_test
 import (
 	"errors"
 	"log/slog"
+	"regexp"
 	"wano-island/common/core"
 	migrationCore "wano-island/migration/core"
 	"wano-island/migration/versions"
@@ -127,6 +128,22 @@ var _ = Describe("[migration.versions.db-migration]", func() {
 				migrationCore.DBInitVersion: mockedMigration,
 			})
 			Expect(err).To(HaveOccurred())
+		})
+
+		It("should not run db migration if the database is up to date", func(ctx SpecContext) {
+			dbMigrator := versions.NewDBMigration(mockedConfig, db, noopLogger)
+
+			mockedConfig.EXPECT().GetAppVersion().Return("1.0.0")
+
+			sqlMock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM information_schema.tables`)).
+				WithArgs("internal", "db_migrations", "BASE TABLE").
+				WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(1))
+			sqlMock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "internal"."db_migrations"`)).
+				WithArgs(1).
+				WillReturnRows(sqlmock.NewRows([]string{"version"}).AddRow("1.0.0"))
+
+			err := dbMigrator.Migrate(ctx, map[string]migrationCore.Migration{})
+			Expect(err).NotTo(HaveOccurred())
 		})
 	})
 })

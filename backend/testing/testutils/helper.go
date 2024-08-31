@@ -16,19 +16,37 @@ import (
 // CreateTestDBInstance sets up a test database instance using sqlmock and GORM.
 // It returns the GORM database instance and the sqlmock instance for mocking database interactions.
 func CreateTestDBInstance() (*gorm.DB, sqlmock.Sqlmock) {
-	db, mock, _ := sqlmock.New()
-	gormDB, _ := core.OpenDatabase(
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		panic(err)
+	}
+
+	gormDB, err := core.OpenDatabase(
 		core.NewNoopLogger(),
-		postgres.Config{Conn: db},
+		func(postgresCfg *postgres.Config, gormCfg *gorm.Config) {
+			postgresCfg.Conn = db
+			// Need to disable PrepareStmt to make mocking queries easier
+			gormCfg.PrepareStmt = false
+		},
 	)
+
+	if err != nil {
+		panic(err)
+	}
 
 	return gormDB, mock
 }
 
 // CloseGormDB closes the database connection associated with the provided GORM instance.
 func CloseGormDB(db *gorm.DB) {
-	sqlDB, _ := db.DB()
-	_ = sqlDB.Close()
+	sqlDB, err := db.DB()
+	if err != nil {
+		panic(err)
+	}
+
+	if err := sqlDB.Close(); err != nil {
+		panic(err)
+	}
 }
 
 // getWorkspaceDir retrieves the workspace directory path by executing the "go env GOWORK" command.

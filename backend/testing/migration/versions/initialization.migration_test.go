@@ -117,7 +117,9 @@ var _ = Describe("[migration.versions.initialization]", func() {
 
 			gormDB, err = core.OpenDatabase(
 				noopLogger,
-				gormPostgres.Config{DSN: postgresContainer.MustConnectionString(ctx)},
+				func(postgresCfg *gormPostgres.Config, gormCfg *gorm.Config) {
+					postgresCfg.DSN = postgresContainer.MustConnectionString(ctx)
+				},
 			)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(gormDB).ToNot(BeNil())
