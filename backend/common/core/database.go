@@ -49,15 +49,21 @@ func (u *Model) BeforeCreate(tx *gorm.DB) error {
 // OpenDatabase establishes a connection to a PostgreSQL database using GORM.
 func OpenDatabase(
 	logger *slog.Logger,
-	cfg postgres.Config,
+	opt func(postgresCfg *postgres.Config, gormCfg *gorm.Config),
 ) (*gorm.DB, error) {
-	return gorm.Open(postgres.New(cfg), &gorm.Config{
+	postgresCfg := postgres.Config{}
+	gormCfg := gorm.Config{
+		PrepareStmt: true,
 		Logger: slogGorm.New(
 			slogGorm.WithHandler(logger.Handler()),
 			slogGorm.WithTraceAll(),
 			slogGorm.WithContextValue("request-id", RequestIDKey),
 		),
-	})
+	}
+
+	opt(&postgresCfg, &gormCfg)
+
+	return gorm.Open(postgres.New(postgresCfg), &gormCfg)
 }
 
 // newGormDatabase initializes a new GORM database connection with retry mechanism.
@@ -79,8 +85,8 @@ func newGormDatabase(
 	)
 
 	gormDB, openDBConnectionErr := retry.DoWithData(func() (*gorm.DB, error) {
-		return OpenDatabase(logger, postgres.Config{
-			DSN: dsn,
+		return OpenDatabase(logger, func(postgresCfg *postgres.Config, gormCfg *gorm.Config) {
+			postgresCfg.DSN = dsn
 		})
 	}, retry.Attempts(databaseCfg.MaxAttempts), retry.Delay(1*time.Second))
 
