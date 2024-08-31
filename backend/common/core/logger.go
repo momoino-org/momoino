@@ -90,8 +90,6 @@ func NewStdoutLogger(config AppConfig) *slog.Logger {
 		},
 	})
 
-	slog.SetDefault(logger)
-
 	return logger
 }
 
