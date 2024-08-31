@@ -27,7 +27,7 @@ func main() {
 		) {
 			appLifeCycle.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
-					logger.InfoContext(ctx, "Migartion App",
+					logger.InfoContext(ctx, "Migration App",
 						slog.Group("app",
 							"version", config.GetAppVersion(),
 							"compatible-version", config.GetCompatibleVersion()))
