@@ -12,11 +12,9 @@ import (
 	mockusermgt "wano-island/testing/mocks/common/usermgt"
 	"wano-island/testing/testutils"
 
-	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gleak"
 	. "github.com/onsi/gomega/gstruct"
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/fx/fxtest"
@@ -26,7 +24,6 @@ import (
 var _ = Describe("handler.profile.go", func() {
 	var (
 		db             *gorm.DB
-		mockedDB       sqlmock.Sqlmock
 		appLifeCycle   *fxtest.Lifecycle
 		config         *mockcore.MockAppConfig
 		userRepository *mockusermgt.MockUserRepository
@@ -34,7 +31,8 @@ var _ = Describe("handler.profile.go", func() {
 	)
 
 	BeforeEach(func() {
-		db, mockedDB = testutils.CreateTestDBInstance()
+		testutils.DetectLeakyGoroutines()
+		db, _ = testutils.CreateTestDBInstance()
 		appLifeCycle = fxtest.NewLifecycle(GinkgoT())
 		config = mockcore.NewMockAppConfig(GinkgoT())
 		config.EXPECT().GetAppVersion().Return("1.0.0-testing")
@@ -66,10 +64,6 @@ var _ = Describe("handler.profile.go", func() {
 
 	AfterEach(func() {
 		appLifeCycle.RequireStop()
-		mockedDB.ExpectClose()
-		testutils.CloseGormDB(db)
-		Expect(mockedDB.ExpectationsWereMet()).NotTo(HaveOccurred())
-		Eventually(Goroutines).ShouldNot(HaveLeaked())
 	})
 
 	It("returns an error if there is no access token", func(ctx SpecContext) {

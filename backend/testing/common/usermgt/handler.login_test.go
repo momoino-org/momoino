@@ -16,7 +16,6 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gleak"
 	. "github.com/onsi/gomega/gstruct"
 	"go.uber.org/fx/fxtest"
 	"gorm.io/gorm"
@@ -33,6 +32,7 @@ var _ = Describe("Login Handler", func() {
 	)
 
 	BeforeEach(func() {
+		testutils.DetectLeakyGoroutines()
 		db, mockedDB = testutils.CreateTestDBInstance()
 		appLifeCycle = fxtest.NewLifecycle(GinkgoT())
 		config = mockcore.NewMockAppConfig(GinkgoT())
@@ -68,10 +68,6 @@ var _ = Describe("Login Handler", func() {
 
 	AfterEach(func() {
 		appLifeCycle.RequireStop()
-		mockedDB.ExpectClose()
-		testutils.CloseGormDB(db)
-		Expect(mockedDB.ExpectationsWereMet()).NotTo(HaveOccurred())
-		Eventually(Goroutines).ShouldNot(HaveLeaked())
 	})
 
 	It("returns an error if cannot decode request body", func(ctx SpecContext) {

@@ -9,17 +9,35 @@ import (
 	"wano-island/common/core"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	. "github.com/onsi/gomega/gleak"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-// CreateTestDBInstance sets up a test database instance using sqlmock and GORM.
-// It returns the GORM database instance and the sqlmock instance for mocking database interactions.
+// DetectLeakyGoroutines is a helper function that detects and prevents leaked goroutines during testing.
+// It uses the gleak library to track goroutine leaks and asserts that no goroutines are leaked.
+// This function should be called at the beginning of each test case that involves goroutines.
+// It uses ginkgo's DeferCleanup function to ensure that the cleanup code is executed after each test case.
+func DetectLeakyGoroutines() {
+	// Capture the initial set of goroutines
+	nonLeakyGoroutines := Goroutines()
+
+	// Register a cleanup function to assert that no goroutines are leaked
+	DeferCleanup(func() {
+		// Assert that no goroutines are leaked
+		Eventually(Goroutines).ShouldNot(HaveLeaked(nonLeakyGoroutines))
+	})
+}
+
+// CreateTestDBInstance creates a test database instance using sqlmock and gorm.DB.
+// It returns a pointer to the gorm.DB instance and a sqlmock.Sqlmock instance for mocking database operations.
+// The function also includes a cleanup mechanism using DeferCleanup to ensure that the database connection is closed
+// and that all expectations set on the mock are met.
 func CreateTestDBInstance() (*gorm.DB, sqlmock.Sqlmock) {
 	db, mock, err := sqlmock.New()
-	if err != nil {
-		panic(err)
-	}
+	Expect(err).NotTo(HaveOccurred())
 
 	gormDB, err := core.OpenDatabase(
 		core.NewNoopLogger(),
@@ -29,24 +47,21 @@ func CreateTestDBInstance() (*gorm.DB, sqlmock.Sqlmock) {
 			gormCfg.PrepareStmt = false
 		},
 	)
+	Expect(err).NotTo(HaveOccurred())
 
-	if err != nil {
-		panic(err)
-	}
+	DeferCleanup(func() {
+		mock.ExpectClose()
+
+		sqlDB, getDBErr := gormDB.DB()
+		Expect(getDBErr).NotTo(HaveOccurred())
+
+		closeDBErr := sqlDB.Close()
+		Expect(closeDBErr).NotTo(HaveOccurred())
+
+		Expect(mock.ExpectationsWereMet()).NotTo(HaveOccurred())
+	})
 
 	return gormDB, mock
-}
-
-// CloseGormDB closes the database connection associated with the provided GORM instance.
-func CloseGormDB(db *gorm.DB) {
-	sqlDB, err := db.DB()
-	if err != nil {
-		panic(err)
-	}
-
-	if err := sqlDB.Close(); err != nil {
-		panic(err)
-	}
 }
 
 // getWorkspaceDir retrieves the workspace directory path by executing the "go env GOWORK" command.

@@ -12,7 +12,7 @@ var _ = BeforeSuite(func() {
 	IgnoreGinkgoParallelClient()
 })
 
-func TestHTTPSrvModule(t *testing.T) {
+func TestHTTPServer(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "httpsrv suite")
+	RunSpecs(t, "HTTP Server")
 }
