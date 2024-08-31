@@ -9,6 +9,8 @@ E-0003: We couldn't process your login. Please log out and try logging in again.
 E-0004: Cannot change the password because we cannot find the user in the system. If the problem continues, kindly reach out to the system administrator for support
 E-0005: Validation failed. Please check and try again
 E-0006: The current password is invalid, please check and try again
+# (showmgt)
+E-0007: Cannot create the show. Please try again. If the problem continues, kindly reach out to the system administrator for support
 
 # Unknown messages (for internal server errors)
 U-0000: An error has occurred. Please try again. If the problem continues, kindly reach out to the system administrator for support

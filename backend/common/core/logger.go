@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/samber/lo"
 	"go.uber.org/fx"
 )
 
@@ -61,17 +62,7 @@ func NewNoopLogger() *slog.Logger {
 
 // NewStdoutLogger returns a logger that writes log messages to the standard output (os.Stdout).
 func NewStdoutLogger(config AppConfig) *slog.Logger {
-	// In production mode, log level is "info"
-	logLevel := slog.LevelInfo
-
-	switch config.GetMode() {
-	case DevelopmentMode:
-		// In development mode, we want to see all logs
-		logLevel = slog.LevelDebug
-	case TestingMode:
-		// In testing mode, we only want to see warning/error logs
-		logLevel = slog.LevelWarn
-	}
+	logLevel := lo.Ternary(config.IsProduction(), slog.LevelInfo, slog.LevelDebug)
 
 	logger := newLogger(os.Stdout, &slog.HandlerOptions{
 		AddSource: true,

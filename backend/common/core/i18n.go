@@ -33,6 +33,7 @@ const (
 	MsgPasswordChangeErrorDueToUserNotFound = "E-0004"
 	MsgValidationFailed                     = "E-0005"
 	MsgInvalidCurrentPassword               = "E-0006"
+	MsgCannotCreateTheShow                  = "E-0007"
 	MsgInternalServerError                  = "U-0000"
 )
 

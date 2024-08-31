@@ -2,6 +2,7 @@ package versions
 
 import (
 	"log/slog"
+	"wano-island/common/showmgt"
 	"wano-island/common/usermgt"
 	migrationCore "wano-island/migration/core"
 	"wano-island/migration/versions/initialization"
@@ -47,6 +48,12 @@ func (m *initializationMigration) Migrate(tx *gorm.DB) error {
 	return tx.AutoMigrate(
 		&initialization.DBMigrationModel{},
 		&usermgt.UserModel{},
+		&showmgt.ShowModel{},
+		&showmgt.ShowTranslationModel{},
+		&showmgt.SeasonModel{},
+		&showmgt.SeasonTranslationModel{},
+		&showmgt.EpisodeModel{},
+		&showmgt.EpisodeTranslationModel{},
 	)
 }
 
