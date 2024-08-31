@@ -15,7 +15,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gleak"
+
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )
@@ -27,16 +27,10 @@ var _ = Describe("[migration.versions.db-migration]", func() {
 	var noopLogger *slog.Logger
 
 	BeforeEach(func() {
+		testutils.DetectLeakyGoroutines()
 		noopLogger = core.NewNoopLogger()
 		mockedConfig = mockcore.NewMockAppConfig(GinkgoT())
 		db, sqlMock = testutils.CreateTestDBInstance()
-	})
-
-	AfterEach(func() {
-		sqlMock.ExpectClose()
-		testutils.CloseGormDB(db)
-		Expect(sqlMock.ExpectationsWereMet()).NotTo(HaveOccurred())
-		Eventually(Goroutines).ShouldNot(HaveLeaked())
 	})
 
 	Context("when creating inital database", func() {
@@ -144,6 +138,20 @@ var _ = Describe("[migration.versions.db-migration]", func() {
 
 			err := dbMigrator.Migrate(ctx, map[string]migrationCore.Migration{})
 			Expect(err).NotTo(HaveOccurred())
+		})
+
+		It("should return an error if cannot get the current db version from the database", func(ctx SpecContext) {
+			dbMigrator := versions.NewDBMigration(mockedConfig, db, noopLogger)
+
+			sqlMock.ExpectQuery(regexp.QuoteMeta(`SELECT count(*) FROM information_schema.tables`)).
+				WithArgs("internal", "db_migrations", "BASE TABLE").
+				WillReturnRows(sqlmock.NewRows([]string{"count"}).AddRow(1))
+			sqlMock.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "internal"."db_migrations"`)).
+				WithArgs(1).
+				WillReturnError(errors.New("something went wrong"))
+
+			err := dbMigrator.Migrate(ctx, map[string]migrationCore.Migration{})
+			Expect(err).To(MatchError(ContainSubstring("cannot get the current database version")))
 		})
 	})
 })

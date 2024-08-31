@@ -12,7 +12,7 @@ var _ = BeforeSuite(func() {
 	IgnoreGinkgoParallelClient()
 })
 
-func TestMigrationVersions(t *testing.T) {
+func TestDBMigration(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "[migration.versions] Suite")
+	RunSpecs(t, "DB Migration")
 }

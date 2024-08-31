@@ -14,7 +14,6 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gleak"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -30,16 +29,10 @@ var _ = Describe("[migration.versions.initialization]", func() {
 		var noopLogger *slog.Logger
 
 		BeforeEach(func() {
+			testutils.DetectLeakyGoroutines()
 			noopLogger = core.NewNoopLogger()
 			mockedConfig = mockcore.NewMockAppConfig(GinkgoT())
 			db, sqlMock = testutils.CreateTestDBInstance()
-		})
-
-		AfterEach(func() {
-			sqlMock.ExpectClose()
-			testutils.CloseGormDB(db)
-			Expect(sqlMock.ExpectationsWereMet()).NotTo(HaveOccurred())
-			Eventually(Goroutines).ShouldNot(HaveLeaked())
 		})
 
 		It("should rollback if the pre-process failed", func(ctx SpecContext) {

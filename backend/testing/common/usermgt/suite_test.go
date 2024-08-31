@@ -17,9 +17,9 @@ var _ = BeforeSuite(func() {
 	IgnoreGinkgoParallelClient()
 })
 
-func TestUsermgt(t *testing.T) {
+func TestUserManagement(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Usermgt Suite")
+	RunSpecs(t, "User Management")
 }
 
 // generateRSAKey generates a pair of RSA public and private keys.
