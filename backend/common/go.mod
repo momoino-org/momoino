@@ -13,6 +13,7 @@ require (
 	github.com/gorilla/schema v1.4.1
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/orandin/slog-gorm v1.4.0
+	github.com/samber/lo v1.47.0
 	github.com/spf13/viper v1.19.0
 	go.uber.org/fx v1.22.2
 	golang.org/x/crypto v0.26.0

@@ -5,7 +5,7 @@ go 1.22.5
 replace wano-island/common => ../common
 
 require (
-	github.com/samber/lo v1.46.0
+	github.com/samber/lo v1.47.0
 	go.uber.org/fx v1.22.2
 	golang.org/x/crypto v0.26.0
 	gorm.io/gorm v1.25.11

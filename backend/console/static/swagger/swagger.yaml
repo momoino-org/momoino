@@ -74,6 +74,52 @@ paths:
               schema:
                 $ref: "#/components/schemas/Response"
 
+  /api/v1/shows:
+    post:
+      security:
+        - accessToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kind:
+                  type: string
+                originalLanguage:
+                  type: string
+                originalTitle:
+                  type: string
+                originalOverview:
+                  type: string
+                  nullable: true
+                keywords:
+                  type: array
+                  nullable: true
+                  items:
+                    type: string
+                isReleased:
+                  type: boolean
+      responses:
+        "200":
+          description: Create the show successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateShow_200"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+
 components:
   securitySchemes:
     accessToken:
@@ -135,6 +181,40 @@ components:
                   type: string
                 lastName:
                   type: string
+                createdAt:
+                  type: string
+                  format: date-time
+                updatedAt:
+                  type: string
+                  format: date-time
+
+    CreateShow_200:
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                kind:
+                  type: string
+                originalLanguage:
+                  type: string
+                originalTitle:
+                  type: string
+                originalOverview:
+                  type: string
+                  nullable: true
+                keywords:
+                  type: array
+                  nullable: true
+                  items:
+                    type: string
+                isReleased:
+                  type: boolean
                 createdAt:
                   type: string
                   format: date-time

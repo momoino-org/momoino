@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 	"wano-island/common/core"
+	"wano-island/common/showmgt"
 	"wano-island/common/usermgt"
 	"wano-island/console/modules/filesystem"
 	"wano-island/console/modules/httpsrv"
@@ -30,8 +31,9 @@ func main() {
 		core.NewLoggerModuleWithConfig(),
 		core.NewRequestModule(),
 		core.NewDatabaseModule(),
-        core.NewTranslationModule(),
+		core.NewTranslationModule(),
 		usermgt.NewUserMgtModule(),
+		showmgt.NewShowMgtModule(),
 
 		// Console
 		filesystem.NewFileSystemModule(staticFiles),
