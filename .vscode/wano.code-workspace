@@ -73,6 +73,27 @@
 					"APP_DATABASE_MAX_ATTEMPTS": "3",
 				}
 			},
+      {
+        "name": "Run [frontend] project",
+        "request": "launch",
+        "runtimeArgs": [
+          "run",
+          "dev"
+        ],
+        "runtimeExecutable": "npm",
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "type": "node",
+        "cwd": "${workspaceRoot}/frontend/admin",
+        "env": {
+          "USE_HTTPS": "true",
+          // For internal communication between NextJS's backend and custom backend
+          "NEXT_BACKEND_HOST": "http://localhost:8080",
+          // For public communication between frontend and backend
+          "NEXT_PUBLIC_BACKEND_HOST": "http://localhost:8080",
+        }
+      },
     ],
   }
 }

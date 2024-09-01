@@ -1,0 +1,12 @@
+{
+  "common": {
+    "email": "Email",
+    "password": "Mật khẩu"
+  },
+  "page": {
+    "signin": {
+      "title": "Đăng nhập",
+      "signinBtn": "Đăng nhập"
+    }
+  }
+}

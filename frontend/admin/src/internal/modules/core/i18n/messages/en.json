@@ -1,0 +1,12 @@
+{
+  "common": {
+    "email": "Email",
+    "password": "Password"
+  },
+  "page": {
+    "signin": {
+      "title": "Sign in",
+      "signinBtn": "Sign in"
+    }
+  }
+}
