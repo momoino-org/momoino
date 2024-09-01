@@ -79,6 +79,19 @@ func toAuthUser(mapClaims jwt.MapClaims) (*core.AuthUser, error) {
 	return &authUser, nil
 }
 
+// extractAccessTokenFromRequest extracts the access token from the HTTP request header or cookie.
+func extractAccessTokenFromRequest(req *http.Request) string {
+	// Extract the access token from the request header.
+	accessToken := strings.TrimPrefix(req.Header.Get(core.AuthorizationHeader), "Bearer ")
+
+	// If the access token is in the cookie, use it instead of the header.
+	if cookie, err := req.Cookie("auth.token"); err == nil {
+		accessToken = cookie.Value
+	}
+
+	return accessToken
+}
+
 // WithJwtMiddleware is a middleware function that handles JWT authentication for HTTP requests.
 // It extracts the access token from the request header, verifies it, and converts the claims into an AuthUser object.
 // If the access token is missing or invalid, it returns an appropriate HTTP response.
@@ -86,8 +99,7 @@ func toAuthUser(mapClaims jwt.MapClaims) (*core.AuthUser, error) {
 func WithJwtMiddleware(bundle *i18n.Bundle, logger *slog.Logger) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// Extract the access token from the request header.
-			accessToken := strings.TrimPrefix(r.Header.Get(core.AuthorizationHeader), "Bearer ")
+			accessToken := extractAccessTokenFromRequest(r)
 
 			// If the access token is missing, return an unauthorized response.
 			if accessToken == "" {

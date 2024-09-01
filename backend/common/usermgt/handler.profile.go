@@ -31,6 +31,7 @@ type ProfileResponse struct {
 	Email     string    `json:"email"`
 	FirstName string    `json:"firstName"`
 	LastName  string    `json:"lastName"`
+	Locale    string    `json:"locale"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
@@ -83,6 +84,7 @@ func (h *profileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Email:     user.Email,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
+		Locale:    user.Locale,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}).Build())

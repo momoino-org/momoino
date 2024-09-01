@@ -1,0 +1,35 @@
+name: frontend
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+  push:
+    paths:
+      - "frontend/**"
+    branches:
+      - "main"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install packages
+        working-directory: frontend/admin
+        run: npm ci
+      - name: Run code linter
+        working-directory: frontend/admin
+        run: npm run lint
+      - name: Build
+        working-directory: frontend/admin
+        run: npm run build

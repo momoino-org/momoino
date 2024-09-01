@@ -1,0 +1,45 @@
+{
+  "name": "admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint && prettier --check .",
+    "format": "next lint --fix && prettier --write ."
+  },
+  "dependencies": {
+    "@emotion/cache": "^11.13.1",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@hookform/resolvers": "^3.9.0",
+    "@mui/icons-material": "^6.0.1",
+    "@mui/material": "^6.0.1",
+    "@mui/material-nextjs": "^6.0.1",
+    "@tanstack/react-query": "^5.54.1",
+    "js-cookie": "^3.0.5",
+    "jwt-decode": "^4.0.0",
+    "ky": "^1.7.2",
+    "next": "14.2.8",
+    "next-intl": "^3.19.1",
+    "path-to-regexp": "^8.0.0",
+    "radash": "^12.1.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.53.0",
+    "valibot": "^0.41.0"
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.8",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-unused-imports": "^3.2.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5"
+  }
+}

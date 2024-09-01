@@ -49,9 +49,13 @@ type LoginResponse struct {
 
 type JWTCustomClaims struct {
 	jwt.RegisteredClaims
-	Locale      string   `json:"locale"`
-	Roles       []string `json:"roles"`
-	Permissions []string `json:"permissions"`
+	Locale            string   `json:"locale"`
+	Roles             []string `json:"roles"`
+	Permissions       []string `json:"permissions"`
+	GivenName         string   `json:"given_name"`
+	FamilyName        string   `json:"family_name"`
+	Email             string   `json:"email"`
+	PreferredUsername string   `json:"preferred_username"`
 }
 
 func NewLoginHandler(params LoginHandlerParams) *loginHandler {
@@ -139,9 +143,13 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, JWTCustomClaims{
-		Roles:       []string{},
-		Permissions: []string{},
-		Locale:      loggedUser.Locale,
+		Email:             loggedUser.Email,
+		PreferredUsername: loggedUser.Username,
+		GivenName:         loggedUser.FirstName,
+		FamilyName:        loggedUser.LastName,
+		Locale:            loggedUser.Locale,
+		Roles:             []string{},
+		Permissions:       []string{},
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   loggedUser.ID.String(),
 			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(h.jwtConfig.AccessTokenExpiresIn))),
