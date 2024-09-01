@@ -2,7 +2,6 @@ package versions_test
 
 import (
 	"log/slog"
-	"time"
 	"wano-island/common/core"
 	migrationCore "wano-island/migration/core"
 	"wano-island/migration/versions"
@@ -14,9 +13,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
 	gormPostgres "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -88,34 +85,12 @@ var _ = Describe("[migration.versions.initialization]", func() {
 		var noopLogger *slog.Logger
 
 		BeforeAll(func(ctx SpecContext) {
-			var err error
+			postgresContainer = testutils.CreatePostgresContainer(ctx)
+			Expect(postgresContainer.Snapshot(ctx, postgres.WithSnapshotName(ctx.SpecReport().FileName()))).ToNot(HaveOccurred())
 
-			noopLogger = core.NewNoopLogger()
-
-			postgresContainer, err = postgres.Run(ctx,
-				"docker.io/postgres:16-alpine",
-				postgres.WithDatabase("db-migration"),
-				postgres.WithUsername("db-migration"),
-				postgres.WithPassword("db-migration"),
-				postgres.WithSQLDriver("pgx"),
-				testcontainers.WithWaitStrategy(
-					wait.ForLog("database system is ready to accept connections").
-						WithOccurrence(2).
-						WithStartupTimeout(5*time.Second)))
-			Expect(err).ToNot(HaveOccurred())
-			Expect(postgresContainer).ToNot(BeNil())
-
-			err = postgresContainer.Snapshot(ctx, postgres.WithSnapshotName(ctx.SpecReport().FileName()))
-			Expect(err).ToNot(HaveOccurred())
-
-			gormDB, err = core.OpenDatabase(
-				noopLogger,
-				func(postgresCfg *gormPostgres.Config, gormCfg *gorm.Config) {
-					postgresCfg.DSN = postgresContainer.MustConnectionString(ctx)
-				},
-			)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(gormDB).ToNot(BeNil())
+			gormDB = testutils.CreateDBInstance(func(postgresCfg *gormPostgres.Config, gormCfg *gorm.Config) {
+				postgresCfg.DSN = postgresContainer.MustConnectionString(ctx)
+			})
 		})
 
 		BeforeEach(func() {
@@ -125,11 +100,6 @@ var _ = Describe("[migration.versions.initialization]", func() {
 
 		AfterEach(func(ctx SpecContext) {
 			err := postgresContainer.Restore(ctx)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		AfterAll(func(ctx SpecContext) {
-			err := postgresContainer.Terminate(ctx)
 			Expect(err).ToNot(HaveOccurred())
 		})
 

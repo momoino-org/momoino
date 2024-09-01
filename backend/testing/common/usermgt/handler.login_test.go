@@ -25,56 +25,47 @@ var _ = Describe("Login Handler", func() {
 	var (
 		db             *gorm.DB
 		mockedDB       sqlmock.Sqlmock
-		appLifeCycle   *fxtest.Lifecycle
 		config         *mockcore.MockAppConfig
 		userRepository usermgt.UserRepository
-		handler        http.Handler
+		router         http.Handler
 	)
 
 	BeforeEach(func() {
 		testutils.DetectLeakyGoroutines()
 		db, mockedDB = testutils.CreateTestDBInstance()
-		appLifeCycle = fxtest.NewLifecycle(GinkgoT())
+
 		config = mockcore.NewMockAppConfig(GinkgoT())
-		config.EXPECT().GetAppVersion().Return("1.0.0-testing")
+		config.EXPECT().GetAppVersion().Return("1.0.0")
 		config.EXPECT().GetRevision().Return("testing")
 		config.EXPECT().GetMode().Return(core.TestingMode)
 		config.EXPECT().IsTesting().Return(true)
 		config.EXPECT().GetJWTConfig().Return(generateJWTConfig())
+
 		userRepository = usermgt.NewUserRepository(usermgt.UserRepositoryParams{})
 		userService := usermgt.NewUserService(usermgt.UserServiceParams{})
-		logger := core.NewNoopLogger()
-		handler = httpsrv.NewRouter(httpsrv.RouteParams{
-			Config: config,
-			Logger: logger,
-			I18nBundle: core.NewI18nBundle(core.I18nBundleParams{
-				AppLifeCycle: appLifeCycle,
-				LocaleFS:     testutils.GetResourceFS(),
-			}),
-			Routes: []core.HTTPRoute{
-				usermgt.NewLoginHandler(usermgt.LoginHandlerParams{
-					AppLifeCycle:   appLifeCycle,
-					Logger:         logger,
-					Config:         config,
-					DB:             db,
-					UserService:    userService,
-					UserRepository: userRepository,
-				}),
-			},
+
+		router = testutils.WithFxLifeCycle(func(l *fxtest.Lifecycle) http.Handler {
+			return testutils.CreateRouter(func(rp *httpsrv.RouteParams) {
+				rp.Config = config
+				rp.Routes = []core.HTTPRoute{
+					usermgt.NewLoginHandler(usermgt.LoginHandlerParams{
+						AppLifeCycle:   l,
+						Logger:         core.NewNoopLogger(),
+						Config:         config,
+						DB:             db,
+						UserService:    userService,
+						UserRepository: userRepository,
+					}),
+				}
+			})
 		})
-
-		appLifeCycle.RequireStart()
-	})
-
-	AfterEach(func() {
-		appLifeCycle.RequireStop()
 	})
 
 	It("returns an error if cannot decode request body", func(ctx SpecContext) {
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewReader([]byte("{,}")))
 		recorder := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewReader([]byte("{,}")))
 
-		handler.ServeHTTP(recorder, req)
+		router.ServeHTTP(recorder, req)
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -94,13 +85,13 @@ var _ = Describe("Login Handler", func() {
 			WithArgs("testing@internal.com", 1).
 			WillReturnError(gorm.ErrRecordNotFound)
 
+		recorder := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewReader([]byte(`{
             "email": "testing@internal.com",
             "password": ""
         }`)))
-		recorder := httptest.NewRecorder()
 
-		handler.ServeHTTP(recorder, req)
+		router.ServeHTTP(recorder, req)
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -122,13 +113,13 @@ var _ = Describe("Login Handler", func() {
 				"testing@internal.com",
 				"$2a$10$4LGRfD5yIX02UIe.4mEmfO60OkPVOQ5rsWgVS708v2TkurwnRW51."))
 
+		recorder := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewReader([]byte(`{
             "email": "testing@internal.com",
             "password": "incorrect-password"
         }`)))
-		recorder := httptest.NewRecorder()
 
-		handler.ServeHTTP(recorder, req)
+		router.ServeHTTP(recorder, req)
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -150,13 +141,13 @@ var _ = Describe("Login Handler", func() {
 				"testing@internal.com",
 				"$2a$10$4LGRfD5yIX02UIe.4mEmfO60OkPVOQ5rsWgVS708v2TkurwnRW51."))
 
+		recorder := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewReader([]byte(`{
             "email": "testing@internal.com",
             "password": "Keep!t5ecret"
         }`)))
-		recorder := httptest.NewRecorder()
 
-		handler.ServeHTTP(recorder, req)
+		router.ServeHTTP(recorder, req)
 
 		var response core.Response[usermgt.LoginResponse]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
