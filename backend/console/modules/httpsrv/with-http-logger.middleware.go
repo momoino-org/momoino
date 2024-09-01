@@ -28,8 +28,7 @@ type HTTPLoggerConfig struct {
 	// The logger ignores requests with paths that start with any of the ignored paths.
 	IgnoredPaths []string
 
-	// Silent is a boolean indicating whether the logger should be silent (i.e., not log any messages).
-	Silent bool
+	CustomLogger func() *slog.Logger
 }
 
 // httpLogger is a struct that encapsulates a slog.Logger for logging HTTP requests and responses.
@@ -69,16 +68,10 @@ func (c customHeader) LogValue() slog.Value {
 // It wraps the provided http.Handler and logs the request details, including method, path, headers,
 // and elapsed time. It also logs the response details, including status code, bytes written, and headers.
 func withRequestLoggerMiddleware(
-	appConfig core.AppConfig,
 	httpLoggerConfig *HTTPLoggerConfig,
 ) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if httpLoggerConfig.Silent {
-				next.ServeHTTP(w, r)
-				return
-			}
-
 			if slices.ContainsFunc(httpLoggerConfig.IgnoredPaths, func(ignoredPath string) bool {
 				return strings.HasPrefix(r.URL.Path, ignoredPath)
 			}) {
@@ -90,7 +83,7 @@ func withRequestLoggerMiddleware(
 			ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
 
 			httpLogger := &httpLogger{
-				logger: core.NewStdoutLogger(appConfig),
+				logger: httpLoggerConfig.CustomLogger(),
 			}
 
 			requestAttrs := []any{

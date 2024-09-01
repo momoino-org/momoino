@@ -6,35 +6,36 @@ import (
 	"testing/fstest"
 	"wano-island/common/core"
 	"wano-island/console/modules/httpsrv"
+	"wano-island/testing/testutils"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	. "github.com/onsi/gomega/gleak"
 	"go.uber.org/fx/fxtest"
 )
 
 var _ = Describe("withJwtMiddleware", func() {
-	AfterEach(func() {
-		Eventually(Goroutines).ShouldNot(HaveLeaked())
+	BeforeEach(func() {
+		testutils.DetectLeakyGoroutines()
 	})
 
 	DescribeTable(
 		"Localizer",
 		func(path string, headers map[string]string, expectedResult string) {
 			router := chi.NewRouter()
-			appLifeCycle := fxtest.NewLifecycle(GinkgoT())
-			i18nBundle := core.NewI18nBundle(core.I18nBundleParams{
-				AppLifeCycle: appLifeCycle,
-				LocaleFS: fstest.MapFS{
-					"resources/trans/locale.en.yaml": &fstest.MapFile{
-						Data: []byte("Language: English"),
+			i18nBundle := testutils.WithFxLifeCycle(func(l *fxtest.Lifecycle) *i18n.Bundle {
+				return core.NewI18nBundle(core.I18nBundleParams{
+					AppLifeCycle: l,
+					LocaleFS: fstest.MapFS{
+						"resources/trans/locale.en.yaml": &fstest.MapFile{
+							Data: []byte("Language: English"),
+						},
+						"resources/trans/locale.vi.yaml": &fstest.MapFile{
+							Data: []byte("Language: Vietnamese"),
+						},
 					},
-					"resources/trans/locale.vi.yaml": &fstest.MapFile{
-						Data: []byte("Language: Vietnamese"),
-					},
-				},
+				})
 			})
 
 			router.Use(httpsrv.WithI18nMiddleware(i18nBundle))
@@ -48,8 +49,6 @@ var _ = Describe("withJwtMiddleware", func() {
 					},
 				})))
 			})
-
-			appLifeCycle.RequireStart()
 
 			recorder := httptest.NewRecorder()
 			request := httptest.NewRequest(http.MethodGet, path, nil)

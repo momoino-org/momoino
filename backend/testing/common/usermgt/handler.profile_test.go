@@ -17,60 +17,46 @@ import (
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
 	"github.com/stretchr/testify/mock"
-	"go.uber.org/fx/fxtest"
 	"gorm.io/gorm"
 )
 
 var _ = Describe("handler.profile.go", func() {
 	var (
 		db             *gorm.DB
-		appLifeCycle   *fxtest.Lifecycle
 		config         *mockcore.MockAppConfig
 		userRepository *mockusermgt.MockUserRepository
-		handler        http.Handler
+		router         http.Handler
 	)
 
 	BeforeEach(func() {
 		testutils.DetectLeakyGoroutines()
 		db, _ = testutils.CreateTestDBInstance()
-		appLifeCycle = fxtest.NewLifecycle(GinkgoT())
+
 		config = mockcore.NewMockAppConfig(GinkgoT())
-		config.EXPECT().GetAppVersion().Return("1.0.0-testing")
+		config.EXPECT().GetAppVersion().Return("1.0.0")
 		config.EXPECT().GetRevision().Return("testing")
 		config.EXPECT().GetMode().Return(core.TestingMode)
 		config.EXPECT().IsTesting().Return(true)
-		// userRepository = usermgt.NewUserRepository(usermgt.UserRepositoryParams{})
+
 		userRepository = mockusermgt.NewMockUserRepository(GinkgoT())
-		// userRepository.EXPECT().FindUserByID(mock.Anything, mock.Anything, mock.Anything)
-		logger := core.NewStdoutLogger(config)
-		handler = httpsrv.NewRouter(httpsrv.RouteParams{
-			Config: config,
-			Logger: logger,
-			I18nBundle: core.NewI18nBundle(core.I18nBundleParams{
-				AppLifeCycle: appLifeCycle,
-				LocaleFS:     testutils.GetResourceFS(),
-			}),
-			Routes: []core.HTTPRoute{
+
+		router = testutils.CreateRouter(func(rp *httpsrv.RouteParams) {
+			rp.Config = config
+			rp.Routes = []core.HTTPRoute{
 				usermgt.NewProfileHandler(usermgt.ProfileHandlerParams{
-					Logger:         logger,
+					Logger:         core.NewNoopLogger(),
 					DB:             db,
 					UserRepository: userRepository,
 				}),
-			},
+			}
 		})
-
-		appLifeCycle.RequireStart()
-	})
-
-	AfterEach(func() {
-		appLifeCycle.RequireStop()
 	})
 
 	It("returns an error if there is no access token", func(ctx SpecContext) {
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/profile", nil)
 		recorder := httptest.NewRecorder()
 
-		handler.ServeHTTP(recorder, req)
+		router.ServeHTTP(recorder, req)
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -106,9 +92,7 @@ var _ = Describe("handler.profile.go", func() {
 
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/profile", nil)
 		recorder := httptest.NewRecorder()
-		//nolint:lll // No need to fix
-		req.Header.Add(core.AuthorizationHeader, "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTkxMzVmNy02MjY1LTdlZjgtODkyMC01NzI4MDczNmY2YzAiLCJleHAiOjE3MjQ4NDc3MTksIm5iZiI6MTcyNDg0NzcxOSwiaWF0IjoxNzI0ODQ3NzE5LCJyb2xlcyI6W10sInBlcm1pc3Npb25zIjpbXX0.I9-Kr2ArmW3V-eUN9KKxKShmV9oDWefKBzaXo5BJCqV6fqVtddNFSxnmGzj72WMykCXSTrz92NDGtH8M-lZWwBsNOJY7XCZFoDdYKHk_OyGR9Nk-lRvburgMgaNChw6lD-zjZTb2xfJhmdj4IMbZOcDMB6bdo5bAz_M_3iiPw1gMX9Jkd5yXIwchjOWwVasVO0ycZZ3qFz-mBrSn1FyG8T_ox6avcEHFdiDiBUR6YBaXZwIpiFqhy0aDdvGz8MCvT95b5keTO6jcNLwHZrm1YnZD-lPz5xJQL14n-FnKOvi0UVpEbmkkmyfQz4IH5kdzaRaEdHEYsSyjpNJ1Xaq5lA")
-		handler.ServeHTTP(recorder, req)
+		router.ServeHTTP(recorder, testutils.WithFakeJWT(req))
 
 		var response core.Response[usermgt.ProfileResponse]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)

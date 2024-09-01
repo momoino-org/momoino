@@ -24,7 +24,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
 	var (
 		db       *gorm.DB
 		mockedDB sqlmock.Sqlmock
-		handler  http.Handler
+		router   http.Handler
 	)
 
 	BeforeEach(func() {
@@ -32,18 +32,16 @@ var _ = Describe("[handler.create-movie.go]", func() {
 		db, mockedDB = testutils.CreateTestDBInstance()
 
 		config := mockcore.NewMockAppConfig(GinkgoT())
-		config.EXPECT().GetAppVersion().Return("1.0.0-testing")
+		config.EXPECT().GetAppVersion().Return("1.0.0")
 		config.EXPECT().GetRevision().Return("testing")
 		config.EXPECT().GetMode().Return(core.TestingMode)
 		config.EXPECT().IsTesting().Return(true)
 
-		handler = testutils.SetupTestRouter(func(rp *httpsrv.RouteParams) {
-			noopLogger := core.NewNoopLogger()
-
+		router = testutils.CreateRouter(func(rp *httpsrv.RouteParams) {
 			rp.Config = config
 			rp.Routes = []core.HTTPRoute{
 				showmgt.NewCreateMovieHandler(showmgt.CreateShowHandlerParams{
-					Logger: noopLogger,
+					Logger: core.NewNoopLogger(),
 					DB:     db,
 				}),
 			}
@@ -56,8 +54,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
         {
             invalid-data
         }`)))
-		testutils.SetJWTToken(request)
-		handler.ServeHTTP(recorder, request)
+		router.ServeHTTP(recorder, testutils.WithFakeJWT(request))
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -111,8 +108,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
             "isReleased": true
         }`)))
 
-		testutils.SetJWTToken(request)
-		handler.ServeHTTP(recorder, request)
+		router.ServeHTTP(recorder, testutils.WithFakeJWT(request))
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -166,8 +162,8 @@ var _ = Describe("[handler.create-movie.go]", func() {
             ],
             "isReleased": true
         }`)))
-		testutils.SetJWTToken(request)
-		handler.ServeHTTP(recorder, request)
+
+		router.ServeHTTP(recorder, testutils.WithFakeJWT(request))
 
 		var response core.Response[showmgt.CreateShowResponseBody]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)

@@ -3,6 +3,7 @@ package httpsrv
 import (
 	"log/slog"
 	"net/http"
+	"slices"
 	"time"
 	"wano-island/common/core"
 
@@ -10,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"github.com/samber/lo"
 	"go.uber.org/fx"
 )
 
@@ -37,32 +39,47 @@ func NewRouter(params RouteParams) http.Handler {
 		}
 	}
 
+	middlewares := map[int]func(http.Handler) http.Handler{
+		0:  middleware.CleanPath,
+		10: withRequestIDMiddleware,
+		20: withRequestLoggerMiddleware(&HTTPLoggerConfig{
+			CustomLogger: func() *slog.Logger {
+				if params.Config.IsTesting() {
+					return core.NewNoopLogger()
+				}
+
+				return core.NewStdoutLogger(params.Config)
+			},
+			IgnoredPaths: []string{
+				"/swagger",
+				"/static",
+			},
+			Tags: map[string]string{
+				"version": params.Config.GetAppVersion(),
+				"mode":    params.Config.GetMode(),
+				"rev":     params.Config.GetRevision(),
+			},
+		}),
+		30: WithI18nMiddleware(params.I18nBundle),
+		//nolint:mnd // I don't think we need to named this number here
+		40: middleware.Compress(5),
+		50: withRecoverMiddleware(func(w http.ResponseWriter, r *http.Request) {
+			render.Status(r, http.StatusInternalServerError)
+			render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
+		}),
+		60: middleware.Timeout(time.Minute),
+	}
+
 	// Public routes
 	r.Group(func(r chi.Router) {
-		r.Use(
-			middleware.CleanPath,
-			withRequestIDMiddleware,
-			WithI18nMiddleware(params.I18nBundle),
-			withRequestLoggerMiddleware(params.Config, &HTTPLoggerConfig{
-				Silent: params.Config.IsTesting(),
-				IgnoredPaths: []string{
-					"/swagger",
-					"/static",
-				},
-				Tags: map[string]string{
-					"version": params.Config.GetAppVersion(),
-					"mode":    params.Config.GetMode(),
-					"rev":     params.Config.GetRevision(),
-				},
-			}),
-			//nolint:mnd // I don't think we need to named this number here
-			middleware.Compress(5),
-			withRecoverMiddleware(func(w http.ResponseWriter, r *http.Request) {
-				render.Status(r, http.StatusInternalServerError)
-				render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
-			}),
-			middleware.Timeout(time.Minute),
-		)
+		middlewarePriorities := lo.Keys(middlewares)
+		slices.Sort(middlewarePriorities)
+
+		for _, priority := range middlewarePriorities {
+			r.Use(middlewares[priority])
+		}
+
+		r.Use(lo.Values(middlewares)...)
 
 		for _, route := range publicRoutes {
 			r.Handle(route.Pattern(), route)
@@ -71,31 +88,13 @@ func NewRouter(params RouteParams) http.Handler {
 
 	// Private routes
 	r.Group(func(r chi.Router) {
-		r.Use(
-			middleware.CleanPath,
-			withRequestIDMiddleware,
-			WithI18nMiddleware(params.I18nBundle),
-			WithJwtMiddleware(params.I18nBundle, params.Logger),
-			withRequestLoggerMiddleware(params.Config, &HTTPLoggerConfig{
-				Silent: params.Config.IsTesting(),
-				IgnoredPaths: []string{
-					"/swagger",
-					"/static",
-				},
-				Tags: map[string]string{
-					"version": params.Config.GetAppVersion(),
-					"mode":    params.Config.GetMode(),
-					"rev":     params.Config.GetRevision(),
-				},
-			}),
-			//nolint:mnd // I don't think we need to named this number here
-			middleware.Compress(5),
-			withRecoverMiddleware(func(w http.ResponseWriter, r *http.Request) {
-				render.Status(r, http.StatusInternalServerError)
-				render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgInternalServerError).Build())
-			}),
-			middleware.Timeout(time.Minute),
-		)
+		middlewares[35] = WithJwtMiddleware(params.I18nBundle, params.Logger)
+		middlewarePriorities := lo.Keys(middlewares)
+		slices.Sort(middlewarePriorities)
+
+		for _, priority := range middlewarePriorities {
+			r.Use(middlewares[priority])
+		}
 
 		for _, route := range privateRoutes {
 			r.Handle(route.Pattern(), route)

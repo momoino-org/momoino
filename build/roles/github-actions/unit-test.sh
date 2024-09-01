@@ -8,7 +8,6 @@ function main() {
   local testing_module="./..."
 
   go run github.com/onsi/ginkgo/v2/ginkgo \
-    -v \
     --procs=4 \
     --randomize-all \
     --randomize-suites \
