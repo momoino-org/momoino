@@ -40,7 +40,7 @@ jobs:
           cache: false
       - working-directory: backend
         run: |
-          go install github.com/vektra/mockery/v2@v2.44.1
+          go install github.com/vektra/mockery/v2@v2.45.0
           rm -rf mocks
           mockery
           git diff --exit-code -- ./testing/mocks
@@ -68,14 +68,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: ${{ matrix.module }}/../go.work
-          cache-dependency-path: ${{ matrix.module }}/go.sum
+          go-version-file: backend/go.work
+          cache-dependency-path: backend/**/*.sum
       - name: golangci-lint ${{ matrix.module }}
         uses: golangci/golangci-lint-action@v6
-        env:
-          GOLANGCI_LINT_VERSION: v1.59
         with:
-          version: ${{ env.GOLANGCI_LINT_VERSION }}
+          version: v1.60.3
           working-directory: ${{ matrix.module }}
 
   unit-test:
@@ -85,7 +83,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: ./backend/go.work
-          cache-dependency-path: ./backend/testing/go.sum
+          cache-dependency-path: backend/**/*.sum
       - name: unit test
         working-directory: backend/testing
         run: bash ../../build/roles/github-actions/unit-test.sh
@@ -107,8 +105,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version-file: ${{ matrix.app }}/../go.work
-          cache-dependency-path: ${{ matrix.app }}/go.sum
+          go-version-file: ./backend/go.work
+          cache-dependency-path: backend/**/*.sum
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx

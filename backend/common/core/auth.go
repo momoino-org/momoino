@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"net/http"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type authUserCtx int
@@ -13,6 +15,17 @@ type AuthUser struct {
 	Locale      string
 	Roles       []string
 	Permissions []string
+}
+
+type JWTCustomClaims struct {
+	jwt.RegisteredClaims
+	Locale            string   `json:"locale"`
+	Roles             []string `json:"roles"`
+	Permissions       []string `json:"permissions"`
+	GivenName         string   `json:"given_name"`
+	FamilyName        string   `json:"family_name"`
+	Email             string   `json:"email"`
+	PreferredUsername string   `json:"preferred_username"`
 }
 
 const authUserCtxID authUserCtx = 0

@@ -1,4 +1,4 @@
-package usermgt_test
+package core_test
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ var _ = BeforeSuite(func() {
 	IgnoreGinkgoParallelClient()
 })
 
-func TestUserManagement(t *testing.T) {
+func TestShowManagement(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "common/user package")
+	RunSpecs(t, "common/core package")
 }

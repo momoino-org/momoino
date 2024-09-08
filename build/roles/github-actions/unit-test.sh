@@ -8,7 +8,6 @@ function main() {
   local testing_module="./..."
 
   go run github.com/onsi/ginkgo/v2/ginkgo \
-    --procs=4 \
     --randomize-all \
     --randomize-suites \
     --fail-on-pending \
@@ -19,7 +18,6 @@ function main() {
     -coverpkg="$cover_packages" \
     --race \
     --trace \
-    --json-report=report.json \
     --timeout=5m \
     --poll-progress-after=120s \
     --poll-progress-interval=30s \

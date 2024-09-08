@@ -37,6 +37,7 @@ var _ = Describe("handler.profile.go", func() {
 		config.EXPECT().GetRevision().Return("testing")
 		config.EXPECT().GetMode().Return(core.TestingMode)
 		config.EXPECT().IsTesting().Return(true)
+		config.EXPECT().GetCorsConfig().Return(&core.CorsConfig{})
 
 		userRepository = mockusermgt.NewMockUserRepository(GinkgoT())
 
@@ -72,6 +73,7 @@ var _ = Describe("handler.profile.go", func() {
 	})
 
 	It("returns a user profile if there is valid access token", func(ctx SpecContext) {
+		config.EXPECT().GetJWTConfig().Return(testutils.GetJWTConfig())
 		userRepository.EXPECT().
 			FindUserByID(mock.Anything, mock.Anything, "019135f7-6265-7ef8-8920-57280736f6c0").
 			Return(&usermgt.UserModel{
@@ -92,7 +94,9 @@ var _ = Describe("handler.profile.go", func() {
 
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/profile", nil)
 		recorder := httptest.NewRecorder()
-		router.ServeHTTP(recorder, testutils.WithFakeJWT(req))
+		router.ServeHTTP(recorder, testutils.WithFakeJWT(req, func(jc *core.JWTCustomClaims) {
+			jc.RegisteredClaims.Subject = "019135f7-6265-7ef8-8920-57280736f6c0"
+		}))
 
 		var response core.Response[usermgt.ProfileResponse]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)

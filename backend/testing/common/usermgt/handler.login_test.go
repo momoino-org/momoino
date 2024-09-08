@@ -17,7 +17,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
-	"go.uber.org/fx/fxtest"
 	"gorm.io/gorm"
 )
 
@@ -39,25 +38,23 @@ var _ = Describe("Login Handler", func() {
 		config.EXPECT().GetRevision().Return("testing")
 		config.EXPECT().GetMode().Return(core.TestingMode)
 		config.EXPECT().IsTesting().Return(true)
-		config.EXPECT().GetJWTConfig().Return(generateJWTConfig())
+		config.EXPECT().GetJWTConfig().Return(testutils.GetJWTConfig())
+		config.EXPECT().GetCorsConfig().Return(&core.CorsConfig{})
 
 		userRepository = usermgt.NewUserRepository(usermgt.UserRepositoryParams{})
 		userService := usermgt.NewUserService(usermgt.UserServiceParams{})
 
-		router = testutils.WithFxLifeCycle(func(l *fxtest.Lifecycle) http.Handler {
-			return testutils.CreateRouter(func(rp *httpsrv.RouteParams) {
-				rp.Config = config
-				rp.Routes = []core.HTTPRoute{
-					usermgt.NewLoginHandler(usermgt.LoginHandlerParams{
-						AppLifeCycle:   l,
-						Logger:         core.NewNoopLogger(),
-						Config:         config,
-						DB:             db,
-						UserService:    userService,
-						UserRepository: userRepository,
-					}),
-				}
-			})
+		router = testutils.CreateRouter(func(rp *httpsrv.RouteParams) {
+			rp.Config = config
+			rp.Routes = []core.HTTPRoute{
+				usermgt.NewLoginHandler(usermgt.LoginHandlerParams{
+					Logger:         core.NewNoopLogger(),
+					Config:         config,
+					DB:             db,
+					UserService:    userService,
+					UserRepository: userRepository,
+				}),
+			}
 		})
 	})
 

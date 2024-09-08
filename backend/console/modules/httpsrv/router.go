@@ -40,14 +40,14 @@ func NewRouter(params RouteParams) http.Handler {
 		}
 	}
 
+	corsConfig := params.Config.GetCorsConfig()
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"http://localhost:3000"}, // Use this to allow specific origin hosts
-		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{"*"},
-		// ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
-		MaxAge:           300, // Maximum value not ignored by any of major browsers
+		AllowedOrigins:   corsConfig.AllowedOrigins,
+		AllowedMethods:   corsConfig.AllowedMethods,
+		AllowedHeaders:   corsConfig.AllowedHeaders,
+		ExposedHeaders:   corsConfig.ExposedHeaders,
+		AllowCredentials: corsConfig.AllowCredentials,
+		MaxAge:           corsConfig.MaxAge,
 	}))
 
 	middlewares := map[int]func(http.Handler) http.Handler{
@@ -99,7 +99,7 @@ func NewRouter(params RouteParams) http.Handler {
 
 	// Private routes
 	r.Group(func(r chi.Router) {
-		middlewares[35] = WithJwtMiddleware(params.I18nBundle, params.Logger)
+		middlewares[35] = WithJwtMiddleware(params.I18nBundle, params.Config, params.Logger)
 		middlewarePriorities := lo.Keys(middlewares)
 		slices.Sort(middlewarePriorities)
 
