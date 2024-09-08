@@ -1,13 +1,26 @@
 version: 2
 updates:
   - package-ecosystem: "gomod"
-    directories:
-      - "/backend/common/"
-      - "/backend/console/"
-      - "/backend/testing/"
-      - "/backend/migration/"
+    directory: /backend/common
     schedule:
       interval: "weekly"
-    labels:
-      - "📦 Type: Dependencies"
-      - "⏳ Status: Waiting for review"
+
+  - package-ecosystem: "gomod"
+    directory: /backend/console
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "gomod"
+    directory: /backend/migration
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "gomod"
+    directory: /backend/testing
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "npm"
+    directory: /frontend/admin
+    schedule:
+      interval: "weekly"
