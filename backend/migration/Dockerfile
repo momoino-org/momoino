@@ -1,4 +1,4 @@
-FROM golang:1.22.5-alpine3.20 AS builder
+FROM golang:1.23-alpine3.20 AS builder
 
 ARG MODE
 ARG GIT_COMMIT_ID
@@ -37,7 +37,7 @@ RUN CGO_ENABLED=0 go build \
     " \
     -o "/usr/bin/migration" .
 
-FROM alpine:3.20.1
+FROM alpine:3.20
 
 COPY --from=builder "/usr/bin/migration" /usr/bin/migration
 
