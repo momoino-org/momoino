@@ -13,7 +13,7 @@ require (
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/samber/lo v1.47.0
 	go.uber.org/fx v1.22.2
-	golang.org/x/text v0.17.0
+	golang.org/x/text v0.18.0
 	wano-island/common v0.0.0-00010101000000-000000000000
 )
 
