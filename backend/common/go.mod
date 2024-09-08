@@ -1,6 +1,6 @@
 module wano-island/common
 
-go 1.22.5
+go 1.23
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0
