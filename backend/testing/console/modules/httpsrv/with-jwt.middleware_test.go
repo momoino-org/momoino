@@ -6,13 +6,13 @@ import (
 	"testing/fstest"
 	"wano-island/common/core"
 	"wano-island/console/modules/httpsrv"
+	mockcore "wano-island/testing/mocks/common/core"
 	"wano-island/testing/testutils"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"go.uber.org/fx/fxtest"
 )
 
 var _ = Describe("withJwtMiddleware", func() {
@@ -24,22 +24,22 @@ var _ = Describe("withJwtMiddleware", func() {
 		"Localizer",
 		func(path string, headers map[string]string, expectedResult string) {
 			router := chi.NewRouter()
-			i18nBundle := testutils.WithFxLifeCycle(func(l *fxtest.Lifecycle) *i18n.Bundle {
-				return core.NewI18nBundle(core.I18nBundleParams{
-					AppLifeCycle: l,
-					LocaleFS: fstest.MapFS{
-						"resources/trans/locale.en.yaml": &fstest.MapFile{
-							Data: []byte("Language: English"),
-						},
-						"resources/trans/locale.vi.yaml": &fstest.MapFile{
-							Data: []byte("Language: Vietnamese"),
-						},
+			i18nBundle, _ := core.NewI18nBundle(core.I18nBundleParams{
+				LocaleFS: fstest.MapFS{
+					"resources/trans/locale.en.yaml": &fstest.MapFile{
+						Data: []byte("Language: English"),
 					},
-				})
+					"resources/trans/locale.vi.yaml": &fstest.MapFile{
+						Data: []byte("Language: Vietnamese"),
+					},
+				},
 			})
 
+			config := mockcore.NewMockAppConfig(GinkgoT())
+			config.EXPECT().GetJWTConfig().Return(testutils.GetJWTConfig())
+
 			router.Use(httpsrv.WithI18nMiddleware(i18nBundle))
-			router.Use(httpsrv.WithJwtMiddleware(i18nBundle, core.NewNoopLogger()))
+			router.Use(httpsrv.WithJwtMiddleware(i18nBundle, config, core.NewNoopLogger()))
 
 			router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 				localizer := core.GetLocalizer(r)
@@ -65,8 +65,9 @@ var _ = Describe("withJwtMiddleware", func() {
 			"should use the preferred language of the logged-in user if the request does not contain the lang query parameter",
 			"/",
 			map[string]string{
-				//nolint:lll // No need to fix
-				core.AuthorizationHeader: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTkxYTM2NS04M2ViLTc1ZGYtYjMzMy0wZDdkNmEwYmNiZTYiLCJleHAiOjE3MjUwMjMzMzAsIm5iZiI6MTcyNTAyMzMzMCwiaWF0IjoxNzI1MDIzMzMwLCJsb2NhbGUiOiJ2aSIsInJvbGVzIjpbXSwicGVybWlzc2lvbnMiOltdfQ.C88NVUYWOR5KTltSpqw7-TmD57Rpia8n5IA8iKUueMYLNHiho0Q3fqRMOnQkai3eMrkvKa9hKIbLt9OJ8ndbbdO3hDMXeN0zS4-kPWJz6nXFqCcJrFqA1JSzsMs7470K_I7tUo0OUWqRkzbQttvHCUrWGrvO5FhyMyP3nof_3ciwXfkXj-yFWSl5Yu-8isU3EGKxKOeqtFDEkTmzN2pM0QR_jGhrPIABmg6up1zHxbX_lvY3uyhf4TgRzbIDbjFfVNw3TEi4RK7HQeCE92l8A4eZRa4q0qGezPeQsEG5UtJ9ZcYReNdJjX_0OJ1DJaYjWxLijvibQojRZqsfTMEInA",
+				core.AuthorizationHeader: testutils.GenerateJWT(func(jc *core.JWTCustomClaims) {
+					jc.Locale = "vi"
+				}),
 			},
 			"Vietnamese",
 		),
@@ -75,8 +76,7 @@ var _ = Describe("withJwtMiddleware", func() {
 			`should always display the translated message based on the lang query parameter, even if the user is logged in with a different preferred language`,
 			"/?lang=en",
 			map[string]string{
-				//nolint:lll // No need to fix
-				core.AuthorizationHeader: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwMTkxYTM2NS04M2ViLTc1ZGYtYjMzMy0wZDdkNmEwYmNiZTYiLCJleHAiOjE3MjUwMjMzMzAsIm5iZiI6MTcyNTAyMzMzMCwiaWF0IjoxNzI1MDIzMzMwLCJsb2NhbGUiOiJ2aSIsInJvbGVzIjpbXSwicGVybWlzc2lvbnMiOltdfQ.C88NVUYWOR5KTltSpqw7-TmD57Rpia8n5IA8iKUueMYLNHiho0Q3fqRMOnQkai3eMrkvKa9hKIbLt9OJ8ndbbdO3hDMXeN0zS4-kPWJz6nXFqCcJrFqA1JSzsMs7470K_I7tUo0OUWqRkzbQttvHCUrWGrvO5FhyMyP3nof_3ciwXfkXj-yFWSl5Yu-8isU3EGKxKOeqtFDEkTmzN2pM0QR_jGhrPIABmg6up1zHxbX_lvY3uyhf4TgRzbIDbjFfVNw3TEi4RK7HQeCE92l8A4eZRa4q0qGezPeQsEG5UtJ9ZcYReNdJjX_0OJ1DJaYjWxLijvibQojRZqsfTMEInA",
+				core.AuthorizationHeader: testutils.GenerateJWT(),
 			},
 			"English",
 		),

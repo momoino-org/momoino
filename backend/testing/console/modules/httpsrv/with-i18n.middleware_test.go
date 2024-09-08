@@ -12,7 +12,6 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"go.uber.org/fx/fxtest"
 )
 
 var _ = Describe("withI18nMiddleware", func() {
@@ -24,18 +23,15 @@ var _ = Describe("withI18nMiddleware", func() {
 		"Localizer",
 		func(path string, expectedResult string) {
 			router := chi.NewRouter()
-			i18nBundle := testutils.WithFxLifeCycle(func(l *fxtest.Lifecycle) *i18n.Bundle {
-				return core.NewI18nBundle(core.I18nBundleParams{
-					AppLifeCycle: l,
-					LocaleFS: fstest.MapFS{
-						"resources/trans/locale.en.yaml": &fstest.MapFile{
-							Data: []byte("Language: English"),
-						},
-						"resources/trans/locale.vi.yaml": &fstest.MapFile{
-							Data: []byte("Language: Vietnamese"),
-						},
+			i18nBundle, _ := core.NewI18nBundle(core.I18nBundleParams{
+				LocaleFS: fstest.MapFS{
+					"resources/trans/locale.en.yaml": &fstest.MapFile{
+						Data: []byte("Language: English"),
 					},
-				})
+					"resources/trans/locale.vi.yaml": &fstest.MapFile{
+						Data: []byte("Language: Vietnamese"),
+					},
+				},
 			})
 
 			router.Use(httpsrv.WithI18nMiddleware(i18nBundle))

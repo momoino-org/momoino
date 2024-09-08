@@ -1,8 +1,6 @@
 package usermgt
 
 import (
-	"context"
-	"crypto/rsa"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -23,13 +21,11 @@ type loginHandler struct {
 	userService    UserService
 	userRepository UserRepository
 	jwtConfig      *core.JWTConfig
-	jwtPrivateKey  *rsa.PrivateKey
 }
 
 type LoginHandlerParams struct {
 	fx.In
 
-	AppLifeCycle   fx.Lifecycle
 	Logger         *slog.Logger
 	Config         core.AppConfig
 	DB             *gorm.DB
@@ -47,17 +43,6 @@ type LoginResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-type JWTCustomClaims struct {
-	jwt.RegisteredClaims
-	Locale            string   `json:"locale"`
-	Roles             []string `json:"roles"`
-	Permissions       []string `json:"permissions"`
-	GivenName         string   `json:"given_name"`
-	FamilyName        string   `json:"family_name"`
-	Email             string   `json:"email"`
-	PreferredUsername string   `json:"preferred_username"`
-}
-
 func NewLoginHandler(params LoginHandlerParams) *loginHandler {
 	handler := loginHandler{
 		config:         params.Config,
@@ -67,20 +52,6 @@ func NewLoginHandler(params LoginHandlerParams) *loginHandler {
 		userRepository: params.UserRepository,
 		jwtConfig:      params.Config.GetJWTConfig(),
 	}
-
-	params.AppLifeCycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			rsaPrivateKey, err := jwt.ParseRSAPrivateKeyFromPEM(handler.jwtConfig.PrivateKey)
-
-			if err != nil {
-				return err
-			}
-
-			handler.jwtPrivateKey = rsaPrivateKey
-
-			return nil
-		},
-	})
 
 	return &handler
 }
@@ -142,7 +113,7 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, JWTCustomClaims{
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, core.JWTCustomClaims{
 		Email:             loggedUser.Email,
 		PreferredUsername: loggedUser.Username,
 		GivenName:         loggedUser.FirstName,
@@ -152,13 +123,13 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Permissions:       []string{},
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   loggedUser.ID.String(),
-			ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(h.jwtConfig.AccessTokenExpiresIn))),
+			ExpiresAt: jwt.NewNumericDate(now.Add(h.jwtConfig.AccessTokenExpiresIn)),
 			IssuedAt:  jwt.NewNumericDate(now),
 			NotBefore: jwt.NewNumericDate(now),
 		},
 	})
 
-	tokenString, err := token.SignedString(h.jwtPrivateKey)
+	tokenString, err := token.SignedString(h.jwtConfig.PrivateKey)
 	if err != nil {
 		h.logger.ErrorContext(r.Context(), "Cannot sign access token", slog.Any("details", err))
 		render.Status(r, http.StatusInternalServerError)
@@ -169,12 +140,12 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.RegisteredClaims{
 		Subject:   loggedUser.ID.String(),
-		ExpiresAt: jwt.NewNumericDate(now.Add(time.Duration(h.jwtConfig.AccessTokenExpiresIn))),
+		ExpiresAt: jwt.NewNumericDate(now.Add(h.jwtConfig.AccessTokenExpiresIn)),
 		IssuedAt:  jwt.NewNumericDate(now),
 		NotBefore: jwt.NewNumericDate(now),
 	})
 
-	refreshTokenString, err := refreshToken.SignedString(h.jwtPrivateKey)
+	refreshTokenString, err := refreshToken.SignedString(h.jwtConfig.PrivateKey)
 	if err != nil {
 		h.logger.ErrorContext(r.Context(), "Cannot sign refresh token", slog.Any("details", err))
 		render.Status(r, http.StatusInternalServerError)

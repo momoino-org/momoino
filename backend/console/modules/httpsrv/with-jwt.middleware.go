@@ -84,19 +84,25 @@ func extractAccessTokenFromRequest(req *http.Request) string {
 	// Extract the access token from the request header.
 	accessToken := strings.TrimPrefix(req.Header.Get(core.AuthorizationHeader), "Bearer ")
 
-	// If the access token is in the cookie, use it instead of the header.
-	if cookie, err := req.Cookie("auth.token"); err == nil {
-		accessToken = cookie.Value
+	// Extract the access token from the cookie if it doesn not exist in the request header.
+	if len(accessToken) == 0 {
+		if cookie, err := req.Cookie("auth.token"); err == nil {
+			accessToken = cookie.Value
+		}
 	}
 
-	return accessToken
+	return strings.TrimSpace(accessToken)
 }
 
 // WithJwtMiddleware is a middleware function that handles JWT authentication for HTTP requests.
 // It extracts the access token from the request header, verifies it, and converts the claims into an AuthUser object.
 // If the access token is missing or invalid, it returns an appropriate HTTP response.
 // Otherwise, it sets the AuthUser object in the request context and calls the next handler.
-func WithJwtMiddleware(bundle *i18n.Bundle, logger *slog.Logger) func(next http.Handler) http.Handler {
+func WithJwtMiddleware(
+	bundle *i18n.Bundle,
+	config core.AppConfig,
+	logger *slog.Logger,
+) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			accessToken := extractAccessTokenFromRequest(r)
@@ -113,7 +119,9 @@ func WithJwtMiddleware(bundle *i18n.Bundle, logger *slog.Logger) func(next http.
 			jwtMapClaims := jwt.MapClaims{}
 			jwtParser := jwt.NewParser()
 
-			if _, _, err := jwtParser.ParseUnverified(accessToken, &jwtMapClaims); err != nil {
+			if _, err := jwtParser.ParseWithClaims(accessToken, &jwtMapClaims, func(t *jwt.Token) (interface{}, error) {
+				return config.GetJWTConfig().PublicKey, nil
+			}); err != nil {
 				logger.ErrorContext(r.Context(), "Cannot parse jwt", slog.Any("details", err))
 				render.Status(r, http.StatusUnauthorized)
 				render.JSON(w, r, core.NewResponseBuilder(r).MessageID(core.MsgCannotProcessYourLogin).Build())

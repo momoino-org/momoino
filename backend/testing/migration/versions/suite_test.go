@@ -14,5 +14,5 @@ var _ = BeforeSuite(func() {
 
 func TestDBMigration(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "DB Migration")
+	RunSpecs(t, "migration/versions package")
 }

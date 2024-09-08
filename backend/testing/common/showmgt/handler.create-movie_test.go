@@ -25,17 +25,20 @@ var _ = Describe("[handler.create-movie.go]", func() {
 		db       *gorm.DB
 		mockedDB sqlmock.Sqlmock
 		router   http.Handler
+		config   *mockcore.MockAppConfig
 	)
 
 	BeforeEach(func() {
 		testutils.DetectLeakyGoroutines()
 		db, mockedDB = testutils.CreateTestDBInstance()
 
-		config := mockcore.NewMockAppConfig(GinkgoT())
+		config = mockcore.NewMockAppConfig(GinkgoT())
 		config.EXPECT().GetAppVersion().Return("1.0.0")
 		config.EXPECT().GetRevision().Return("testing")
 		config.EXPECT().GetMode().Return(core.TestingMode)
 		config.EXPECT().IsTesting().Return(true)
+		config.EXPECT().GetJWTConfig().Return(testutils.GetJWTConfig())
+		config.EXPECT().GetCorsConfig().Return(&core.CorsConfig{})
 
 		router = testutils.CreateRouter(func(rp *httpsrv.RouteParams) {
 			rp.Config = config

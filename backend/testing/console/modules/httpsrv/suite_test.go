@@ -14,5 +14,5 @@ var _ = BeforeSuite(func() {
 
 func TestHTTPServer(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "HTTP Server")
+	RunSpecs(t, "console/modules/httpsrv package")
 }

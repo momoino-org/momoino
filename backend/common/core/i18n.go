@@ -16,10 +16,7 @@ import (
 type LocalizerCtxKey string
 
 type I18nBundleParams struct {
-	fx.In
-
-	AppLifeCycle fx.Lifecycle
-	LocaleFS     fs.FS
+	LocaleFS fs.FS
 }
 
 const localizerCtxID LocalizerCtxKey = "LocalizerCtxID"
@@ -49,37 +46,33 @@ func WithLocalizer(r *http.Request, localizer *i18n.Localizer) *http.Request {
 	return r.WithContext(context.WithValue(r.Context(), localizerCtxID, localizer))
 }
 
-func NewI18nBundle(params I18nBundleParams) *i18n.Bundle {
+// NewI18nBundle creates a new i18n.Bundle instance with support for YAML files from a given file system (fs.FS).
+// It loads translation messages from files matching the pattern "resources/trans/locale.*.yaml" and registers
+// a YAML unmarshal function for the bundle.
+func NewI18nBundle(params I18nBundleParams) (*i18n.Bundle, error) {
 	bundle := i18n.NewBundle(language.English)
 	bundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
 
-	params.AppLifeCycle.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			files, err := glob(params.LocaleFS, "resources/trans/locale.*.yaml")
-			if err != nil {
-				return err
-			}
+	files, err := glob(params.LocaleFS, "resources/trans/locale.*.yaml")
+	if err != nil {
+		return nil, err
+	}
 
-			for _, file := range files {
-				if _, err := bundle.LoadMessageFileFS(params.LocaleFS, file); err != nil {
-					return err
-				}
-			}
+	for _, file := range files {
+		if _, err := bundle.LoadMessageFileFS(params.LocaleFS, file); err != nil {
+			return nil, err
+		}
+	}
 
-			return nil
-		},
-	})
-
-	return bundle
+	return bundle, nil
 }
 
 func NewI18nModule(fs fs.FS) fx.Option {
 	return fx.Module(
 		"I18n Module",
-		fx.Provide(func(appLifeCycle fx.Lifecycle) *i18n.Bundle {
+		fx.Provide(func() (*i18n.Bundle, error) {
 			return NewI18nBundle(I18nBundleParams{
-				AppLifeCycle: appLifeCycle,
-				LocaleFS:     fs,
+				LocaleFS: fs,
 			})
 		}),
 	)

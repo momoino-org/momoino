@@ -14,5 +14,5 @@ var _ = BeforeSuite(func() {
 
 func TestShowManagement(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Show Management")
+	RunSpecs(t, "common/showmgt package")
 }
