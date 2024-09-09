@@ -8,7 +8,7 @@ require (
 	github.com/samber/lo v1.47.0
 	go.uber.org/fx v1.22.2
 	golang.org/x/crypto v0.27.0
-	gorm.io/gorm v1.25.11
+	gorm.io/gorm v1.25.12
 	wano-island/common v0.0.0-00010101000000-000000000000
 )
 
