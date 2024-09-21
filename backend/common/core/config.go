@@ -331,6 +331,8 @@ func NewAppConfig() (*appConfig, error) {
 func NewConfigModule() fx.Option {
 	return fx.Module(
 		"Config Module",
-		fx.Provide(NewAppConfig),
+		fx.Provide(
+			fx.Annotate(NewAppConfig, fx.As(new(AppConfig))),
+		),
 	)
 }
