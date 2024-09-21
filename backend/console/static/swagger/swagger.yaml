@@ -75,6 +75,42 @@ paths:
                 $ref: "#/components/schemas/Response"
 
   /api/v1/shows:
+    get:
+      security:
+        - accessToken: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        "200":
+          description: Retrieved shows successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetShows_200"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
     post:
       security:
         - accessToken: []
@@ -101,12 +137,12 @@ paths:
                 isReleased:
                   type: boolean
       responses:
-        "200":
+        "201":
           description: Create the show successfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateShow_200"
+                $ref: "#/components/schemas/CreateShow_201"
         "400":
           description: Bad request
           content:
@@ -138,6 +174,23 @@ components:
         timestamp:
           type: string
           format: date-time
+
+    PaginatedResponse:
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            pagination:
+              type: object
+              properties:
+                page:
+                  type: number
+                pageSize:
+                  type: number
+                totalRows:
+                  type: number
+                totalPages:
+                  type: number
 
     Login_RequestBody:
       type: object
@@ -190,36 +243,48 @@ components:
                   type: string
                   format: date-time
 
-    CreateShow_200:
+    ShowDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+        originalLanguage:
+          type: string
+        originalTitle:
+          type: string
+        originalOverview:
+          type: string
+          nullable: true
+        keywords:
+          type: array
+          items:
+            type: string
+        isReleased:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CreateShow_201:
       allOf:
         - $ref: "#/components/schemas/Response"
         - type: object
           properties:
             data:
-              type: object
-              properties:
-                id:
-                  type: string
-                  format: uuid
-                kind:
-                  type: string
-                originalLanguage:
-                  type: string
-                originalTitle:
-                  type: string
-                originalOverview:
-                  type: string
-                  nullable: true
-                keywords:
-                  type: array
-                  nullable: true
-                  items:
-                    type: string
-                isReleased:
-                  type: boolean
-                createdAt:
-                  type: string
-                  format: date-time
-                updatedAt:
-                  type: string
-                  format: date-time
+              $ref: "#/components/schemas/ShowDTO"
+
+    GetShows_200:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResponse"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ShowDTO"

@@ -1,33 +1,37 @@
 'use client';
 
-import { valibotResolver } from '@hookform/resolvers/valibot';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Card, Stack, TextField, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
-import * as v from 'valibot';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useLoginByCredentials } from '@/internal/modules/core/ui/providers/AppProvider';
 import { useTranslations } from 'next-intl';
+import { z } from 'zod';
+import { useMutation } from '@tanstack/react-query';
+import { loginByCredentials } from '@/internal/core/auth/client';
 
-const LoginSchema = v.object({
-  email: v.pipe(v.string(), v.email()),
-  password: v.pipe(v.string(), v.minLength(8)),
+const LoginSchema = z.strictObject({
+  email: z.string().email(),
+  password: z.string().min(8),
 });
 
-type LoginData = v.InferOutput<typeof LoginSchema>;
+type LoginData = z.infer<typeof LoginSchema>;
 
 export default function LoginPage() {
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { mutateAsync: loginAsync, status: loginStatus } =
-    useLoginByCredentials();
+  const { mutateAsync: loginAsync, status: loginStatus } = useMutation({
+    mutationKey: ['login-by-credentials'],
+    mutationFn: (params: LoginData) =>
+      loginByCredentials(params.email, params.password),
+  });
 
   const { control, handleSubmit } = useForm<LoginData>({
     defaultValues: {
       email: '',
       password: '',
     },
-    resolver: valibotResolver(LoginSchema),
+    resolver: zodResolver(LoginSchema),
   });
 
   const onSubmit = async (data: LoginData) => {

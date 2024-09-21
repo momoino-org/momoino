@@ -1,5 +1,5 @@
-import { Button } from '@mui/material';
+import { Typography } from '@mui/material';
 
 export default function Home() {
-  return <Button>OK</Button>;
+  return <Typography>This page is not available yet.</Typography>;
 }

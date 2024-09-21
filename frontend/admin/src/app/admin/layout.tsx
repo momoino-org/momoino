@@ -1,8 +1,25 @@
-import { getUserProfile } from '@/internal/modules/auth/services';
-import { AccountMenu, TemplateFrame } from '@/internal/modules/core/ui';
-import { MenuRounded, ModeNightRounded } from '@mui/icons-material';
-import { AppBar, Toolbar, IconButton, Stack, Box } from '@mui/material';
+import {
+  HomeRounded,
+  MenuRounded,
+  ModeNightRounded,
+  MovieRounded,
+  TvRounded,
+} from '@mui/icons-material';
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Stack,
+  Box,
+  Container,
+} from '@mui/material';
 import { PropsWithChildren } from 'react';
+import { getUserProfile } from '@/internal/core/auth/server';
+import {
+  Sidebar,
+  AccountMenu,
+  TemplateFrame,
+} from '@/internal/modules/templates/admin';
 
 export default async function AdminLayout(props: PropsWithChildren) {
   const userProfile = await getUserProfile();
@@ -41,7 +58,28 @@ export default async function AdminLayout(props: PropsWithChildren) {
           </Stack>
         </Toolbar>
       </AppBar>
-      <Box sx={{ flex: '1 1', overflow: 'auto' }}>{props.children}</Box>
+      <Box sx={{ flex: '1 1', overflow: 'auto' }}>
+        <Box sx={{ display: 'flex', height: `calc(100dvh - 64px)` }}>
+          <Sidebar
+            items={[
+              { label: 'Home', href: '/admin', icon: <HomeRounded /> },
+              {
+                label: 'Movies',
+                href: '/admin/movies',
+                icon: <MovieRounded />,
+              },
+              {
+                label: 'TV Shows',
+                href: '/admin/tv-shows',
+                icon: <TvRounded />,
+              },
+            ]}
+          />
+          <Container maxWidth="xl" sx={{ flexGrow: 1, py: 2, height: '100%' }}>
+            {props.children}
+          </Container>
+        </Box>
+      </Box>
     </TemplateFrame>
   );
 }

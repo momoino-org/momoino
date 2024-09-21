@@ -10,6 +10,7 @@ const config = {
   endOfLine: 'lf',
   quoteProps: 'as-needed',
   useTabs: false,
+  printWidth: 80,
 };
 
 export default config;

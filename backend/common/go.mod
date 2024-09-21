@@ -11,6 +11,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/schema v1.4.1
+	github.com/lib/pq v1.10.9
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/samber/lo v1.47.0

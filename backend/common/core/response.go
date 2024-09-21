@@ -9,7 +9,7 @@ import (
 )
 
 type Pagination struct {
-	Page       int   `json:"currentPage"`
+	Page       int   `json:"page"`
 	PageSize   int   `json:"pageSize"`
 	TotalRows  int64 `json:"totalRows"`
 	TotalPages int   `json:"totalPages"`

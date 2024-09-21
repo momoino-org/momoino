@@ -91,7 +91,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
 				// original_overview
 				"Naruto - Overview",
 				// keywords
-				`["naruto"]`,
+				`{"naruto"}`,
 				// is_released
 				true,
 			).
@@ -146,7 +146,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
 				// original_overview
 				"Naruto - Overview",
 				// keywords
-				`["naruto"]`,
+				`{"naruto"}`,
 				// is_released
 				true,
 			).
@@ -168,10 +168,10 @@ var _ = Describe("[handler.create-movie.go]", func() {
 
 		router.ServeHTTP(recorder, testutils.WithFakeJWT(request))
 
-		var response core.Response[showmgt.CreateShowResponseBody]
+		var response core.Response[showmgt.ShowDTO]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
 
-		Expect(recorder).To(HaveHTTPStatus(http.StatusOK))
+		Expect(recorder).To(HaveHTTPStatus(http.StatusCreated))
 		Expect(response).To(MatchFields(IgnoreMissing, Fields{
 			"MessageID": Equal("S-0000"),
 			"Message":   Equal("Success"),
@@ -181,7 +181,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
 				"OriginalLanguage": Equal("ja"),
 				"OriginalTitle":    Equal("Naruto - Title"),
 				"OriginalOverview": PointTo(Equal("Naruto - Overview")),
-				"Keywords":         PointTo(Equal([]string{"naruto"})),
+				"Keywords":         Equal([]string{"naruto"}),
 				"IsReleased":       Equal(true),
 				"CreatedAt":        BeTemporally("~", time.Now(), time.Minute),
 				"UpdatedAt":        BeTemporally("~", time.Now(), time.Minute),

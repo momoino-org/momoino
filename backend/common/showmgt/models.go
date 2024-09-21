@@ -4,6 +4,7 @@ import (
 	"wano-island/common/core"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 type ShowModel struct {
@@ -15,8 +16,8 @@ type ShowModel struct {
 	OriginalLanguage string                 `gorm:"type:string;size:256;not null"`
 	OriginalTitle    string                 `gorm:"type:string;size:256;not null"`
 	OriginalOverview *string                `gorm:"type:string;size:256"`
-	Keywords         *[]string              `gorm:"type:text[];serializer:json"`
-	IsReleased       bool                   `gorm:"type:boolean"`
+	Keywords         pq.StringArray         `gorm:"type:text[]"`
+	IsReleased       bool                   `gorm:"type:boolean;not null"`
 	Seasons          []SeasonModel          `gorm:"foreignKey:ShowID;constraint:OnDelete:CASCADE"`
 	Translations     []ShowTranslationModel `gorm:"foreignKey:ShowID;constraint:OnDelete:CASCADE"`
 }

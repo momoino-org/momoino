@@ -113,6 +113,51 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	now := time.Now()
 
+	tokenString, err := h.generateAccessToken(loggedUser, now)
+	if err != nil {
+		h.logger.ErrorContext(r.Context(), "Cannot sign access token", slog.Any("details", err))
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
+
+		return
+	}
+
+	refreshTokenString, err := h.generateRefreshToken(loggedUser, now)
+	if err != nil {
+		h.logger.ErrorContext(r.Context(), "Cannot sign refresh token", slog.Any("details", err))
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
+
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "auth.token",
+		Value:    *tokenString,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+		Expires:  now.Add(h.jwtConfig.AccessTokenExpiresIn),
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "auth.refresh",
+		Value:    *refreshTokenString,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+		Expires:  now.Add(h.jwtConfig.RefreshTokenExpiresIn),
+	})
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, responseBuilder.Data(&LoginResponse{
+		AccessToken:  *tokenString,
+		RefreshToken: *refreshTokenString,
+	}).Build())
+}
+
+// generateAccessToken generates a new JWT access token for the given user and current time.
+func (h *loginHandler) generateAccessToken(loggedUser *UserModel, now time.Time) (*string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, core.JWTCustomClaims{
 		Email:             loggedUser.Email,
 		PreferredUsername: loggedUser.Username,
@@ -131,13 +176,14 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	tokenString, err := token.SignedString(h.jwtConfig.PrivateKey)
 	if err != nil {
-		h.logger.ErrorContext(r.Context(), "Cannot sign access token", slog.Any("details", err))
-		render.Status(r, http.StatusInternalServerError)
-		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
-
-		return
+		return nil, err
 	}
 
+	return &tokenString, nil
+}
+
+// generateRefreshToken generates a new JWT refresh token for the given user and current time.
+func (h *loginHandler) generateRefreshToken(loggedUser *UserModel, now time.Time) (*string, error) {
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.RegisteredClaims{
 		Subject:   loggedUser.ID.String(),
 		ExpiresAt: jwt.NewNumericDate(now.Add(h.jwtConfig.AccessTokenExpiresIn)),
@@ -147,16 +193,8 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	refreshTokenString, err := refreshToken.SignedString(h.jwtConfig.PrivateKey)
 	if err != nil {
-		h.logger.ErrorContext(r.Context(), "Cannot sign refresh token", slog.Any("details", err))
-		render.Status(r, http.StatusInternalServerError)
-		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
-
-		return
+		return nil, err
 	}
 
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, responseBuilder.Data(&LoginResponse{
-		AccessToken:  tokenString,
-		RefreshToken: refreshTokenString,
-	}).Build())
+	return &refreshTokenString, nil
 }

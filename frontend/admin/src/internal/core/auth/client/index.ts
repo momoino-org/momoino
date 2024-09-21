@@ -1,0 +1,1 @@
+export { loginByCredentials } from './services';

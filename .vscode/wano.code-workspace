@@ -30,7 +30,8 @@
 			"golang.go",
 			"redhat.vscode-yaml",
 			"editorconfig.editorconfig",
-			"ms-azuretools.vscode-docker"
+			"ms-azuretools.vscode-docker",
+			"dbaeumer.vscode-eslint"
 		]
 	},
   "launch": {
@@ -53,7 +54,12 @@
 					"APP_DATABASE_PORT": "5432",
 					"APP_DATABASE_MAX_ATTEMPTS": "3",
           "APP_JWT_ACCESS_TOKEN_EXPIRES_IN": "5m",
-          "APP_JWT_REFRESH_TOKEN_EXPIRES_IN": "24h"
+          "APP_JWT_REFRESH_TOKEN_EXPIRES_IN": "24h",
+          "APP_CORS_ALLOWED_ORIGINS": "https://* http://*",
+          "APP_CORS_ALLOWED_HEADERS": "*",
+          "APP_CORS_EXPOSED_HEADERS": "*",
+          "APP_CORS_ALLOW_CREDENTIALS": "true",
+          "APP_CORS_MAX_AGE": "300"
 				}
 			},
       {
@@ -87,7 +93,7 @@
         "type": "node",
         "cwd": "${workspaceRoot}/frontend/admin",
         "env": {
-          "USE_HTTPS": "true",
+          "USE_SECURE_COOKIES": "true",
           // For internal communication between NextJS's backend and custom backend
           "NEXT_BACKEND_HOST": "http://localhost:8080",
           // For public communication between frontend and backend

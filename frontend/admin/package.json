@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint && prettier --check .",
+    "eslint:lint": "next lint",
+    "prettier:lint": "prettier --check .",
     "format": "next lint --fix && prettier --write ."
   },
   "dependencies": {
@@ -17,7 +18,11 @@
     "@mui/icons-material": "^6.1.1",
     "@mui/material": "^6.1.1",
     "@mui/material-nextjs": "^6.1.1",
+    "@mui/x-data-grid": "^7.18.0",
+    "@next/bundle-analyzer": "^14.2.13",
+    "@reduxjs/toolkit": "^2.2.7",
     "@tanstack/react-query": "^5.56.2",
+    "date-fns": "^4.1.0",
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "ky": "^1.7.2",
@@ -28,7 +33,10 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.53.0",
-    "valibot": "^0.42.1"
+    "react-redux": "^9.1.2",
+    "sonner": "^1.5.0",
+    "usehooks-ts": "^3.1.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
@@ -38,6 +46,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.13",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsdoc": "^50.3.0",
     "eslint-plugin-unused-imports": "^3.2.0",
     "prettier": "^3.3.3",
     "typescript": "^5"
