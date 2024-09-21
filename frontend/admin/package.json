@@ -28,7 +28,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.53.0",
-    "valibot": "^0.41.0"
+    "valibot": "^0.42.1"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
