@@ -1,9 +1,9 @@
 'use server';
 
 import { NextMiddleware, NextRequest, NextResponse } from 'next/server';
-import { AuthProvider } from './internal/modules/auth/AuthProvider';
 import { match } from 'path-to-regexp';
 import { isEmpty } from 'radash';
+import { isAccessTokenValid } from '@/internal/core/auth/server';
 
 const isSignInRoute = match('/auth/signin');
 const privateRoutes = [match('/admin{/*path}')];
@@ -23,7 +23,7 @@ const signInMiddleware: NextMiddleware = async (request: NextRequest) => {
   }
 
   // If user is authenticated, redirect to the specified redirectTo URL
-  if (await AuthProvider.isAuthenticated()) {
+  if (await isAccessTokenValid()) {
     const redirectURL = new URL(redirectTo!, request.url);
     return NextResponse.redirect(redirectURL);
   }
@@ -47,7 +47,7 @@ const privateRouteMiddleware: NextMiddleware = async (request: NextRequest) => {
       return NextResponse.redirect(signInURL);
     }
 
-    if (await AuthProvider.isAuthenticated()) {
+    if (await isAccessTokenValid()) {
       return NextResponse.next();
     }
 

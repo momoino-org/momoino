@@ -1,7 +1,8 @@
 import createNextIntlPlugin from 'next-intl/plugin';
+import bundleAnalyzer from '@next/bundle-analyzer';
 
 const withNextIntl = createNextIntlPlugin(
-  './src/internal/modules/core/i18n/request.ts',
+  './src/internal/core/i18n/request.ts',
 );
 
 /** @type {import('next').NextConfig} */
@@ -12,4 +13,9 @@ const nextConfig = {
   poweredByHeader: false,
 };
 
-export default withNextIntl(nextConfig);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+export default withBundleAnalyzer(withNextIntl(nextConfig));

@@ -1,0 +1,36 @@
+{
+  "common": {
+    "email": "Email",
+    "password": "Mật khẩu",
+    "close": "Đóng",
+    "create": "Tạo",
+    "messages": {
+      "internalError": "Đã xảy ra lỗi nội bộ không mong đợi. Vui lòng báo cáo vấn đề này cho tác giả phần mềm để được hỗ trợ."
+    }
+  },
+  "page": {
+    "signin": {
+      "title": "Đăng nhập",
+      "signinBtn": "Đăng nhập"
+    },
+    "movies": {
+      "creationDialog": {
+        "title": "Tạo chương trình",
+        "fields": {
+          "kind": {
+            "label": "Loại",
+            "options": {
+              "movie": "Điện ảnh",
+              "tv_show": "Truyền hình"
+            }
+          },
+          "originalTitle": "Tên gốc",
+          "originalOverview": "Mô tả gốc",
+          "originalLanguage": "Ngôn ngữ gốc",
+          "keywords": "Từ khóa",
+          "isReleased": "Phát hành chưa?"
+        }
+      }
+    }
+  }
+}

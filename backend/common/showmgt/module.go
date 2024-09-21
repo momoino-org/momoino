@@ -11,6 +11,7 @@ func NewShowMgtModule() fx.Option {
 	return fx.Module(
 		"Show management module",
 		fx.Provide(
+			core.AsRoute(NewGetShowsHandler),
 			core.AsRoute(NewCreateMovieHandler),
 		),
 	)

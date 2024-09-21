@@ -3,11 +3,10 @@ package showmgt
 import (
 	"log/slog"
 	"net/http"
-	"time"
 	"wano-island/common/core"
 
 	"github.com/go-chi/render"
-	"github.com/google/uuid"
+	"github.com/lib/pq"
 	"go.uber.org/fx"
 	"gorm.io/gorm"
 )
@@ -25,24 +24,12 @@ type CreateShowHandlerParams struct {
 }
 
 type CreateShowRequestBody struct {
-	Kind             string    `json:"kind"`
-	OriginalLanguage string    `json:"originalLanguage"`
-	OriginalTitle    string    `json:"originalTitle"`
-	OriginalOverview *string   `json:"originalOverview"`
-	Keywords         *[]string `json:"keywords"`
-	IsReleased       bool      `json:"isReleased"`
-}
-
-type CreateShowResponseBody struct {
-	ID               uuid.UUID `json:"id"`
-	Kind             string    `json:"kind"`
-	OriginalLanguage string    `json:"originalLanguage"`
-	OriginalTitle    string    `json:"originalTitle"`
-	OriginalOverview *string   `json:"originalOverview"`
-	Keywords         *[]string `json:"keywords"`
-	IsReleased       bool      `json:"isReleased"`
-	CreatedAt        time.Time `json:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt"`
+	Kind             string   `json:"kind"`
+	OriginalLanguage string   `json:"originalLanguage"`
+	OriginalTitle    string   `json:"originalTitle"`
+	OriginalOverview *string  `json:"originalOverview"`
+	Keywords         []string `json:"keywords"`
+	IsReleased       bool     `json:"isReleased"`
 }
 
 var _ core.HTTPRoute = (*createMovieHandler)(nil)
@@ -80,7 +67,7 @@ func (h *createMovieHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		OriginalLanguage: requestBody.OriginalLanguage,
 		OriginalTitle:    requestBody.OriginalTitle,
 		OriginalOverview: requestBody.OriginalOverview,
-		Keywords:         requestBody.Keywords,
+		Keywords:         pq.StringArray(requestBody.Keywords),
 		IsReleased:       requestBody.IsReleased,
 	}
 
@@ -92,16 +79,6 @@ func (h *createMovieHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, responseBuilder.MessageID(core.MsgSuccess).Data(&CreateShowResponseBody{
-		ID:               showModel.ID,
-		Kind:             showModel.Kind,
-		OriginalLanguage: showModel.OriginalLanguage,
-		OriginalTitle:    showModel.OriginalTitle,
-		OriginalOverview: showModel.OriginalOverview,
-		Keywords:         showModel.Keywords,
-		IsReleased:       showModel.IsReleased,
-		CreatedAt:        showModel.CreatedAt,
-		UpdatedAt:        showModel.UpdatedAt,
-	}).Build())
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, responseBuilder.MessageID(core.MsgSuccess).Data(ToShowDTO(&showModel)).Build())
 }

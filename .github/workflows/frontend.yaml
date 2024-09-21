@@ -27,9 +27,12 @@ jobs:
       - name: Install packages
         working-directory: frontend/admin
         run: npm ci
-      - name: Run code linter
+      - name: "[ESLint] Run code linter"
         working-directory: frontend/admin
-        run: npm run lint
+        run: npm run eslint:lint
+      - name: "[Prettier] Run code linter"
+        working-directory: frontend/admin
+        run: npm run prettier:lint
       - name: Build
         working-directory: frontend/admin
         run: npm run build

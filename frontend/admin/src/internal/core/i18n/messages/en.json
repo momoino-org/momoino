@@ -1,0 +1,36 @@
+{
+  "common": {
+    "email": "Email",
+    "password": "Password",
+    "close": "Close",
+    "create": "Create",
+    "messages": {
+      "internalError": "An unexpected internal error occurred. Please report this issue to the software author for support."
+    }
+  },
+  "page": {
+    "signin": {
+      "title": "Sign in",
+      "signinBtn": "Sign in"
+    },
+    "movies": {
+      "creationDialog": {
+        "title": "Create show",
+        "fields": {
+          "kind": {
+            "label": "Kind",
+            "options": {
+              "movie": "Movie",
+              "tv_show": "TV Show"
+            }
+          },
+          "originalTitle": "Original title",
+          "originalOverview": "Original overview",
+          "originalLanguage": "Original language",
+          "keywords": "Keywords",
+          "isReleased": "Is released?"
+        }
+      }
+    }
+  }
+}
