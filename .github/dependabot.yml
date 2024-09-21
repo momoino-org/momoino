@@ -4,23 +4,28 @@ updates:
     directory: /backend/common
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "gomod"
     directory: /backend/console
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "gomod"
     directory: /backend/migration
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "gomod"
     directory: /backend/testing
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
 
   - package-ecosystem: "npm"
     directory: /frontend/admin
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 0
