@@ -22,7 +22,12 @@ jobs:
           npm install commitlint@19.4.0
           npm i -D @commitlint/config-conventional
 
-          echo "export default { extends: ['@commitlint/config-conventional'] };" > commitlint.config.ts
+          echo "export default {
+            extends: ['@commitlint/config-conventional'],
+            rules: {
+              'body-max-line-length': [2, 'always', Infinity],
+            },
+          };" > commitlint.config.ts
 
       - name: Validate current commit (last commit) with commitlint
         if: github.event_name == 'push'
