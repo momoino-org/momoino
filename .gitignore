@@ -36,3 +36,5 @@ sketch
 coverage.txt
 report.json
 report.xml
+
+__debug*

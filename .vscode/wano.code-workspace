@@ -28,7 +28,9 @@
 	"extensions": {
 		"recommendations": [
 			"golang.go",
-			"redhat.vscode-yaml"
+			"redhat.vscode-yaml",
+			"editorconfig.editorconfig",
+			"ms-azuretools.vscode-docker"
 		]
 	},
   "launch": {
@@ -45,9 +47,9 @@
 				"env": {
           "APP_MODE": "development",
 					"APP_DATABASE_HOST": "localhost",
-					"APP_DATABASE_USERNAME": "x-movie-api",
+					"APP_DATABASE_USERNAME": "momoino-console",
 					"APP_DATABASE_PASSWORD": "Keep!t5ecret",
-					"APP_DATABASE_NAME": "x-block-builder",
+					"APP_DATABASE_NAME": "momoino",
 					"APP_DATABASE_PORT": "5432",
 					"APP_DATABASE_MAX_ATTEMPTS": "3",
           "APP_JWT_ACCESS_TOKEN_EXPIRES_IN": "5m",
@@ -64,9 +66,9 @@
 				"env": {
           "APP_MODE": "development",
 					"APP_DATABASE_HOST": "localhost",
-					"APP_DATABASE_USERNAME": "x-movie-api",
+					"APP_DATABASE_USERNAME": "momoino-console",
 					"APP_DATABASE_PASSWORD": "Keep!t5ecret",
-					"APP_DATABASE_NAME": "x-block-builder",
+					"APP_DATABASE_NAME": "momoino",
 					"APP_DATABASE_PORT": "5432",
 					"APP_DATABASE_MAX_ATTEMPTS": "3",
 				}
