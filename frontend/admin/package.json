@@ -26,7 +26,7 @@
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "ky": "^1.7.2",
-    "next": "14.2.13",
+    "next": "14.2.14",
     "next-intl": "^3.20.0",
     "path-to-regexp": "^8.2.0",
     "radash": "^12.1.0",
