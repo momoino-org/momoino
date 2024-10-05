@@ -5,6 +5,7 @@ const withNextIntl = createNextIntlPlugin(
   './src/internal/core/i18n/request.ts',
 );
 
+// eslint-disable-next-line jsdoc/check-tag-names
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: undefined,

@@ -1,6 +1,6 @@
 {
   "common": {
-    "email": "Email",
+    "username": "Tên tài khoản",
     "password": "Mật khẩu",
     "close": "Đóng",
     "create": "Tạo",

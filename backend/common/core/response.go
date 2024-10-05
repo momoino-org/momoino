@@ -21,6 +21,7 @@ type Response[T any] struct {
 	Data       T           `json:"data,omitempty"`
 	Pagination *Pagination `json:"pagination,omitempty"`
 	Timestamp  time.Time   `json:"timestamp"`
+	RequestID  string      `json:"requestId"`
 }
 
 type ResponseBuilder struct {
@@ -39,12 +40,15 @@ func (r *ResponseBuilder) Data(data any) *ResponseBuilder {
 	return r
 }
 
-func (r *ResponseBuilder) Pagination(page int, limit int, totalRows int64) *ResponseBuilder {
+func (r *ResponseBuilder) Pagination(totalRows int64) *ResponseBuilder {
+	page := GetPage(r.request)
+	pageSize := GetPageSize(r.request)
+
 	r.response.Pagination = &Pagination{
 		Page:       page,
-		PageSize:   limit,
+		PageSize:   pageSize,
 		TotalRows:  totalRows,
-		TotalPages: int(math.Ceil(float64(totalRows) / float64(limit))),
+		TotalPages: int(math.Ceil(float64(totalRows) / float64(pageSize))),
 	}
 
 	return r
@@ -63,6 +67,7 @@ func (r *ResponseBuilder) Build() *Response[any] {
 		},
 	})
 
+	r.response.RequestID = GetRequestID(r.request)
 	r.response.Timestamp = time.Now()
 
 	return r.response

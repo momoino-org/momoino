@@ -84,6 +84,12 @@ func NewStdoutLogger(config AppConfig) *slog.Logger {
 	return logger
 }
 
+// DetailsLogAttr creates an slog attribute with the key "details" and the provided error value.
+// This function is useful for adding error details to log records.
+func DetailsLogAttr(err error) slog.Attr {
+	return slog.Any("details", err)
+}
+
 // NewLoggerModuleWithConfig is an fx.Option that provides a new stdout logger for the application.
 // It uses the slog library for structured logging and provides a module for dependency injection.
 func NewLoggerModuleWithConfig() fx.Option {

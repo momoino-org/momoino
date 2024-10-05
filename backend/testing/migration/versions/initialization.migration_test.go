@@ -3,10 +3,12 @@ package versions_test
 import (
 	"log/slog"
 	"wano-island/common/core"
+	"wano-island/common/usermgt"
 	migrationCore "wano-island/migration/core"
 	"wano-island/migration/versions"
 	"wano-island/migration/versions/initialization"
 	mockcore "wano-island/testing/mocks/common/core"
+	mockusermgt "wano-island/testing/mocks/common/usermgt"
 	"wano-island/testing/testutils"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -24,12 +26,14 @@ var _ = Describe("[migration.versions.initialization]", func() {
 		var db *gorm.DB
 		var sqlMock sqlmock.Sqlmock
 		var noopLogger *slog.Logger
+		var userService *mockusermgt.MockUserService
 
 		BeforeEach(func() {
 			testutils.DetectLeakyGoroutines()
 			noopLogger = core.NewNoopLogger()
 			mockedConfig = mockcore.NewMockAppConfig(GinkgoT())
 			db, sqlMock = testutils.CreateTestDBInstance()
+			userService = mockusermgt.NewMockUserService(GinkgoT())
 		})
 
 		It("should rollback if the pre-process failed", func(ctx SpecContext) {
@@ -40,7 +44,10 @@ var _ = Describe("[migration.versions.initialization]", func() {
 			sqlMock.ExpectRollback()
 
 			err := dbMigrator.Migrate(ctx, map[string]migrationCore.Migration{
-				migrationCore.DBInitVersion: versions.NewInitializationMigration(noopLogger),
+				migrationCore.DBInitVersion: versions.NewInitializationMigration(versions.InitializationMigrationParams{
+					Logger:     noopLogger,
+					UserSerice: userService,
+				}),
 			})
 			Expect(err).To(HaveOccurred())
 		})
@@ -56,7 +63,10 @@ var _ = Describe("[migration.versions.initialization]", func() {
 			sqlMock.ExpectRollback()
 
 			err := dbMigrator.Migrate(ctx, map[string]migrationCore.Migration{
-				migrationCore.DBInitVersion: versions.NewInitializationMigration(noopLogger),
+				migrationCore.DBInitVersion: versions.NewInitializationMigration(versions.InitializationMigrationParams{
+					Logger:     noopLogger,
+					UserSerice: userService,
+				}),
 			})
 			Expect(err).To(HaveOccurred())
 		})
@@ -96,6 +106,7 @@ var _ = Describe("[migration.versions.initialization]", func() {
 		BeforeEach(func() {
 			mockedConfig = mockcore.NewMockAppConfig(GinkgoT())
 			mockedConfig.EXPECT().GetAppVersion().Return("1.0.0")
+			mockedConfig.EXPECT().GetJWTConfig().Return(testutils.GetJWTConfig())
 		})
 
 		AfterEach(func(ctx SpecContext) {
@@ -104,9 +115,17 @@ var _ = Describe("[migration.versions.initialization]", func() {
 		})
 
 		It("should no error occurs when creating initialize database", func(ctx SpecContext) {
+			userService := usermgt.NewUserService(usermgt.UserServiceParams{
+				Logger: noopLogger,
+				Config: mockedConfig,
+			})
+
 			dbMigrator := versions.NewDBMigration(mockedConfig, gormDB, noopLogger)
 			err := dbMigrator.Migrate(ctx, map[string]migrationCore.Migration{
-				migrationCore.DBInitVersion: versions.NewInitializationMigration(noopLogger),
+				migrationCore.DBInitVersion: versions.NewInitializationMigration(versions.InitializationMigrationParams{
+					Logger:     noopLogger,
+					UserSerice: userService,
+				}),
 			})
 			Expect(err).ToNot(HaveOccurred())
 

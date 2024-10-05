@@ -69,6 +69,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
 			"Data":       BeNil(),
 			"Pagination": BeNil(),
 			"Timestamp":  BeTemporally("~", time.Now(), time.Minute),
+			"RequestID":  Not(BeEmpty()),
 		}))
 	})
 
@@ -124,6 +125,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
 			"Data":       BeNil(),
 			"Pagination": BeNil(),
 			"Timestamp":  BeTemporally("~", time.Now(), time.Minute),
+			"RequestID":  Not(BeEmpty()),
 		}))
 	})
 
@@ -188,6 +190,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
 			}),
 			"Pagination": BeNil(),
 			"Timestamp":  BeTemporally("~", time.Now(), time.Minute),
+			"RequestID":  Not(BeEmpty()),
 		}))
 	})
 })

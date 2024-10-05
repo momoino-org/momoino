@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"time"
 
 	"github.com/avast/retry-go/v4"
@@ -13,6 +14,7 @@ import (
 	"go.uber.org/fx"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 // Model is a base struct for all database models. It includes an ID field of type uuid.UUID.
@@ -26,10 +28,25 @@ type HasCreatedAtColumn struct {
 	CreatedAt time.Time `gorm:"type:time;not null"`
 }
 
+// HasCreatedByColumn provides a common column for tracking who created a particular record.
+// This struct can be embedded in other models to ensure the "CreatedBy" field is present.
+type HasCreatedByColumn struct {
+	// The unique identifier (e.g., username or ID) of the user or system that created the record.
+	CreatedBy string `gorm:"type:string;size:256;not null"`
+}
+
 // HasUpdatedAtColumn is a struct that includes an UpdatedAt field of type time.Time.
 // This field is automatically set by GORM when a record is updated.
 type HasUpdatedAtColumn struct {
 	UpdatedAt time.Time `gorm:"type:time"`
+}
+
+type newGormDatabaseParams struct {
+	fx.In
+	Logger       *slog.Logger
+	Config       AppConfig
+	Encryptor    Encryptor `name:"aes-gcm"`
+	AppLifeCycle fx.Lifecycle
 }
 
 func (u *Model) BeforeCreate(tx *gorm.DB) error {
@@ -49,6 +66,7 @@ func (u *Model) BeforeCreate(tx *gorm.DB) error {
 // OpenDatabase establishes a connection to a PostgreSQL database using GORM.
 func OpenDatabase(
 	logger *slog.Logger,
+	encryptor Encryptor,
 	opt func(postgresCfg *postgres.Config, gormCfg *gorm.Config),
 ) (*gorm.DB, error) {
 	postgresCfg := postgres.Config{}
@@ -57,23 +75,22 @@ func OpenDatabase(
 		Logger: slogGorm.New(
 			slogGorm.WithHandler(logger.Handler()),
 			slogGorm.WithTraceAll(),
-			slogGorm.WithContextValue("request-id", RequestIDKey),
 		),
 	}
 
 	opt(&postgresCfg, &gormCfg)
+
+	schema.RegisterSerializer("encryption", EncryptionSerializer{
+		Encryptor: encryptor,
+	})
 
 	return gorm.Open(postgres.New(postgresCfg), &gormCfg)
 }
 
 // newGormDatabase initializes a new GORM database connection with retry mechanism.
 // It also sets up lifecycle hooks for starting and stopping the database connection.
-func newGormDatabase(
-	logger *slog.Logger,
-	config AppConfig,
-	appLifeCycle fx.Lifecycle,
-) *gorm.DB {
-	databaseCfg := config.GetDatabaseConfig()
+func newGormDatabase(p newGormDatabaseParams) *gorm.DB {
+	databaseCfg := p.Config.GetDatabaseConfig()
 
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=UTC",
@@ -85,15 +102,15 @@ func newGormDatabase(
 	)
 
 	gormDB, openDBConnectionErr := retry.DoWithData(func() (*gorm.DB, error) {
-		return OpenDatabase(logger, func(postgresCfg *postgres.Config, gormCfg *gorm.Config) {
+		return OpenDatabase(p.Logger, p.Encryptor, func(postgresCfg *postgres.Config, gormCfg *gorm.Config) {
 			postgresCfg.DSN = dsn
 		})
 	}, retry.Attempts(databaseCfg.MaxAttempts), retry.Delay(1*time.Second))
 
-	appLifeCycle.Append(fx.Hook{
+	p.AppLifeCycle.Append(fx.Hook{
 		OnStart: func(_ context.Context) error {
 			if openDBConnectionErr != nil {
-				logger.Error("Cannot connect to database", "details", errors.Unwrap(openDBConnectionErr))
+				p.Logger.Error("Cannot connect to database", "details", errors.Unwrap(openDBConnectionErr))
 
 				return errors.Unwrap(openDBConnectionErr)
 			}
@@ -101,21 +118,21 @@ func newGormDatabase(
 			return nil
 		},
 		OnStop: func(_ context.Context) error {
-			logger.Info("Trying to close the database connection")
+			p.Logger.Info("Trying to close the database connection")
 
 			sqlDB, getSQLDbErr := gormDB.DB()
 
 			if getSQLDbErr != nil {
-				logger.Error("Unable to get *sql.DB instance.", "details", getSQLDbErr)
+				p.Logger.Error("Unable to get *sql.DB instance.", "details", getSQLDbErr)
 				return getSQLDbErr
 			}
 
 			if closeSQLDbErr := sqlDB.Close(); closeSQLDbErr != nil {
-				logger.Error("Unable to close database connection", "details", closeSQLDbErr)
+				p.Logger.Error("Unable to close database connection", "details", closeSQLDbErr)
 				return closeSQLDbErr
 			}
 
-			logger.Info("The database connection closed successfully")
+			p.Logger.Info("The database connection closed successfully")
 
 			return nil
 		},
@@ -130,4 +147,13 @@ func NewDatabaseModule() fx.Option {
 		"Database Module",
 		fx.Provide(newGormDatabase),
 	)
+}
+
+func Paginate(r *http.Request) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		pageSize := GetPageSize(r)
+		offset := GetOffset(r)
+
+		return db.Offset(offset).Limit(pageSize)
+	}
 }

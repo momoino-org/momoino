@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"wano-island/common/core"
 
 	"go.uber.org/fx"
 )
@@ -29,7 +30,7 @@ func newHTTPServer(
 			go func(ctx context.Context) {
 				err := srv.ListenAndServe()
 				if err != nil && err != http.ErrServerClosed {
-					logger.ErrorContext(ctx, "Cannot start http server", slog.Any("details", err))
+					logger.ErrorContext(ctx, "Cannot start http server", core.DetailsLogAttr(err))
 					os.Exit(1)
 				}
 			}(ctx)

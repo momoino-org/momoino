@@ -15,6 +15,7 @@ import (
 var _ = Describe("[common/core/config.go]", Ordered, func() {
 	BeforeEach(func() {
 		testutils.DetectLeakyGoroutines()
+		testutils.GenerateSecretFiles()
 	})
 
 	Context("when initializing the config module", func() {
@@ -78,7 +79,8 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "staging")
 
-			appCfg, _ := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetMode()).To(Equal("development"))
 		})
 
@@ -86,7 +88,8 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "development")
 
-			appCfg, _ := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.IsDevelopment()).To(BeTrue())
 		})
 
@@ -94,7 +97,8 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "production")
 
-			appCfg, _ := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.IsProduction()).To(BeTrue())
 		})
 
@@ -102,7 +106,8 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "testing")
 
-			appCfg, _ := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.IsTesting()).To(BeTrue())
 		})
 	})
@@ -110,7 +115,8 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 	Context("when AppVesion is set", func() {
 		It("should return the value", func() {
 			core.AppVersion = "1.0.0"
-			appCfg, _ := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetAppVersion()).To(Equal("1.0.0"))
 		})
 	})
@@ -118,7 +124,8 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 	Context("when CompatibleVersion is set", func() {
 		It("should return the value", func() {
 			core.CompatibleVersion = "0.5.0"
-			appCfg, _ := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetCompatibleVersion()).To(Equal("0.5.0"))
 		})
 	})
@@ -126,7 +133,8 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 	Context("when AppRevision is set", func() {
 		It("should return the value", func() {
 			core.AppRevision = "12345678"
-			appCfg, _ := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetRevision()).To(Equal("12345678"))
 		})
 	})
@@ -141,7 +149,8 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t.Setenv("APP_DATABASE_PASSWORD", "password")
 			t.Setenv("APP_DATABASE_MAX_ATTEMPTS", "5")
 
-			appCfg, _ := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig()
+			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetDatabaseConfig()).To(PointTo(MatchFields(IgnoreMissing, Fields{
 				"Host":         Equal("127.0.0.1"),
 				"Port":         Equal(uint16(5434)),
@@ -172,28 +181,6 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 				"AccessTokenExpiresIn":  Equal(10 * time.Minute),
 				"RefreshTokenExpiresIn": Equal(8760 * time.Hour),
 			})))
-		})
-
-		It("should return an error if APP_JWT_PUBLIC_KEY is invalid", func() {
-			t := GinkgoT()
-			t.Setenv("APP_JWT_PUBLIC_KEY", "invalid-public-key")
-
-			appCfg, err := core.NewAppConfig()
-			Expect(err).To(MatchError(ContainSubstring("cannot parse public key")))
-			Expect(appCfg).To(BeNil())
-		})
-
-		It("should return an error if APP_JWT_PRIVATE_KEY is invalid", func() {
-			publicKey, _, err := core.GenerateRSAKey()
-			Expect(err).NotTo(HaveOccurred())
-
-			t := GinkgoT()
-			t.Setenv("APP_JWT_PUBLIC_KEY", string(publicKey))
-			t.Setenv("APP_JWT_PRIVATE_KEY", "invalid-private-key")
-
-			appCfg, err := core.NewAppConfig()
-			Expect(err).To(MatchError(ContainSubstring("cannot parse private key")))
-			Expect(appCfg).To(BeNil())
 		})
 
 		It("should return an error if APP_JWT_ACCESS_TOKEN_EXPIRES_IN is invalid", func() {

@@ -100,30 +100,30 @@ func (m *DBMigration) Migrate(
 
 	if err = m.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if migrateErr := migration.BeforeMigrate(tx); migrateErr != nil {
-			m.logger.Error("Failed at [beforeMigrate] step", slog.Any("details", migrateErr))
+			m.logger.Error("Failed at [beforeMigrate] step", core.DetailsLogAttr(migrateErr))
 			return migrateErr
 		}
 
 		if migrateErr := migration.Migrate(tx); migrateErr != nil {
-			m.logger.Error("Failed at [AutoMigrate] step", slog.Any("details", migrateErr))
+			m.logger.Error("Failed at [AutoMigrate] step", core.DetailsLogAttr(migrateErr))
 			return migrateErr
 		}
 
 		if migrateErr := migration.AfterMigrate(tx); migrateErr != nil {
-			m.logger.Error("Failed at [AfterAutoMigrate] step", slog.Any("details", migrateErr))
+			m.logger.Error("Failed at [AfterAutoMigrate] step", core.DetailsLogAttr(migrateErr))
 			return migrateErr
 		}
 
 		if result := tx.Create(&initialization.DBMigrationModel{
 			Version: m.config.GetAppVersion(),
 		}); result.Error != nil {
-			m.logger.Error("Cannot insert record to public.db_migrations table", slog.Any("details", result.Error))
+			m.logger.Error("Cannot insert record to public.db_migrations table", core.DetailsLogAttr(result.Error))
 			return result.Error
 		}
 
 		return nil
 	}); err != nil {
-		m.logger.ErrorContext(ctx, "Failed to migrate database", slog.Any("details", err))
+		m.logger.ErrorContext(ctx, "Failed to migrate database", core.DetailsLogAttr(err))
 	}
 
 	return err

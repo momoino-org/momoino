@@ -42,7 +42,10 @@ var _ = Describe("Login Handler", func() {
 		config.EXPECT().GetCorsConfig().Return(&core.CorsConfig{})
 
 		userRepository = usermgt.NewUserRepository(usermgt.UserRepositoryParams{})
-		userService := usermgt.NewUserService(usermgt.UserServiceParams{})
+		userService := usermgt.NewUserService(usermgt.UserServiceParams{
+			Logger: core.NewNoopLogger(),
+			Config: config,
+		})
 
 		router = testutils.CreateRouter(func(rp *httpsrv.RouteParams) {
 			rp.Config = config
@@ -74,17 +77,18 @@ var _ = Describe("Login Handler", func() {
 			"Data":       BeNil(),
 			"Pagination": BeNil(),
 			"Timestamp":  BeTemporally("~", time.Now(), time.Minute),
+			"RequestID":  Not(BeEmpty()),
 		}))
 	})
 
-	It("returns an error if email is incorrect", func(ctx SpecContext) {
+	It("returns an error if username is incorrect", func(ctx SpecContext) {
 		mockedDB.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "public"."users"`)).
 			WithArgs("testing@internal.com", 1).
 			WillReturnError(gorm.ErrRecordNotFound)
 
 		recorder := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewReader([]byte(`{
-            "email": "testing@internal.com",
+            "username": "testing@internal.com",
             "password": ""
         }`)))
 
@@ -100,19 +104,20 @@ var _ = Describe("Login Handler", func() {
 			"Data":       BeNil(),
 			"Pagination": BeNil(),
 			"Timestamp":  BeTemporally("~", time.Now(), time.Minute),
+			"RequestID":  Not(BeEmpty()),
 		}))
 	})
 
 	It("returns an error if password is incorrect", func(ctx SpecContext) {
 		mockedDB.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "public"."users"`)).
 			WithArgs("testing@internal.com", 1).
-			WillReturnRows(sqlmock.NewRows([]string{"email", "password"}).AddRow(
+			WillReturnRows(sqlmock.NewRows([]string{"username", "password"}).AddRow(
 				"testing@internal.com",
 				"$2a$10$4LGRfD5yIX02UIe.4mEmfO60OkPVOQ5rsWgVS708v2TkurwnRW51."))
 
 		recorder := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewReader([]byte(`{
-            "email": "testing@internal.com",
+            "username": "testing@internal.com",
             "password": "incorrect-password"
         }`)))
 
@@ -128,19 +133,20 @@ var _ = Describe("Login Handler", func() {
 			"Data":       BeNil(),
 			"Pagination": BeNil(),
 			"Timestamp":  BeTemporally("~", time.Now(), time.Minute),
+			"RequestID":  Not(BeEmpty()),
 		}))
 	})
 
 	It("returns an accessToken and refreshToken if the user inputs the correct credentials.", func(ctx SpecContext) {
 		mockedDB.ExpectQuery(regexp.QuoteMeta(`SELECT * FROM "public"."users"`)).
 			WithArgs("testing@internal.com", 1).
-			WillReturnRows(sqlmock.NewRows([]string{"email", "password"}).AddRow(
+			WillReturnRows(sqlmock.NewRows([]string{"username", "password"}).AddRow(
 				"testing@internal.com",
 				"$2a$10$4LGRfD5yIX02UIe.4mEmfO60OkPVOQ5rsWgVS708v2TkurwnRW51."))
 
 		recorder := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/login", bytes.NewReader([]byte(`{
-            "email": "testing@internal.com",
+            "username": "testing@internal.com",
             "password": "Keep!t5ecret"
         }`)))
 
@@ -159,6 +165,7 @@ var _ = Describe("Login Handler", func() {
 			}),
 			"Pagination": BeNil(),
 			"Timestamp":  BeTemporally("~", time.Now(), time.Minute),
+			"RequestID":  Not(BeEmpty()),
 		}))
 	})
 })

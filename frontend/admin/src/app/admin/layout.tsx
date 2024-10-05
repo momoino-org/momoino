@@ -73,6 +73,11 @@ export default async function AdminLayout(props: PropsWithChildren) {
                 href: '/admin/tv-shows',
                 icon: <TvRounded />,
               },
+              {
+                label: 'User Management',
+                href: '/admin/usermgt',
+                icon: <TvRounded />,
+              },
             ]}
           />
           <Container maxWidth="xl" sx={{ flexGrow: 1, py: 2, height: '100%' }}>

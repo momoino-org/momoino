@@ -11,6 +11,10 @@ E-0005: Validation failed. Please check and try again
 E-0006: The current password is invalid, please check and try again
 # (showmgt)
 E-0007: Cannot create the show. Please try again. If the problem continues, kindly reach out to the system administrator for support
+E-R404: Oops! The page you're looking for can't be found. It might have been moved or no longer exists.
+
+# (oauth2)
+E-OAUTH2-0001: It looks like the sign-in option isn't available right now or hasn't been set up yet.
 
 # Unknown messages (for internal server errors)
 U-0000: An error has occurred. Please try again. If the problem continues, kindly reach out to the system administrator for support

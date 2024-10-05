@@ -31,7 +31,11 @@ const (
 	MsgValidationFailed                     = "E-0005"
 	MsgInvalidCurrentPassword               = "E-0006"
 	MsgCannotCreateTheShow                  = "E-0007"
+	MsgRouteNotFound                        = "E-R404"
 	MsgInternalServerError                  = "U-0000"
+
+	// OAuth2 related messages.
+	MsgOAuth2ProviderUnavailable = "E-OAUTH2-0001"
 )
 
 func GetLocalizer(r *http.Request) *i18n.Localizer {

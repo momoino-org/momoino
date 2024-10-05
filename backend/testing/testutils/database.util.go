@@ -28,7 +28,7 @@ func closeGormDB(gormDB *gorm.DB) {
 
 // CreateDBInstance initializes and returns a gorm.DB instance connected to a PostgreSQL database.
 func CreateDBInstance(cfgFn func(postgresCfg *gormPostgres.Config, gormCfg *gorm.Config)) *gorm.DB {
-	gormDB, err := core.OpenDatabase(core.NewNoopLogger(), cfgFn)
+	gormDB, err := core.OpenDatabase(core.NewNoopLogger(), core.NewNoopEncryptor(), cfgFn)
 	Expect(err).ToNot(HaveOccurred())
 
 	DeferCleanup(func() {
@@ -48,6 +48,7 @@ func CreateTestDBInstance() (*gorm.DB, sqlmock.Sqlmock) {
 
 	gormDB, err := core.OpenDatabase(
 		core.NewNoopLogger(),
+		core.NewNoopEncryptor(),
 		func(postgresCfg *gormPostgres.Config, gormCfg *gorm.Config) {
 			postgresCfg.Conn = db
 			// Need to disable PrepareStmt to make mocking queries easier
