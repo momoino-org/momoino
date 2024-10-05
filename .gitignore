@@ -38,3 +38,5 @@ report.json
 report.xml
 
 __debug*
+
+*.key

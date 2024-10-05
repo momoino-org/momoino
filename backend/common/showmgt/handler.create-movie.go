@@ -55,7 +55,7 @@ func (h *createMovieHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var requestBody CreateShowRequestBody
 	if err := render.DecodeJSON(r.Body, &requestBody); err != nil {
-		h.logger.ErrorContext(reqCtx, "Something went wrong when trying to decode request body", slog.Any("details", err))
+		h.logger.ErrorContext(reqCtx, "Something went wrong when trying to decode request body", core.DetailsLogAttr(err))
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, responseBuilder.MessageID(core.MsgFailedToDecodeRequestBody).Build())
 
@@ -72,7 +72,7 @@ func (h *createMovieHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result := h.db.Create(&showModel); result.Error != nil {
-		h.logger.ErrorContext(reqCtx, "Something went wrong when creating a show", slog.Any("details", result.Error))
+		h.logger.ErrorContext(reqCtx, "Something went wrong when creating a show", core.DetailsLogAttr(result.Error))
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, responseBuilder.MessageID(core.MsgCannotCreateTheShow).Build())
 

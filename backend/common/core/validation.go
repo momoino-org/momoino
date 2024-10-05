@@ -43,7 +43,7 @@ func TranslateValidationErrors(
 
 	if errors.As(v, &validationErrs) {
 		authUser := MustGetAuthUserFromRequest(r)
-		trans, _ := uni.GetTranslator(authUser.Locale)
+		trans, _ := uni.GetTranslator(authUser.GetLocale())
 		translations := validator.ValidationErrorsTranslations{}
 
 		for _, v := range validationErrs {

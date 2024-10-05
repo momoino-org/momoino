@@ -47,6 +47,7 @@ func (c customHeader) LogValue() slog.Value {
 	filteredHeaders := []string{
 		"Authorization",
 		core.AuthorizationHeader,
+		"Cookie",
 	}
 
 	// Convert the customHeader into a slice of slog.Attr, filtering out sensitive headers.

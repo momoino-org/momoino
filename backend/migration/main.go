@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"wano-island/common/core"
+	"wano-island/common/usermgt"
 	migrationCore "wano-island/migration/core"
 	"wano-island/migration/versions"
 
@@ -14,9 +15,11 @@ import (
 // It initializes the necessary dependencies and runs the database migration process.
 func main() {
 	fx.New(
+		core.NewEncryptionModule(),
 		core.NewConfigModule(),
 		core.NewLoggerModuleWithConfig(),
 		core.NewDatabaseModule(),
+		usermgt.NewUserMgtModule(),
 		versions.NewDBMigrationModule(),
 		fx.Invoke(func(
 			appLifeCycle fx.Lifecycle,
@@ -24,6 +27,7 @@ func main() {
 			shutdowner fx.Shutdowner,
 			dbMigration *versions.DBMigration,
 			config core.AppConfig,
+			userService usermgt.UserService,
 		) {
 			appLifeCycle.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
@@ -33,7 +37,10 @@ func main() {
 							"compatible-version", config.GetCompatibleVersion()))
 
 					if err := dbMigration.Migrate(ctx, map[string]migrationCore.Migration{
-						migrationCore.DBInitVersion:   versions.NewInitializationMigration(logger),
+						migrationCore.DBInitVersion: versions.NewInitializationMigration(versions.InitializationMigrationParams{
+							Logger:     logger,
+							UserSerice: userService,
+						}),
 						config.GetCompatibleVersion(): versions.NewUpgradeMigration(logger),
 					}); err != nil {
 						return err

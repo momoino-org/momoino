@@ -27,7 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "**/*.d.ts"
+    "**/*.d.ts",
+    "src/internal/core/auth/client/hooks/useOAuth2/index.ts="
   ],
   "exclude": ["node_modules"]
 }

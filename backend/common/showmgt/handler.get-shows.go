@@ -46,13 +46,12 @@ func (h *getShowsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var showModels []ShowModel
 
-	page := core.GetPage(r)
 	pageSize := core.GetPageSize(r)
 	offset := core.GetOffset(r)
 
 	var totalRows int64
 	if result := h.db.Model(&ShowModel{}).Count(&totalRows); result.Error != nil {
-		h.logger.ErrorContext(reqCtx, "Something went wrong when getting total rows", slog.Any("details", result.Error))
+		h.logger.ErrorContext(reqCtx, "Something went wrong when getting total rows", core.DetailsLogAttr(result.Error))
 		render.Status(r, http.StatusInternalServerError)
 		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
 
@@ -60,7 +59,7 @@ func (h *getShowsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result := h.db.Offset(offset).Limit(pageSize).Order("created_at DESC").Find(&showModels); result.Error != nil {
-		h.logger.ErrorContext(reqCtx, "Something went wrong when getting shows", slog.Any("details", result.Error))
+		h.logger.ErrorContext(reqCtx, "Something went wrong when getting shows", core.DetailsLogAttr(result.Error))
 		render.Status(r, http.StatusInternalServerError)
 		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
 
@@ -72,7 +71,5 @@ func (h *getShowsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, responseBuilder.MessageID(core.MsgSuccess).
-		Data(showDTOs).
-		Pagination(page, pageSize, totalRows).Build())
+	render.JSON(w, r, responseBuilder.Data(showDTOs).Pagination(totalRows).Build())
 }

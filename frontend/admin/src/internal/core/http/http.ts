@@ -1,5 +1,5 @@
 import ky from 'ky';
-import { isServer } from '@/internal/core/config';
+import { backendOrigin } from '@/internal/core/config';
 
 /**
  * Creates a configured instance of the Ky HTTP client with custom settings.
@@ -8,9 +8,8 @@ import { isServer } from '@/internal/core/config';
  * @returns A configured instance of the Ky HTTP client.
  */
 export const http = ky.create({
-  prefixUrl: isServer
-    ? process.env.NEXT_BACKEND_HOST
-    : process.env.NEXT_PUBLIC_BACKEND_HOST,
+  prefixUrl: backendOrigin,
   throwHttpErrors: true,
   credentials: 'include',
+  retry: 0,
 });

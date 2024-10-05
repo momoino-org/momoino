@@ -156,6 +156,91 @@ paths:
               schema:
                 $ref: "#/components/schemas/Response"
 
+  /api/v1/providers:
+    get:
+      tags:
+        - oauth2
+      security:
+        - accessToken: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+      responses:
+        "200":
+          description: Get paginated providers.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetOAuth2Providers_200"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+
+    post:
+      tags:
+        - oauth2
+      security:
+        - accessToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                clientID:
+                  type: string
+                clientSecret:
+                  type: string
+                redirectURL:
+                  type: string
+                scopes:
+                  type: array
+                  items:
+                    type: string
+                isEnabled:
+                  type: boolean
+      responses:
+        "201":
+          description: Create the oauth2 provider successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateOAuth2Provider_201"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+
 components:
   securitySchemes:
     accessToken:
@@ -174,6 +259,9 @@ components:
         timestamp:
           type: string
           format: date-time
+        requestId:
+          type: string
+          format: uuid
 
     PaginatedResponse:
       allOf:
@@ -195,9 +283,8 @@ components:
     Login_RequestBody:
       type: object
       properties:
-        email:
+        username:
           type: string
-          format: email
         password:
           type: string
 
@@ -288,3 +375,45 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/ShowDTO"
+
+    GetOAuth2Providers_200:
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                isEnabled:
+                  type: boolean
+                createdAt:
+                  type: string
+                  format: date-time
+                createdBy:
+                  type: string
+
+    CreateOAuth2Provider_201:
+      allOf:
+        - $ref: "#/components/schemas/Response"
+        - type: object
+          properties:
+            data:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                isEnabled:
+                  type: boolean
+                createdAt:
+                  type: string
+                  format: date-time
+                createdBy:
+                  type: string

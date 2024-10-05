@@ -24,7 +24,12 @@ func GetRequestID(r *http.Request) string {
 func NewRequestModule() fx.Option {
 	return fx.Module(
 		"Request Module",
-		fx.Provide(schema.NewDecoder),
+		fx.Provide(func() *schema.Decoder {
+			schema := schema.NewDecoder()
+			schema.IgnoreUnknownKeys(true)
+
+			return schema
+		}),
 	)
 }
 

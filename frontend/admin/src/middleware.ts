@@ -5,7 +5,7 @@ import { match } from 'path-to-regexp';
 import { isEmpty } from 'radash';
 import { isAccessTokenValid } from '@/internal/core/auth/server';
 
-const isSignInRoute = match('/auth/signin');
+const isSignInRoute = match('/auth/*segments');
 const privateRoutes = [match('/admin{/*path}')];
 
 const signInMiddleware: NextMiddleware = async (request: NextRequest) => {
@@ -58,6 +58,10 @@ const privateRouteMiddleware: NextMiddleware = async (request: NextRequest) => {
 };
 
 export const middleware: NextMiddleware = async (request, event) => {
+  if (request.nextUrl.pathname.startsWith('/_next')) {
+    return NextResponse.next();
+  }
+
   if (isSignInRoute(request.nextUrl.pathname) !== false) {
     return signInMiddleware(request, event);
   }

@@ -69,13 +69,14 @@ var _ = Describe("handler.profile.go", func() {
 			"Data":       BeNil(),
 			"Pagination": BeNil(),
 			"Timestamp":  BeTemporally("~", time.Now(), time.Minute),
+			"RequestID":  Not(BeEmpty()),
 		}))
 	})
 
 	It("returns a user profile if there is valid access token", func(ctx SpecContext) {
 		config.EXPECT().GetJWTConfig().Return(testutils.GetJWTConfig())
 		userRepository.EXPECT().
-			FindUserByID(mock.Anything, mock.Anything, "019135f7-6265-7ef8-8920-57280736f6c0").
+			FindUserByID(mock.Anything, mock.Anything, uuid.MustParse("019135f7-6265-7ef8-8920-57280736f6c0")).
 			Return(&usermgt.UserModel{
 				Model: core.Model{
 					ID: uuid.MustParse("019135f7-6265-7ef8-8920-57280736f6c0"),
@@ -116,6 +117,7 @@ var _ = Describe("handler.profile.go", func() {
 			}),
 			"Pagination": BeNil(),
 			"Timestamp":  BeTemporally("~", time.Now(), time.Minute),
+			"RequestID":  Not(BeEmpty()),
 		}))
 	})
 })

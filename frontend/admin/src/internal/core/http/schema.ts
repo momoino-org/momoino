@@ -5,6 +5,7 @@ export const EmptyResponse = z
     message: z.string(),
     messageId: z.string(),
     timestamp: z.string(),
+    requestId: z.string(),
   })
   .strict();
 

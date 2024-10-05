@@ -1,9 +1,12 @@
 package core
 
 import (
+	"bytes"
 	"crypto/rsa"
+	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"slices"
 	"time"
 
@@ -53,6 +56,9 @@ type AppConfig interface {
 	// provided viper configuration. It retrieves the CORS configuration details from environment variables
 	// using the Viper library. If any of the required environment variables are not set, default values are used.
 	GetCorsConfig() *CorsConfig
+
+	// GetSecretKey retrieves the secret key from "secret.key" file.
+	GetSecretKey() []byte
 }
 
 // DatabaseConfig is a struct that holds the database configuration details.
@@ -112,12 +118,13 @@ type CorsConfig struct {
 	MaxAge int
 }
 
-// AppConfig is a struct that holds the application's configuration.
+// appConfig is a struct that holds the application's configuration.
 type appConfig struct {
 	appMode        string
 	databaseConfig *DatabaseConfig
 	jwtConfig      *JWTConfig
 	corsConfig     *CorsConfig
+	secretKey      []byte
 }
 
 const (
@@ -130,6 +137,8 @@ const (
 	// ProductionMode: Indicates that the application is running in production mode.
 	ProductionMode = "production"
 )
+
+var _ AppConfig = (*appConfig)(nil)
 
 var (
 	// AppVersion is the current version of the migration application.
@@ -182,6 +191,10 @@ func (appCfg *appConfig) GetCorsConfig() *CorsConfig {
 	return appCfg.corsConfig
 }
 
+func (appCfg *appConfig) GetSecretKey() []byte {
+	return appCfg.secretKey
+}
+
 // initAppMode retrieves the application mode from the provided viper configuration.
 // If the mode is not explicitly set in the configuration, it defaults to development mode.
 func initAppMode(v *viper.Viper) string {
@@ -226,26 +239,24 @@ func initJWTConfig(v *viper.Viper) (*JWTConfig, error) {
 	v.SetDefault("jwt_access_token_expires_in", "5m")
 	v.SetDefault("jwt_refresh_token_expires_in", "24h")
 
-	// Generate the public and private keys if it's not already present in the environment
-	if v.GetString("jwt_public_key") == "" || v.GetString("jwt_private_key") == "" {
-		publicKeyBytes, privateKeyBytes, err := GenerateRSAKey()
+	publicKeyBytes, err := os.ReadFile("public.key")
+	if err != nil {
+		return nil, err
+	}
 
-		if err != nil {
-			return nil, err
-		}
-
-		v.SetDefault("jwt_public_key", publicKeyBytes)
-		v.SetDefault("jwt_private_key", privateKeyBytes)
+	privateKeyBytes, err := os.ReadFile("private.key")
+	if err != nil {
+		return nil, err
 	}
 
 	// Parse the public key from the configuration
-	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(v.GetString("jwt_public_key")))
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse public key: %w", err)
 	}
 
 	// Parse the private key from the configuration
-	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(v.GetString("jwt_private_key")))
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyBytes)
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse private key: %w", err)
 	}
@@ -299,6 +310,28 @@ func initCorsConfig(v *viper.Viper) *CorsConfig {
 	}
 }
 
+// getSecretKey reads the secret key from the "secret.key" file.
+// If the file does not exist or cannot be read, it returns an error.
+// Otherwise, it returns the trimmed secret key as a byte slice.
+func getSecretKey() ([]byte, error) {
+	_, err := os.Stat("secret.key")
+	if err != nil {
+		return nil, fmt.Errorf("secret key file not found at secret.key: %w", err)
+	}
+
+	secretValue, err := os.ReadFile("secret.key")
+	if err != nil {
+		return nil, fmt.Errorf("failed to read secret key file at secret.key: %w", err)
+	}
+
+	trimmedSecret := bytes.TrimSpace(secretValue)
+	if len(trimmedSecret) == 0 {
+		return nil, errors.New("secret key file at secret.key is empty")
+	}
+
+	return trimmedSecret, nil
+}
+
 // NewAppConfig initializes and returns a new instance of the application's configuration.
 // The configuration is loaded from environment variables and files using the Viper library.
 // The function retrieves the application's mode, database connection details, and JWT configuration.
@@ -312,6 +345,11 @@ func NewAppConfig() (*appConfig, error) {
 	// Enable automatic environment variable loading
 	viperInstance.AutomaticEnv()
 
+	secretKey, err := getSecretKey()
+	if err != nil {
+		return nil, err
+	}
+
 	// Retrieve the JWT configuration
 	jwtConfig, err := initJWTConfig(viperInstance)
 	if err != nil {
@@ -320,6 +358,7 @@ func NewAppConfig() (*appConfig, error) {
 
 	// Create a new appConfig instance with the retrieved configuration details
 	return &appConfig{
+		secretKey:      secretKey,
 		appMode:        initAppMode(viperInstance),
 		databaseConfig: initDatabaseConfig(viperInstance),
 		jwtConfig:      jwtConfig,

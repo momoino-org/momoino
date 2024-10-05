@@ -1,6 +1,6 @@
 {
   "common": {
-    "email": "Email",
+    "username": "Username",
     "password": "Password",
     "close": "Close",
     "create": "Create",

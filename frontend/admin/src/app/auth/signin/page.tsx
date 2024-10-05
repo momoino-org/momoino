@@ -7,10 +7,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { loginByCredentials } from '@/internal/core/auth/client';
+import { Google } from '@mui/icons-material';
+import { loginByCredentials, OAuth2Button } from '@/internal/core/auth/client';
+import { backendOrigin } from '@/internal/core/config';
 
 const LoginSchema = z.strictObject({
-  email: z.string().email(),
+  username: z.string(),
   password: z.string().min(8),
 });
 
@@ -23,12 +25,12 @@ export default function LoginPage() {
   const { mutateAsync: loginAsync, status: loginStatus } = useMutation({
     mutationKey: ['login-by-credentials'],
     mutationFn: (params: LoginData) =>
-      loginByCredentials(params.email, params.password),
+      loginByCredentials(params.username, params.password),
   });
 
   const { control, handleSubmit } = useForm<LoginData>({
     defaultValues: {
-      email: '',
+      username: '',
       password: '',
     },
     resolver: zodResolver(LoginSchema),
@@ -90,16 +92,16 @@ export default function LoginPage() {
         >
           <Controller
             control={control}
-            name="email"
+            name="username"
             render={({ field: { ref, ...field }, fieldState }) => (
               <TextField
-                autoComplete="email"
+                autoComplete="username"
                 error={fieldState.invalid}
                 helperText={fieldState.error?.message}
-                id="email"
+                id="username"
                 inputRef={ref}
-                label={t('common.email')}
-                type="email"
+                label={t('common.username')}
+                type="text"
                 variant="filled"
                 {...field}
               />
@@ -133,6 +135,14 @@ export default function LoginPage() {
             {t('page.signin.signinBtn')}
           </Button>
         </Stack>
+
+        <OAuth2Button
+          pkce
+          authURL={new URL('api/v1/login/providers/google', backendOrigin)}
+          provider="google"
+        >
+          <Google />
+        </OAuth2Button>
       </Card>
     </Stack>
   );
