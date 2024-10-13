@@ -91,7 +91,7 @@
           "<node_internals>/**"
         ],
         "type": "node",
-        "cwd": "${workspaceRoot}/frontend/admin",
+        "cwd": "${workspaceRoot}/frontend",
         "env": {
           "USE_SECURE_COOKIES": "true",
           // For internal communication between NextJS's backend and custom backend
