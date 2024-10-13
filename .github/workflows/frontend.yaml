@@ -28,10 +28,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install packages
-        working-directory: frontend/admin
+        working-directory: frontend
         run: npm ci
       - name: "[ESLint] Run code linter"
-        working-directory: frontend/admin
+        working-directory: frontend
         run: npm run eslint:lint
 
   prettier:
@@ -44,10 +44,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install packages
-        working-directory: frontend/admin
+        working-directory: frontend
         run: npm ci
       - name: "[Prettier] Run code linter"
-        working-directory: frontend/admin
+        working-directory: frontend
         run: npm run prettier:lint
 
   build:
@@ -60,8 +60,8 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install packages
-        working-directory: frontend/admin
+        working-directory: frontend
         run: npm ci
       - name: Build
-        working-directory: frontend/admin
+        working-directory: frontend
         run: npm run build
