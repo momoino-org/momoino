@@ -14,7 +14,42 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.number }}
   cancel-in-progress: true
 
+env:
+  NODE_VERSION: 22
+
 jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install packages
+        working-directory: frontend/admin
+        run: npm ci
+      - name: "[ESLint] Run code linter"
+        working-directory: frontend/admin
+        run: npm run eslint:lint
+
+  prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install packages
+        working-directory: frontend/admin
+        run: npm ci
+      - name: "[Prettier] Run code linter"
+        working-directory: frontend/admin
+        run: npm run prettier:lint
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -23,16 +58,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
       - name: Install packages
         working-directory: frontend/admin
         run: npm ci
-      - name: "[ESLint] Run code linter"
-        working-directory: frontend/admin
-        run: npm run eslint:lint
-      - name: "[Prettier] Run code linter"
-        working-directory: frontend/admin
-        run: npm run prettier:lint
       - name: Build
         working-directory: frontend/admin
         run: npm run build
