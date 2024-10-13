@@ -44,7 +44,7 @@ require (
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/nicksnyder/go-i18n/v2 v2.4.0 // indirect
+	github.com/nicksnyder/go-i18n/v2 v2.4.1 // indirect
 	github.com/orandin/slog-gorm v1.4.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
