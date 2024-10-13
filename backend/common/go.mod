@@ -16,7 +16,7 @@ require (
 	github.com/orandin/slog-gorm v1.4.0
 	github.com/samber/lo v1.47.0
 	github.com/spf13/viper v1.19.0
-	go.uber.org/fx v1.22.2
+	go.uber.org/fx v1.23.0
 	golang.org/x/crypto v0.28.0
 	golang.org/x/oauth2 v0.23.0
 	golang.org/x/text v0.19.0

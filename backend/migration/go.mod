@@ -6,7 +6,7 @@ replace wano-island/common => ../common
 
 require (
 	github.com/samber/lo v1.47.0
-	go.uber.org/fx v1.22.2
+	go.uber.org/fx v1.23.0
 	gorm.io/gorm v1.25.12
 	wano-island/common v0.0.0-00010101000000-000000000000
 )
