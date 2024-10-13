@@ -14,7 +14,7 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.33.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.33.0
-	go.uber.org/fx v1.22.2
+	go.uber.org/fx v1.23.0
 	golang.org/x/oauth2 v0.23.0
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/gorm v1.25.12
