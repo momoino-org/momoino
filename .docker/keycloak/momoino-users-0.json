@@ -1,0 +1,24 @@
+{
+  "realm" : "momoino",
+  "users" : [ {
+    "id" : "84a9da41-e620-49b5-9525-edd9e18a5d14",
+    "username" : "admin",
+    "emailVerified" : false,
+    "createdTimestamp" : 1732515847398,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "c36e6287-36f8-4c1b-b1fc-1af95631a48b",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1732515854607,
+      "secretData" : "{\"value\":\"LuUvGmMV541or4AjyUy1IIPTOJOuRfRZP12AqSdKwQQ=\",\"salt\":\"xSAQnzFg3XYZibV4AJNxUw==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-momoino" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}

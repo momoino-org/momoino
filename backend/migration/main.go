@@ -27,7 +27,6 @@ func main() {
 			shutdowner fx.Shutdowner,
 			dbMigration *versions.DBMigration,
 			config core.AppConfig,
-			userService usermgt.UserService,
 		) {
 			appLifeCycle.Append(fx.Hook{
 				OnStart: func(ctx context.Context) error {
@@ -38,8 +37,7 @@ func main() {
 
 					if err := dbMigration.Migrate(ctx, map[string]migrationCore.Migration{
 						migrationCore.DBInitVersion: versions.NewInitializationMigration(versions.InitializationMigrationParams{
-							Logger:     logger,
-							UserSerice: userService,
+							Logger: logger,
 						}),
 						config.GetCompatibleVersion(): versions.NewUpgradeMigration(logger),
 					}); err != nil {

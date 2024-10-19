@@ -13,19 +13,7 @@ func NewUserMgtModule() fx.Option {
 	return fx.Module(
 		"User management module",
 		fx.Provide(
-			fx.Annotate(NewUserService, fx.As(new(UserService))),
-			fx.Annotate(NewUserRepository, fx.As(new(UserRepository))),
-			core.AsRoute(NewLoginHandler),
 			core.AsRoute(NewProfileHandler),
-			core.AsRoute(NewChangePasswordHandler),
-
-			// OAuth2
-			fx.Annotate(NewGoogleProvider, fx.As(new(OAuth2Provider)), fx.ResultTags(`name:"google_provider"`)),
-			fx.Annotate(NewOAuth2ProviderRepository, fx.As(new(OAuth2ProviderRepository))),
-			core.AsRoute(NewCreateOAuth2Provider),
-			core.AsRoute(NewOAuth2LoginHandler),
-			core.AsRoute(NewOAuth2LoginCallbackHandler),
-			core.AsRoute(NewGetOAuth2ProvidersHandler),
 		),
 	)
 }

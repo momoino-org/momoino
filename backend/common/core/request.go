@@ -12,7 +12,6 @@ type requestIDCtxKey string
 
 const RequestIDHeader = "X-Request-Id"
 const RequestIDKey requestIDCtxKey = "RequestIDKey"
-const AuthorizationHeader = "X-Auth-Access-Token"
 const DefaultPage = 1
 const DefaultPageSize = 10
 const MaxPageSize = 100

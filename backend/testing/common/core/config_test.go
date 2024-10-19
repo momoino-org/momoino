@@ -1,8 +1,6 @@
 package core_test
 
 import (
-	"crypto/rsa"
-	"time"
 	"wano-island/common/core"
 	"wano-island/testing/testutils"
 
@@ -26,7 +24,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 
 	Context("when the config not set in the environment", func() {
 		It("should return default values when no configuration is provided", func() {
-			appCfg, err := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg).NotTo(BeNil())
 
@@ -45,12 +43,6 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 				"Password":     Equal("Keep!t5ecret"),
 				"MaxAttempts":  Equal(uint(3)),
 			})))
-			Expect(appCfg.GetJWTConfig()).To(PointTo(MatchFields(IgnoreMissing, Fields{
-				"PublicKey":             BeAssignableToTypeOf(&rsa.PublicKey{}),
-				"PrivateKey":            BeAssignableToTypeOf(&rsa.PrivateKey{}),
-				"AccessTokenExpiresIn":  Equal(5 * time.Minute),
-				"RefreshTokenExpiresIn": Equal(24 * time.Hour),
-			})))
 			Expect(appCfg.GetCorsConfig()).To(PointTo(MatchFields(IgnoreMissing, Fields{
 				"AllowedOrigins":   Equal([]string{"*"}),
 				"AllowedMethods":   Equal([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
@@ -68,7 +60,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 				t := GinkgoT()
 				t.Setenv("APP_MODE", mode)
 
-				appCfg, err := core.NewAppConfig()
+				appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 				Expect(err).NotTo(HaveOccurred())
 				Expect(appCfg.GetMode()).To(Equal(mode))
 			},
@@ -80,7 +72,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "staging")
 
-			appCfg, err := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetMode()).To(Equal("development"))
 		})
@@ -89,7 +81,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "development")
 
-			appCfg, err := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.IsDevelopment()).To(BeTrue())
 		})
@@ -98,7 +90,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "production")
 
-			appCfg, err := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.IsProduction()).To(BeTrue())
 		})
@@ -107,7 +99,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "testing")
 
-			appCfg, err := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.IsTesting()).To(BeTrue())
 		})
@@ -116,7 +108,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 	Context("when AppVesion is set", func() {
 		It("should return the value", func() {
 			core.AppVersion = "1.0.0"
-			appCfg, err := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetAppVersion()).To(Equal("1.0.0"))
 		})
@@ -125,7 +117,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 	Context("when CompatibleVersion is set", func() {
 		It("should return the value", func() {
 			core.CompatibleVersion = "0.5.0"
-			appCfg, err := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetCompatibleVersion()).To(Equal("0.5.0"))
 		})
@@ -134,7 +126,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 	Context("when AppRevision is set", func() {
 		It("should return the value", func() {
 			core.AppRevision = "12345678"
-			appCfg, err := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetRevision()).To(Equal("12345678"))
 		})
@@ -150,7 +142,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t.Setenv("APP_DATABASE_PASSWORD", "password")
 			t.Setenv("APP_DATABASE_MAX_ATTEMPTS", "5")
 
-			appCfg, err := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetDatabaseConfig()).To(PointTo(MatchFields(IgnoreMissing, Fields{
 				"Host":         Equal("127.0.0.1"),
@@ -160,46 +152,6 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 				"Password":     Equal("password"),
 				"MaxAttempts":  Equal(uint(5)),
 			})))
-		})
-	})
-
-	Context("when user defines the jwt configuration in the envionment", func() {
-		It("should use the jwt configuration in the envionment", func() {
-			publicKey, privateKey, err := core.GenerateRSAKey()
-			Expect(err).NotTo(HaveOccurred())
-
-			t := GinkgoT()
-			t.Setenv("APP_JWT_PUBLIC_KEY", string(publicKey))
-			t.Setenv("APP_JWT_PRIVATE_KEY", string(privateKey))
-			t.Setenv("APP_JWT_ACCESS_TOKEN_EXPIRES_IN", "10m")
-			t.Setenv("APP_JWT_REFRESH_TOKEN_EXPIRES_IN", "8760h")
-
-			appCfg, err := core.NewAppConfig()
-			Expect(err).NotTo(HaveOccurred())
-			Expect(appCfg.GetJWTConfig()).To(PointTo(MatchFields(IgnoreMissing, Fields{
-				"PublicKey":             BeAssignableToTypeOf(&rsa.PublicKey{}),
-				"PrivateKey":            BeAssignableToTypeOf(&rsa.PrivateKey{}),
-				"AccessTokenExpiresIn":  Equal(10 * time.Minute),
-				"RefreshTokenExpiresIn": Equal(8760 * time.Hour),
-			})))
-		})
-
-		It("should return an error if APP_JWT_ACCESS_TOKEN_EXPIRES_IN is invalid", func() {
-			t := GinkgoT()
-			t.Setenv("APP_JWT_ACCESS_TOKEN_EXPIRES_IN", "10d")
-
-			appCfg, err := core.NewAppConfig()
-			Expect(err).To(MatchError(ContainSubstring("cannot parse access token expiration duration")))
-			Expect(appCfg).To(BeNil())
-		})
-
-		It("should return an error if APP_JWT_REFRESH_TOKEN_EXPIRES_IN is invalid", func() {
-			t := GinkgoT()
-			t.Setenv("APP_JWT_REFRESH_TOKEN_EXPIRES_IN", "8760 s")
-
-			appCfg, err := core.NewAppConfig()
-			Expect(err).To(MatchError(ContainSubstring("cannot parse refresh token expiration duration")))
-			Expect(appCfg).To(BeNil())
 		})
 	})
 
@@ -213,7 +165,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t.Setenv("APP_CORS_ALLOW_CREDENTIALS", "true")
 			t.Setenv("APP_CORS_MAX_AGE", "500")
 
-			appCfg, err := core.NewAppConfig()
+			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetCorsConfig()).To(PointTo(MatchFields(IgnoreMissing, Fields{
 				"AllowedOrigins":   Equal([]string{"http://localhost:3000", "http://*.localhost"}),

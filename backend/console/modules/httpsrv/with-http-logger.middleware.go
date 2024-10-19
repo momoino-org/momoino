@@ -45,7 +45,6 @@ const loggerCtxID loggerCtxKey = 0
 func (c customHeader) LogValue() slog.Value {
 	// Define a list of headers to be filtered out and redacted.
 	filteredHeaders := []string{
-		"Authorization",
 		core.AuthorizationHeader,
 		"Cookie",
 	}

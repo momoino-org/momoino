@@ -10,8 +10,13 @@ import (
 type HTTPRoute interface {
 	http.Handler
 
-	Pattern() string
-	IsPrivateRoute() bool
+	Config() *HTTPRouteConfig
+}
+
+type HTTPRouteConfig struct {
+	Pattern   string
+	IsPrivate bool
+	Wrappers  []func(http.Handler) http.Handler
 }
 
 func AsRoute(function any) any {

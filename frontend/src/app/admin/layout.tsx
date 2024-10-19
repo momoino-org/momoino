@@ -14,20 +14,10 @@ import {
   Container,
 } from '@mui/material';
 import { PropsWithChildren } from 'react';
-import { getUserProfile } from '@/internal/core/auth/server';
-import {
-  Sidebar,
-  AccountMenu,
-  TemplateFrame,
-} from '@/internal/modules/templates/admin';
+import { Sidebar, TemplateFrame } from '@/internal/modules/templates/admin';
+import { AXccountMenu } from '@/internal/modules/templates/admin/providers/AccountMenu';
 
 export default async function AdminLayout(props: PropsWithChildren) {
-  const userProfile = await getUserProfile();
-
-  if (userProfile === null) {
-    return null;
-  }
-
   return (
     <TemplateFrame>
       <AppBar elevation={1}>
@@ -45,16 +35,7 @@ export default async function AdminLayout(props: PropsWithChildren) {
             <IconButton aria-label="Switch to the dark mode">
               <ModeNightRounded />
             </IconButton>
-            <AccountMenu
-              slotProps={{
-                avatar: {
-                  src: `https://ui-avatars.com/api/?rounded=true&name=${userProfile.username}&size=24`,
-                },
-                tooltip: {
-                  title: 'Account',
-                },
-              }}
-            />
+            <AXccountMenu />
           </Stack>
         </Toolbar>
       </AppBar>

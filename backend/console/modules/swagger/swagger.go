@@ -15,12 +15,10 @@ func newSwaggerUIHandler() *swaggerUIHandler {
 	return &swaggerUIHandler{}
 }
 
-func (handler *swaggerUIHandler) Pattern() string {
-	return "GET /swagger"
-}
-
-func (handler *swaggerUIHandler) IsPrivateRoute() bool {
-	return false
+func (handler *swaggerUIHandler) Config() *core.HTTPRouteConfig {
+	return &core.HTTPRouteConfig{
+		Pattern: "GET /swagger",
+	}
 }
 
 func (handler *swaggerUIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

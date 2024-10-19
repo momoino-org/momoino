@@ -23,12 +23,10 @@ func newCreateFileSystemHandler(staticFiles embed.FS) *createFileSystemHandler {
 	}
 }
 
-func (handler *createFileSystemHandler) Pattern() string {
-	return "GET /static/*"
-}
-
-func (handler *createFileSystemHandler) IsPrivateRoute() bool {
-	return false
+func (handler *createFileSystemHandler) Config() *core.HTTPRouteConfig {
+	return &core.HTTPRouteConfig{
+		Pattern: "GET /static/*",
+	}
 }
 
 func (handler *createFileSystemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

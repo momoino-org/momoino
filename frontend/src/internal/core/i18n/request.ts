@@ -1,6 +1,6 @@
 import { getRequestConfig } from 'next-intl/server';
 import { IntlConfig } from 'next-intl';
-import { getUserProfile } from '@/internal/core/auth/server';
+import { auth } from '@/auth';
 
 export const config: Pick<IntlConfig, 'formats'> = {
   formats: {
@@ -19,8 +19,8 @@ export const config: Pick<IntlConfig, 'formats'> = {
 };
 
 export default getRequestConfig(async () => {
-  const userProfileResponse = await getUserProfile();
-  const locale = userProfileResponse?.locale ?? 'en';
+  const session = await auth();
+  const locale = session?.user?.locale ?? 'en';
 
   return {
     locale,

@@ -9,23 +9,19 @@ import (
 	"wano-island/common/usermgt"
 	"wano-island/console/modules/httpsrv"
 	mockcore "wano-island/testing/mocks/common/core"
-	mockusermgt "wano-island/testing/mocks/common/usermgt"
 	"wano-island/testing/testutils"
 
-	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
-	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
 )
 
 var _ = Describe("handler.profile.go", func() {
 	var (
-		db             *gorm.DB
-		config         *mockcore.MockAppConfig
-		userRepository *mockusermgt.MockUserRepository
-		router         http.Handler
+		db     *gorm.DB
+		config *mockcore.MockAppConfig
+		router http.Handler
 	)
 
 	BeforeEach(func() {
@@ -39,15 +35,12 @@ var _ = Describe("handler.profile.go", func() {
 		config.EXPECT().IsTesting().Return(true)
 		config.EXPECT().GetCorsConfig().Return(&core.CorsConfig{})
 
-		userRepository = mockusermgt.NewMockUserRepository(GinkgoT())
-
 		router = testutils.CreateRouter(func(rp *httpsrv.RouteParams) {
 			rp.Config = config
 			rp.Routes = []core.HTTPRoute{
 				usermgt.NewProfileHandler(usermgt.ProfileHandlerParams{
-					Logger:         core.NewNoopLogger(),
-					DB:             db,
-					UserRepository: userRepository,
+					Logger: core.NewNoopLogger(),
+					DB:     db,
 				}),
 			}
 		})
@@ -74,29 +67,17 @@ var _ = Describe("handler.profile.go", func() {
 	})
 
 	It("returns a user profile if there is valid access token", func(ctx SpecContext) {
-		config.EXPECT().GetJWTConfig().Return(testutils.GetJWTConfig())
-		userRepository.EXPECT().
-			FindUserByID(mock.Anything, mock.Anything, uuid.MustParse("019135f7-6265-7ef8-8920-57280736f6c0")).
-			Return(&usermgt.UserModel{
-				Model: core.Model{
-					ID: uuid.MustParse("019135f7-6265-7ef8-8920-57280736f6c0"),
-				},
-				HasCreatedAtColumn: core.HasCreatedAtColumn{
-					CreatedAt: time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC),
-				},
-				HasUpdatedAtColumn: core.HasUpdatedAtColumn{
-					UpdatedAt: time.Date(2024, time.February, 1, 0, 0, 0, 0, time.UTC),
-				},
-				Username:  "testing",
-				Email:     "testing@example.com",
-				FirstName: "testing",
-				LastName:  "testing",
-			}, nil)
-
 		req := httptest.NewRequest(http.MethodGet, "/api/v1/profile", nil)
 		recorder := httptest.NewRecorder()
-		router.ServeHTTP(recorder, testutils.WithFakeJWT(req, func(jc *core.JWTCustomClaims) {
-			jc.RegisteredClaims.Subject = "019135f7-6265-7ef8-8920-57280736f6c0"
+		router.ServeHTTP(recorder, core.WithTestAuthUser(req, core.AuthenticatedUser{
+			ID:          "019135f7-6265-7ef8-8920-57280736f6c0",
+			Username:    "testing",
+			Email:       "testing@example.com",
+			GivenName:   "testing",
+			FamilyName:  "testing",
+			Locale:      "en",
+			Roles:       []string{},
+			Permissions: []string{},
 		}))
 
 		var response core.Response[usermgt.ProfileResponse]
@@ -106,14 +87,13 @@ var _ = Describe("handler.profile.go", func() {
 		Expect(response).To(MatchFields(IgnoreMissing, Fields{
 			"MessageID": Equal("S-0000"),
 			"Message":   Equal("Success"),
-			"Data": MatchFields(IgnoreExtras, Fields{
+			"Data": MatchFields(IgnoreMissing, Fields{
 				"ID":        Equal("019135f7-6265-7ef8-8920-57280736f6c0"),
 				"Username":  Equal("testing"),
 				"Email":     Equal("testing@example.com"),
 				"FirstName": Equal("testing"),
 				"LastName":  Equal("testing"),
-				"CreatedAt": Equal(time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC)),
-				"UpdatedAt": Equal(time.Date(2024, time.February, 1, 0, 0, 0, 0, time.UTC)),
+				"Locale":    Equal("en"),
 			}),
 			"Pagination": BeNil(),
 			"Timestamp":  BeTemporally("~", time.Now(), time.Minute),

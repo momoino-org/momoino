@@ -25,20 +25,41 @@ type RouteParams struct {
 	I18nBundle *i18n.Bundle
 }
 
-// NewRouter initializes and returns a new HTTP router instance.
-func NewRouter(params RouteParams) http.Handler {
-	r := chi.NewRouter()
-
+// separatePublicAndPrivateRoutes divides a slice of HTTP routes into two separate slices
+// based on their access level, returning one slice for public routes and another for private routes.
+//
+// Parameters:
+//   - routes: A slice of core.HTTPRoute, each containing configuration that determines if it is public or private.
+//
+// Returns:
+//   - []core.HTTPRoute: A slice containing only public routes.
+//   - []core.HTTPRoute: A slice containing only private routes.
+//
+// Each route's access level is determined by inspecting its configuration (`route.Config()`).
+// If a route is marked as private, it is added to the private routes slice;
+// otherwise, it is included in the public routes slice.
+func separatePublicAndPrivateRoutes(routes []core.HTTPRoute) ([]core.HTTPRoute, []core.HTTPRoute) {
 	publicRoutes := []core.HTTPRoute{}
 	privateRoutes := []core.HTTPRoute{}
 
-	for _, route := range params.Routes {
-		if route.IsPrivateRoute() {
+	for _, route := range routes {
+		routeConfig := route.Config()
+
+		if routeConfig.IsPrivate {
 			privateRoutes = append(privateRoutes, route)
 		} else {
 			publicRoutes = append(publicRoutes, route)
 		}
 	}
+
+	return publicRoutes, privateRoutes
+}
+
+// NewRouter initializes and returns a new HTTP router instance.
+func NewRouter(params RouteParams) http.Handler {
+	r := chi.NewRouter()
+
+	publicRoutes, privateRoutes := separatePublicAndPrivateRoutes(params.Routes)
 
 	corsConfig := params.Config.GetCorsConfig()
 	r.Use(cors.Handler(cors.Options{
@@ -90,10 +111,15 @@ func NewRouter(params RouteParams) http.Handler {
 			r.Use(middlewares[priority])
 		}
 
-		r.Use(lo.Values(middlewares)...)
-
 		for _, route := range publicRoutes {
-			r.Handle(route.Pattern(), route)
+			routeConfig := route.Config()
+
+			var wrappedRoute http.Handler = route
+			for _, wrapper := range slices.Backward(routeConfig.Wrappers) {
+				wrappedRoute = wrapper(wrappedRoute)
+			}
+
+			r.Handle(route.Config().Pattern, wrappedRoute)
 		}
 	})
 
@@ -108,7 +134,14 @@ func NewRouter(params RouteParams) http.Handler {
 		}
 
 		for _, route := range privateRoutes {
-			r.Handle(route.Pattern(), route)
+			routeConfig := route.Config()
+
+			var wrappedRoute http.Handler = route
+			for _, wrapper := range slices.Backward(routeConfig.Wrappers) {
+				wrappedRoute = wrapper(wrappedRoute)
+			}
+
+			r.Handle(routeConfig.Pattern, wrappedRoute)
 		}
 	})
 

@@ -1,15 +1,14 @@
 package core
 
 import (
-	"crypto/rsa"
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"strings"
-	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/go-resty/resty/v2"
 	"github.com/spf13/viper"
 	"go.uber.org/fx"
 )
@@ -47,10 +46,6 @@ type AppConfig interface {
 	// It returns a pointer to a DatabaseConfig struct containing the database configuration details.
 	GetDatabaseConfig() *DatabaseConfig
 
-	// GetJWTConfig retrieves the JWT configuration from the application's configuration source.
-	// It returns a pointer to a JWTConfig struct containing the JWT configuration details.
-	GetJWTConfig() *JWTConfig
-
 	// getCorsConfig retrieves the CORS (Cross-Origin Resource Sharing) configuration details from the
 	// provided viper configuration. It retrieves the CORS configuration details from environment variables
 	// using the Viper library. If any of the required environment variables are not set, default values are used.
@@ -58,6 +53,20 @@ type AppConfig interface {
 
 	// GetSecretKey retrieves the secret key from "secret.key" file.
 	GetSecretKey() []byte
+
+	GetKeycloakProvider() *KeycloakProvider
+
+	IsHTTPS() bool
+
+	GetHost() string
+}
+
+type KeycloakProvider struct {
+	Issuer       string
+	WellKnownURL string
+	JwksURI      string
+	ClientID     string
+	ClientSecret string
 }
 
 // DatabaseConfig is a struct that holds the database configuration details.
@@ -68,14 +77,6 @@ type DatabaseConfig struct {
 	Username     string
 	Password     string
 	MaxAttempts  uint
-}
-
-// JWTConfig holds the configuration details for JSON Web Tokens (JWT).
-type JWTConfig struct {
-	PublicKey             *rsa.PublicKey
-	PrivateKey            *rsa.PrivateKey
-	AccessTokenExpiresIn  time.Duration
-	RefreshTokenExpiresIn time.Duration
 }
 
 // CorsConfig holds the configuration settings for Cross-Origin Resource Sharing (CORS).
@@ -119,11 +120,12 @@ type CorsConfig struct {
 
 // appConfig is a struct that holds the application's configuration.
 type appConfig struct {
-	appMode        string
-	databaseConfig *DatabaseConfig
-	jwtConfig      *JWTConfig
-	corsConfig     *CorsConfig
-	secretKey      []byte
+	appMode          string
+	host             *url.URL
+	databaseConfig   *DatabaseConfig
+	corsConfig       *CorsConfig
+	secretKey        []byte
+	keycloakProvider *KeycloakProvider
 }
 
 const (
@@ -182,16 +184,24 @@ func (appCfg *appConfig) GetDatabaseConfig() *DatabaseConfig {
 	return appCfg.databaseConfig
 }
 
-func (appCfg *appConfig) GetJWTConfig() *JWTConfig {
-	return appCfg.jwtConfig
-}
-
 func (appCfg *appConfig) GetCorsConfig() *CorsConfig {
 	return appCfg.corsConfig
 }
 
 func (appCfg *appConfig) GetSecretKey() []byte {
 	return appCfg.secretKey
+}
+
+func (appCfg *appConfig) IsHTTPS() bool {
+	return appCfg.host.Scheme == "https"
+}
+
+func (appCfg *appConfig) GetHost() string {
+	return appCfg.host.Host
+}
+
+func (appCfg *appConfig) GetKeycloakProvider() *KeycloakProvider {
+	return appCfg.keycloakProvider
 }
 
 // initAppMode retrieves the application mode from the provided viper configuration.
@@ -226,63 +236,6 @@ func initDatabaseConfig(v *viper.Viper) *DatabaseConfig {
 	}
 
 	return databaseCfg
-}
-
-// initJWTConfig initializes JWT configuration by loading and parsing
-// RSA public/private keys and token expiration durations from the provided
-// Viper configuration instance.
-//
-// The function expects the following configuration keys:
-//   - jwt_rsa_public_key: RSA public key (PEM encoded)
-//   - jwt_rsa_private_key: RSA private key (PEM encoded)
-//   - jwt_access_token_expires_in: Access token expiration duration (e.g., "5m")
-//   - jwt_refresh_token_expires_in: Refresh token expiration duration (e.g., "24h")
-//
-// If these values are not explicitly set, the following defaults are used:
-//   - Access token expires in 5 minutes ("5m")
-//   - Refresh token expires in 24 hours ("24h")
-//
-// Parameters:
-//   - v: A pointer to a Viper instance containing the JWT configuration.
-//
-// Returns:
-//   - A pointer to a JWTConfig struct containing the parsed keys and durations.
-//   - An error if the public/private keys cannot be parsed or if the durations
-//     are not valid.
-func initJWTConfig(v *viper.Viper) (*JWTConfig, error) {
-	v.SetDefault("jwt_access_token_expires_in", "5m")
-	v.SetDefault("jwt_refresh_token_expires_in", "24h")
-
-	// Parse the public key from the configuration
-	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(v.GetString("jwt_rsa_public_key")))
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse public key: %w", err)
-	}
-
-	// Parse the private key from the configuration
-	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(v.GetString("jwt_rsa_private_key")))
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse private key: %w", err)
-	}
-
-	// Parse the access token expiration duration from the configuration
-	accessTokenExpiresIn, err := time.ParseDuration(v.GetString("jwt_access_token_expires_in"))
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse access token expiration duration: %w", err)
-	}
-
-	// Parse the refresh token expiration duration from the configuration
-	refreshTokenExpiresIn, err := time.ParseDuration(v.GetString("jwt_refresh_token_expires_in"))
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse refresh token expiration duration: %w", err)
-	}
-
-	return &JWTConfig{
-		PublicKey:             publicKey,
-		PrivateKey:            privateKey,
-		AccessTokenExpiresIn:  accessTokenExpiresIn,
-		RefreshTokenExpiresIn: refreshTokenExpiresIn,
-	}, nil
 }
 
 // initCorsConfig retrieves the CORS (Cross-Origin Resource Sharing) configuration details from the
@@ -338,10 +291,42 @@ func getSecretKey(v *viper.Viper) ([]byte, error) {
 	return []byte(secretValue), nil
 }
 
+func initHost(v *viper.Viper) (*url.URL, error) {
+	u, err := url.Parse(v.GetString("host"))
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse APP_HOST: %w", err)
+	}
+
+	return u, nil
+}
+
+func initKeycloakProider(v *viper.Viper, httpClient *resty.Client) (*KeycloakProvider, error) {
+	type WellKnownResponse struct {
+		Issuer  string `json:"issuer"`
+		JwksURI string `json:"jwks_uri"`
+	}
+
+	wellKnownURL := v.GetString("keycloak_well_known_url")
+	wellKnownResponse := &WellKnownResponse{}
+
+	resp, err := httpClient.R().EnableTrace().SetResult(wellKnownResponse).Get(wellKnownURL)
+	if err != nil || !resp.IsSuccess() {
+		return nil, fmt.Errorf("failed to retrieve well-known response: (status = %v) %w", resp.Status(), err)
+	}
+
+	return &KeycloakProvider{
+		Issuer:       wellKnownResponse.Issuer,
+		WellKnownURL: wellKnownURL,
+		JwksURI:      wellKnownResponse.JwksURI,
+		ClientID:     v.GetString("keycloak_client_id"),
+		ClientSecret: v.GetString("keycloak_client_secret"),
+	}, nil
+}
+
 // NewAppConfig initializes and returns a new instance of the application's configuration.
 // The configuration is loaded from environment variables and files using the Viper library.
 // The function retrieves the application's mode, database connection details, and JWT configuration.
-func NewAppConfig() (*appConfig, error) {
+func NewAppConfig(httpClient *resty.Client) (*appConfig, error) {
 	// Initialize a new Viper instance
 	viperInstance := viper.New()
 
@@ -351,24 +336,29 @@ func NewAppConfig() (*appConfig, error) {
 	// Enable automatic environment variable loading
 	viperInstance.AutomaticEnv()
 
+	host, err := initHost(viperInstance)
+	if err != nil {
+		return nil, err
+	}
+
 	secretKey, err := getSecretKey(viperInstance)
 	if err != nil {
 		return nil, err
 	}
 
-	// Retrieve the JWT configuration
-	jwtConfig, err := initJWTConfig(viperInstance)
+	keycloakProvider, err := initKeycloakProider(viperInstance, httpClient)
 	if err != nil {
 		return nil, err
 	}
 
 	// Create a new appConfig instance with the retrieved configuration details
 	return &appConfig{
-		secretKey:      secretKey,
-		appMode:        initAppMode(viperInstance),
-		databaseConfig: initDatabaseConfig(viperInstance),
-		jwtConfig:      jwtConfig,
-		corsConfig:     initCorsConfig(viperInstance),
+		secretKey:        secretKey,
+		host:             host,
+		appMode:          initAppMode(viperInstance),
+		databaseConfig:   initDatabaseConfig(viperInstance),
+		corsConfig:       initCorsConfig(viperInstance),
+		keycloakProvider: keycloakProvider,
 	}, nil
 }
 
