@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import {
-  Dialog,
   DialogTitle,
   DialogContent,
   TextField,
@@ -21,17 +20,13 @@ import {
   Provider,
 } from '../../service';
 import { EmptyResponse } from '@/internal/core/http';
-import { toast } from '@/internal/core/ui';
+import { toast, useModalContext } from '@/internal/core/ui';
 
-interface ProviderCreationDialogProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-export function ProviderCreationDialog(props: ProviderCreationDialogProps) {
+export function ProviderCreationDialog() {
   const t = useTranslations();
+  const modal = useModalContext();
 
-  const { control, handleSubmit, reset } = useForm<CreateProviderParams>({
+  const { control, handleSubmit } = useForm<CreateProviderParams>({
     resolver: zodResolver(CreateProviderParamsSchema),
     defaultValues: {
       provider: '',
@@ -42,11 +37,6 @@ export function ProviderCreationDialog(props: ProviderCreationDialogProps) {
       isEnabled: false,
     },
   });
-
-  const handleCloseDialog = () => {
-    reset();
-    props.onClose();
-  };
 
   const { mutateAsync, isPending } = useMutation({
     mutationKey: ['create-a-provider'],
@@ -59,7 +49,7 @@ export function ProviderCreationDialog(props: ProviderCreationDialogProps) {
         message: response.message,
       });
 
-      handleCloseDialog();
+      modal.close();
     },
   });
 
@@ -68,7 +58,7 @@ export function ProviderCreationDialog(props: ProviderCreationDialogProps) {
   };
 
   return (
-    <Dialog fullWidth maxWidth="md" open={props.open}>
+    <>
       <DialogTitle>Create a provider</DialogTitle>
       <DialogContent
         dividers
@@ -180,11 +170,7 @@ export function ProviderCreationDialog(props: ProviderCreationDialogProps) {
         />
       </DialogContent>
       <DialogActions>
-        <Button
-          disabled={isPending}
-          variant="outlined"
-          onClick={handleCloseDialog}
-        >
+        <Button disabled={isPending} variant="outlined" onClick={modal.close}>
           {t('common.close')}
         </Button>
         <Button
@@ -198,6 +184,6 @@ export function ProviderCreationDialog(props: ProviderCreationDialogProps) {
           {t('common.create')}
         </Button>
       </DialogActions>
-    </Dialog>
+    </>
   );
 }

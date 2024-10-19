@@ -5,7 +5,7 @@ export { MUIThemeProvider } from './mui/MUIThemeProvider';
 export { Toaster, toast } from './toast';
 
 // Hooks
-export { useModal } from './hooks/useModal';
+export { useModal, useModalContext } from './hooks/useModal';
 
 // Store
 export {
