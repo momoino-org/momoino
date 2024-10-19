@@ -32,7 +32,12 @@ import {
 export default function MovieListPage() {
   const t = useTranslations();
   const formatter = useFormatter();
-  const creationDialog = useModal();
+  const creationDialog = useModal({
+    content: <CreateShowDialog />,
+    onClose: () => {
+      refetch();
+    },
+  });
   const [paginationModel, setPaginationModel] =
     useDebounceValue<GridPaginationModel>(
       {
@@ -169,7 +174,7 @@ export default function MovieListPage() {
           <Button
             disabled={creationDialog.visible}
             variant="contained"
-            onClick={creationDialog.show}
+            onClick={creationDialog.open}
           >
             Create
           </Button>
@@ -203,14 +208,6 @@ export default function MovieListPage() {
           />
         </Box>
       </Stack>
-
-      <CreateShowDialog
-        open={creationDialog.visible}
-        onClose={() => {
-          refetch();
-          creationDialog.close();
-        }}
-      />
     </>
   );
 }

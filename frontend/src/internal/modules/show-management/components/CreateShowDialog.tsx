@@ -4,7 +4,6 @@ import {
   Autocomplete,
   Button,
   Checkbox,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -23,17 +22,13 @@ import {
   ShowKind,
 } from '../service';
 import { EmptyResponse } from '@/internal/core/http';
-import { toast } from '@/internal/core/ui';
+import { toast, useModalContext } from '@/internal/core/ui';
 
-interface CreateMovieDialogProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-export function CreateShowDialog(props: CreateMovieDialogProps) {
+export function CreateShowDialog() {
   const t = useTranslations();
+  const modal = useModalContext();
 
-  const { control, handleSubmit, reset } = useForm<CreateShowFormData>({
+  const { control, handleSubmit } = useForm<CreateShowFormData>({
     resolver: zodResolver(CreateShowFormDataSchema),
     defaultValues: {
       kind: ShowKind.Movie,
@@ -56,21 +51,16 @@ export function CreateShowDialog(props: CreateMovieDialogProps) {
         message: response.message,
       });
 
-      handleCloseDialog();
+      modal.close();
     },
   });
-
-  const handleCloseDialog = () => {
-    reset();
-    props.onClose();
-  };
 
   const onSubmit: SubmitHandler<CreateShowFormData> = async (data) => {
     await mutateAsync(data);
   };
 
   return (
-    <Dialog fullWidth maxWidth="md" open={props.open}>
+    <>
       <DialogTitle>{t('page.movies.creationDialog.title')}</DialogTitle>
       <DialogContent
         dividers
@@ -182,11 +172,7 @@ export function CreateShowDialog(props: CreateMovieDialogProps) {
         />
       </DialogContent>
       <DialogActions>
-        <Button
-          disabled={isPending}
-          variant="outlined"
-          onClick={handleCloseDialog}
-        >
+        <Button disabled={isPending} variant="outlined" onClick={modal.close}>
           {t('common.close')}
         </Button>
         <Button
@@ -198,6 +184,6 @@ export function CreateShowDialog(props: CreateMovieDialogProps) {
           {t('common.create')}
         </Button>
       </DialogActions>
-    </Dialog>
+    </>
   );
 }

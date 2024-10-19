@@ -14,7 +14,12 @@ import { useModal } from '@/internal/core/ui';
 
 export function ProviderList() {
   const formatter = useFormatter();
-  const creationDialog = useModal();
+  const creationDialog = useModal({
+    content: <ProviderCreationDialog />,
+    onClose: () => {
+      refetch();
+    },
+  });
 
   const [paginationModel, setPaginationModel] =
     useDebounceValue<GridPaginationModel>(
@@ -87,7 +92,7 @@ export function ProviderList() {
 
   return (
     <>
-      <Button onClick={creationDialog.show}>Create</Button>
+      <Button onClick={creationDialog.open}>Create</Button>
       <DataGrid
         checkboxSelection
         disableColumnResize
@@ -108,13 +113,7 @@ export function ProviderList() {
         }}
         onPaginationModelChange={handlePaginationModelChange}
       />
-      <ProviderCreationDialog
-        open={creationDialog.visible}
-        onClose={() => {
-          creationDialog.close();
-          refetch();
-        }}
-      />
+      {creationDialog.content}
     </>
   );
 }
