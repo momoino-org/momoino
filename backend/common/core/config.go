@@ -1,13 +1,12 @@
 package core
 
 import (
-	"bytes"
 	"crypto/rsa"
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"slices"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -229,34 +228,39 @@ func initDatabaseConfig(v *viper.Viper) *DatabaseConfig {
 	return databaseCfg
 }
 
-// initJWTConfig retrieves the JWT configuration details from the provided viper configuration.
-// It generates RSA public and private keys if they are not already present in the environment.
-// The public and private keys are then parsed from the configuration.
-// The access token and refresh token expiration durations are also parsed from the configuration.
-// If any errors occur during the parsing process, an error is returned.
-// Otherwise, a pointer to a JWTConfig struct containing the parsed configuration details is returned.
+// initJWTConfig initializes JWT configuration by loading and parsing
+// RSA public/private keys and token expiration durations from the provided
+// Viper configuration instance.
+//
+// The function expects the following configuration keys:
+//   - jwt_rsa_public_key: RSA public key (PEM encoded)
+//   - jwt_rsa_private_key: RSA private key (PEM encoded)
+//   - jwt_access_token_expires_in: Access token expiration duration (e.g., "5m")
+//   - jwt_refresh_token_expires_in: Refresh token expiration duration (e.g., "24h")
+//
+// If these values are not explicitly set, the following defaults are used:
+//   - Access token expires in 5 minutes ("5m")
+//   - Refresh token expires in 24 hours ("24h")
+//
+// Parameters:
+//   - v: A pointer to a Viper instance containing the JWT configuration.
+//
+// Returns:
+//   - A pointer to a JWTConfig struct containing the parsed keys and durations.
+//   - An error if the public/private keys cannot be parsed or if the durations
+//     are not valid.
 func initJWTConfig(v *viper.Viper) (*JWTConfig, error) {
 	v.SetDefault("jwt_access_token_expires_in", "5m")
 	v.SetDefault("jwt_refresh_token_expires_in", "24h")
 
-	publicKeyBytes, err := os.ReadFile("public.key")
-	if err != nil {
-		return nil, err
-	}
-
-	privateKeyBytes, err := os.ReadFile("private.key")
-	if err != nil {
-		return nil, err
-	}
-
 	// Parse the public key from the configuration
-	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyBytes)
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(v.GetString("jwt_rsa_public_key")))
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse public key: %w", err)
 	}
 
 	// Parse the private key from the configuration
-	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKeyBytes)
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(v.GetString("jwt_rsa_private_key")))
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse private key: %w", err)
 	}
@@ -310,26 +314,28 @@ func initCorsConfig(v *viper.Viper) *CorsConfig {
 	}
 }
 
-// getSecretKey reads the secret key from the "secret.key" file.
-// If the file does not exist or cannot be read, it returns an error.
-// Otherwise, it returns the trimmed secret key as a byte slice.
-func getSecretKey() ([]byte, error) {
-	_, err := os.Stat("secret.key")
-	if err != nil {
-		return nil, fmt.Errorf("secret key file not found at secret.key: %w", err)
+// getSecretKey retrieves and validates the secret key from the provided
+// Viper configuration instance. The secret key is expected to be a string
+// that is trimmed of any leading or trailing whitespace and must meet the
+// required length.
+//
+// If the length of the secret key does not match the expected AES key length
+// (AESSecretKeyLength), the function returns an error.
+//
+// Parameters:
+//   - v: A pointer to a Viper instance from which the secret key is retrieved.
+//
+// Returns:
+//   - A byte slice containing the secret key if valid.
+//   - An error if the secret key is of invalid length.
+func getSecretKey(v *viper.Viper) ([]byte, error) {
+	secretValue := strings.TrimSpace(v.GetString("secret_key"))
+
+	if len(secretValue) != AESSecretKeyLength {
+		return nil, errors.New("secret key length is invalid")
 	}
 
-	secretValue, err := os.ReadFile("secret.key")
-	if err != nil {
-		return nil, fmt.Errorf("failed to read secret key file at secret.key: %w", err)
-	}
-
-	trimmedSecret := bytes.TrimSpace(secretValue)
-	if len(trimmedSecret) == 0 {
-		return nil, errors.New("secret key file at secret.key is empty")
-	}
-
-	return trimmedSecret, nil
+	return []byte(secretValue), nil
 }
 
 // NewAppConfig initializes and returns a new instance of the application's configuration.
@@ -345,7 +351,7 @@ func NewAppConfig() (*appConfig, error) {
 	// Enable automatic environment variable loading
 	viperInstance.AutomaticEnv()
 
-	secretKey, err := getSecretKey()
+	secretKey, err := getSecretKey(viperInstance)
 	if err != nil {
 		return nil, err
 	}
