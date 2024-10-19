@@ -14,6 +14,11 @@ type aesGCMEncryptor struct {
 	config AppConfig
 }
 
+// AESSecretKeyLength defines the required length for an AES secret key, in bytes.
+// This constant is typically used for AES-256 encryption, where the key length
+// must be 32 bytes (256 bits).
+const AESSecretKeyLength = 32
+
 var _ Encryptor = (*aesGCMEncryptor)(nil)
 
 func newAESEncryptor(config AppConfig) *aesGCMEncryptor {

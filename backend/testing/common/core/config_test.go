@@ -15,7 +15,7 @@ import (
 var _ = Describe("[common/core/config.go]", Ordered, func() {
 	BeforeEach(func() {
 		testutils.DetectLeakyGoroutines()
-		testutils.GenerateSecretFiles()
+		testutils.ConfigureMinimumEnvVariables()
 	})
 
 	Context("when initializing the config module", func() {
@@ -68,7 +68,8 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 				t := GinkgoT()
 				t.Setenv("APP_MODE", mode)
 
-				appCfg, _ := core.NewAppConfig()
+				appCfg, err := core.NewAppConfig()
+				Expect(err).NotTo(HaveOccurred())
 				Expect(appCfg.GetMode()).To(Equal(mode))
 			},
 			Entry(`should return "production"`, "production"),
