@@ -8,6 +8,7 @@ import (
 	"time"
 	"wano-island/common/core"
 
+	"github.com/alexedwards/scs/v2"
 	"go.uber.org/fx"
 )
 
@@ -16,6 +17,8 @@ func newHTTPServer(
 	appLifeCycle fx.Lifecycle,
 	httpHandler http.Handler,
 	logger *slog.Logger,
+	config core.AppConfig,
+	sessionManager *scs.SessionManager,
 ) *http.Server {
 	const readHeaderTimeout = 5 * time.Second
 

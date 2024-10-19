@@ -36,6 +36,7 @@ type AuthenticatedUser struct {
 
 type JWTCustomClaims struct {
 	jwt.RegisteredClaims
+	SessionID         string   `json:"sid"`
 	Locale            string   `json:"locale"`
 	Roles             []string `json:"roles"`
 	Permissions       []string `json:"permissions"`
@@ -46,6 +47,10 @@ type JWTCustomClaims struct {
 }
 
 const authUserCtxID authUserCtx = 0
+const IdentityCookie = "MOMOINO_IDENTITY"
+const SessionCookie = "MOMOINO_SESSION"
+const LoginSessionCookie = "MOMOINO_LOGIN_SESSION"
+const CsrfCookie = "MOMOINO_CSRF"
 
 var _ PrincipalUser = (*AuthenticatedUser)(nil)
 

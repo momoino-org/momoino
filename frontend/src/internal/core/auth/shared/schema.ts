@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const JWTSchema = z.strictObject({
   accessToken: z.string(),
-  refreshToken: z.string(),
+  // refreshToken: z.string(),
 });
 
 export const ProfileSchema = z.strictObject({
@@ -12,4 +12,5 @@ export const ProfileSchema = z.strictObject({
   firstName: z.string(),
   lastName: z.string(),
   locale: z.string(),
+  sid: z.string(),
 });

@@ -7,6 +7,8 @@ info:
 paths:
   /api/v1/login:
     post:
+      tags:
+        - auth
       requestBody:
         content:
           application/json:
@@ -22,8 +24,10 @@ paths:
 
   /api/v1/profile:
     get:
+      tags:
+        - auth
       security:
-        - accessToken: []
+        - bearerAuth: []
       responses:
         "200":
           description: Get user profile successfully
@@ -40,8 +44,10 @@ paths:
 
   /api/v1/profile/change-password:
     post:
+      tags:
+        - auth
       security:
-        - accessToken: []
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -74,10 +80,22 @@ paths:
               schema:
                 $ref: "#/components/schemas/Response"
 
+  /api/v1/token/renew:
+    post:
+      tags:
+        - auth
+      responses:
+        "200":
+          description: Renew session successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RenewSession_200"
+
   /api/v1/shows:
     get:
       security:
-        - accessToken: []
+        - bearerAuth: []
       parameters:
         - in: query
           name: page
@@ -113,7 +131,7 @@ paths:
                 $ref: "#/components/schemas/Response"
     post:
       security:
-        - accessToken: []
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -161,7 +179,7 @@ paths:
       tags:
         - oauth2
       security:
-        - accessToken: []
+        - bearerAuth: []
       parameters:
         - in: query
           name: page
@@ -200,7 +218,7 @@ paths:
       tags:
         - oauth2
       security:
-        - accessToken: []
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -243,10 +261,10 @@ paths:
 
 components:
   securitySchemes:
-    accessToken:
-      type: apiKey
-      name: X-Auth-Access-Token
-      in: header
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 
   schemas:
     Response:
@@ -298,8 +316,16 @@ components:
               properties:
                 accessToken:
                   type: string
-                refreshToken:
-                  type: string
+
+    RenewSession_200:
+      - $ref: "#/components/schemas/Response"
+      - type: object
+        properties:
+          data:
+            type: object
+            properties:
+              accessToken:
+                type: string
 
     Profile_200:
       allOf:

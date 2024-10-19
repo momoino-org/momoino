@@ -1,5 +1,6 @@
 'use client';
 
+import { Options } from 'ky';
 import { http, SingleResponse } from '@/internal/core/http';
 import { JWT, JWTSchema } from '@/internal/core/auth/shared';
 
@@ -22,6 +23,12 @@ export async function loginByCredentials(
       },
     })
     .json();
+
+  return SingleResponse(JWTSchema).parseAsync(response);
+}
+
+export async function refreshSession(options?: Options) {
+  const response = await http.post('api/v1/token/renew', options).json();
 
   return SingleResponse(JWTSchema).parseAsync(response);
 }

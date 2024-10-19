@@ -72,9 +72,9 @@ func (_c *MockUserService_ComparePassword_Call) RunAndReturn(run func(context.Co
 	return _c
 }
 
-// GenerateJWT provides a mock function with given fields: user
-func (_m *MockUserService) GenerateJWT(user usermgt.UserModel) (*usermgt.JWT, error) {
-	ret := _m.Called(user)
+// GenerateJWT provides a mock function with given fields: sessionID, user
+func (_m *MockUserService) GenerateJWT(sessionID string, user usermgt.UserModel) (*usermgt.JWT, error) {
+	ret := _m.Called(sessionID, user)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GenerateJWT")
@@ -82,19 +82,19 @@ func (_m *MockUserService) GenerateJWT(user usermgt.UserModel) (*usermgt.JWT, er
 
 	var r0 *usermgt.JWT
 	var r1 error
-	if rf, ok := ret.Get(0).(func(usermgt.UserModel) (*usermgt.JWT, error)); ok {
-		return rf(user)
+	if rf, ok := ret.Get(0).(func(string, usermgt.UserModel) (*usermgt.JWT, error)); ok {
+		return rf(sessionID, user)
 	}
-	if rf, ok := ret.Get(0).(func(usermgt.UserModel) *usermgt.JWT); ok {
-		r0 = rf(user)
+	if rf, ok := ret.Get(0).(func(string, usermgt.UserModel) *usermgt.JWT); ok {
+		r0 = rf(sessionID, user)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*usermgt.JWT)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(usermgt.UserModel) error); ok {
-		r1 = rf(user)
+	if rf, ok := ret.Get(1).(func(string, usermgt.UserModel) error); ok {
+		r1 = rf(sessionID, user)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -108,14 +108,15 @@ type MockUserService_GenerateJWT_Call struct {
 }
 
 // GenerateJWT is a helper method to define mock.On call
+//   - sessionID string
 //   - user usermgt.UserModel
-func (_e *MockUserService_Expecter) GenerateJWT(user interface{}) *MockUserService_GenerateJWT_Call {
-	return &MockUserService_GenerateJWT_Call{Call: _e.mock.On("GenerateJWT", user)}
+func (_e *MockUserService_Expecter) GenerateJWT(sessionID interface{}, user interface{}) *MockUserService_GenerateJWT_Call {
+	return &MockUserService_GenerateJWT_Call{Call: _e.mock.On("GenerateJWT", sessionID, user)}
 }
 
-func (_c *MockUserService_GenerateJWT_Call) Run(run func(user usermgt.UserModel)) *MockUserService_GenerateJWT_Call {
+func (_c *MockUserService_GenerateJWT_Call) Run(run func(sessionID string, user usermgt.UserModel)) *MockUserService_GenerateJWT_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(usermgt.UserModel))
+		run(args[0].(string), args[1].(usermgt.UserModel))
 	})
 	return _c
 }
@@ -125,7 +126,7 @@ func (_c *MockUserService_GenerateJWT_Call) Return(_a0 *usermgt.JWT, _a1 error) 
 	return _c
 }
 
-func (_c *MockUserService_GenerateJWT_Call) RunAndReturn(run func(usermgt.UserModel) (*usermgt.JWT, error)) *MockUserService_GenerateJWT_Call {
+func (_c *MockUserService_GenerateJWT_Call) RunAndReturn(run func(string, usermgt.UserModel) (*usermgt.JWT, error)) *MockUserService_GenerateJWT_Call {
 	_c.Call.Return(run)
 	return _c
 }

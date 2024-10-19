@@ -6,6 +6,7 @@ export type JWT = z.infer<typeof JWTSchema>;
 export type Profile = z.infer<typeof ProfileSchema>;
 
 export interface JwtPayload {
+  sid: string;
   sub: string;
   exp: number;
   nbf: number;

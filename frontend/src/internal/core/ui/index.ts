@@ -2,16 +2,16 @@
 export { MUIThemeProvider } from './mui/MUIThemeProvider';
 
 // Custom components
-export { Toaster, toast } from './toast';
+export { Toaster, notification } from './toast';
 
 // Hooks
 export { useModal, useModalContext } from './hooks/useModal';
 
 // Store
+export { rootReducer } from './redux';
+export { StoreProvider } from './redux/client/StoreProvider';
 export {
-  rootReducer,
   useAppDispatch,
   useAppSelector,
   useAppStore,
-  StoreProvider,
-} from './redux';
+} from './redux/client/hooks';

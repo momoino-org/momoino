@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"strings"
 	"time"
@@ -58,6 +59,12 @@ type AppConfig interface {
 
 	// GetSecretKey retrieves the secret key from "secret.key" file.
 	GetSecretKey() []byte
+
+	GetSessionConfig() *SessionConfig
+
+	IsHTTPS() bool
+
+	GetHost() string
 }
 
 // DatabaseConfig is a struct that holds the database configuration details.
@@ -117,13 +124,20 @@ type CorsConfig struct {
 	MaxAge int
 }
 
+type SessionConfig struct {
+	LifeTime    time.Duration
+	IdleTimeout time.Duration
+}
+
 // appConfig is a struct that holds the application's configuration.
 type appConfig struct {
 	appMode        string
+	host           *url.URL
 	databaseConfig *DatabaseConfig
 	jwtConfig      *JWTConfig
 	corsConfig     *CorsConfig
 	secretKey      []byte
+	sessionConfig  *SessionConfig
 }
 
 const (
@@ -192,6 +206,18 @@ func (appCfg *appConfig) GetCorsConfig() *CorsConfig {
 
 func (appCfg *appConfig) GetSecretKey() []byte {
 	return appCfg.secretKey
+}
+
+func (appCfg *appConfig) GetSessionConfig() *SessionConfig {
+	return appCfg.sessionConfig
+}
+
+func (appCfg *appConfig) IsHTTPS() bool {
+	return appCfg.host.Scheme == "https"
+}
+
+func (appCfg *appConfig) GetHost() string {
+	return appCfg.host.Host
 }
 
 // initAppMode retrieves the application mode from the provided viper configuration.
@@ -338,6 +364,40 @@ func getSecretKey(v *viper.Viper) ([]byte, error) {
 	return []byte(secretValue), nil
 }
 
+func initHost(v *viper.Viper) (*url.URL, error) {
+	u, err := url.Parse(v.GetString("host"))
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse APP_HOST: %w", err)
+	}
+
+	return u, nil
+}
+
+// initSessionConfig initializes and returns a new instance of the SessionConfig struct.
+//
+// Parameters:
+//   - v: A pointer to a Viper instance from which the session configuration details are retrieved.
+//
+// Returns:
+//   - A pointer to a SessionConfig struct containing the parsed session configuration details.
+//   - An error if the session lifetime or idle timeout values are not valid or cannot be parsed.
+func initSessionConfig(v *viper.Viper) (*SessionConfig, error) {
+	sessionLifetime, err := time.ParseDuration(v.GetString("session_lifetime"))
+	if err != nil {
+		return nil, fmt.Errorf("invalid session lifetime: %w", err)
+	}
+
+	idleTimeout, err := time.ParseDuration(v.GetString("session_idle_timeout"))
+	if err != nil {
+		return nil, fmt.Errorf("invalid idle timeout: %w", err)
+	}
+
+	return &SessionConfig{
+		LifeTime:    sessionLifetime,
+		IdleTimeout: idleTimeout,
+	}, nil
+}
+
 // NewAppConfig initializes and returns a new instance of the application's configuration.
 // The configuration is loaded from environment variables and files using the Viper library.
 // The function retrieves the application's mode, database connection details, and JWT configuration.
@@ -351,6 +411,11 @@ func NewAppConfig() (*appConfig, error) {
 	// Enable automatic environment variable loading
 	viperInstance.AutomaticEnv()
 
+	host, err := initHost(viperInstance)
+	if err != nil {
+		return nil, err
+	}
+
 	secretKey, err := getSecretKey(viperInstance)
 	if err != nil {
 		return nil, err
@@ -362,13 +427,20 @@ func NewAppConfig() (*appConfig, error) {
 		return nil, err
 	}
 
+	sessionConfig, err := initSessionConfig(viperInstance)
+	if err != nil {
+		return nil, err
+	}
+
 	// Create a new appConfig instance with the retrieved configuration details
 	return &appConfig{
 		secretKey:      secretKey,
+		host:           host,
 		appMode:        initAppMode(viperInstance),
 		databaseConfig: initDatabaseConfig(viperInstance),
 		jwtConfig:      jwtConfig,
 		corsConfig:     initCorsConfig(viperInstance),
+		sessionConfig:  sessionConfig,
 	}, nil
 }
 

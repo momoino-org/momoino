@@ -20,7 +20,7 @@ func extractAccessTokenFromRequest(req *http.Request) string {
 
 	// Extract the access token from the cookie if it doesn not exist in the request header.
 	if len(accessToken) == 0 {
-		if cookie, err := req.Cookie("auth.token"); err == nil {
+		if cookie, err := req.Cookie(core.IdentityCookie); err == nil {
 			accessToken = cookie.Value
 		}
 	}

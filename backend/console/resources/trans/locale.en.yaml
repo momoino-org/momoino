@@ -13,6 +13,14 @@ E-0006: The current password is invalid, please check and try again
 E-0007: Cannot create the show. Please try again. If the problem continues, kindly reach out to the system administrator for support
 E-R404: Oops! The page you're looking for can't be found. It might have been moved or no longer exists.
 
+# CSRF
+E_INVALID_CSRF: Your session has expired or there was an issue with your request. Please refresh the page and try again.
+
+# Session
+E_INVALID_SESSION: Uh-oh! It looks like your session is no longer valid.
+E_CANNOT_CREATE_SESSION: Sorry, we couldn't start your session. Please try again, or reach out to support if the issue continues
+E_CANNOT_DESTROY_SESSION: Oops! We couldn't close your session. Please try again, and if the problem persists, contact support for help.
+
 # (oauth2)
 E-OAUTH2-0001: It looks like the sign-in option isn't available right now or hasn't been set up yet.
 

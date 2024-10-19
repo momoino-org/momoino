@@ -58,12 +58,11 @@ func NewProfileHandler(params ProfileHandlerParams) *profileHandler {
 	}
 }
 
-func (h *profileHandler) Pattern() string {
-	return "GET /api/v1/profile"
-}
-
-func (h *profileHandler) IsPrivateRoute() bool {
-	return true
+func (h *profileHandler) Config() *core.HTTPRouteConfig {
+	return &core.HTTPRouteConfig{
+		Pattern:   "GET /api/v1/profile",
+		IsPrivate: true,
+	}
 }
 
 // ServeHTTP handles incoming HTTP requests for retrieving user profile information.

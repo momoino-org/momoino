@@ -3,11 +3,13 @@ package usermgt
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
 	"wano-island/common/core"
 
+	"github.com/alexedwards/scs/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/fx"
 	"golang.org/x/crypto/bcrypt"
@@ -47,7 +49,7 @@ type UserService interface {
 	// Returns:
 	//   - *JWT: A pointer to the generated JWT, or nil if generation fails.
 	//   - error: Returns nil if JWT generation is successful, or an error if it fails.
-	GenerateJWT(user UserModel) (*JWT, error)
+	GenerateJWT(sessionID string, user UserModel) (*JWT, error)
 
 	// SetAuthCookies establishes authentication cookies in the HTTP response.
 	//
@@ -55,11 +57,14 @@ type UserService interface {
 	//   - w: The http.ResponseWriter used to set cookies.
 	//   - jwt: The JSON Web Token to be set as a cookie.
 	SetAuthCookies(w http.ResponseWriter, jwt JWT)
+
+	ClearAuthCookies(w http.ResponseWriter, sessionManager *scs.SessionManager)
 }
 
 // userService is an implementation of the UserService interface.
 type userService struct {
 	logger    *slog.Logger
+	config    core.AppConfig
 	jwtConfig *core.JWTConfig
 }
 
@@ -97,6 +102,7 @@ var _ UserService = (*userService)(nil)
 func NewUserService(params UserServiceParams) *userService {
 	return &userService{
 		logger:    params.Logger,
+		config:    params.Config,
 		jwtConfig: params.Config.GetJWTConfig(),
 	}
 }
@@ -127,9 +133,10 @@ func (s *userService) HashPassword(ctx context.Context, password string) ([]byte
 	return hashedPassword, nil
 }
 
-func (s *userService) generateAccessToken(user UserModel, nowFn func() time.Time) (*Token, error) {
+func (s *userService) generateAccessToken(sessionID string, user UserModel, nowFn func() time.Time) (*Token, error) {
 	now := nowFn()
 	claims := core.JWTCustomClaims{
+		SessionID:         sessionID,
 		Email:             user.Email,
 		PreferredUsername: user.Username,
 		GivenName:         user.FirstName,
@@ -157,7 +164,7 @@ func (s *userService) generateAccessToken(user UserModel, nowFn func() time.Time
 	}, nil
 }
 
-func (s *userService) generateRefreshToken(user UserModel, nowFn func() time.Time) (*Token, error) {
+func (s *userService) generateRefreshToken(sessionID string, user UserModel, nowFn func() time.Time) (*Token, error) {
 	now := nowFn()
 	claims := jwt.RegisteredClaims{
 		Subject:   user.ID.String(),
@@ -178,10 +185,10 @@ func (s *userService) generateRefreshToken(user UserModel, nowFn func() time.Tim
 	}, nil
 }
 
-func (s *userService) GenerateJWT(user UserModel) (*JWT, error) {
+func (s *userService) GenerateJWT(sessionID string, user UserModel) (*JWT, error) {
 	now := time.Now()
 
-	accessToken, signedAccessTokenErr := s.generateAccessToken(user, func() time.Time {
+	accessToken, signedAccessTokenErr := s.generateAccessToken(sessionID, user, func() time.Time {
 		return now
 	})
 
@@ -189,7 +196,7 @@ func (s *userService) GenerateJWT(user UserModel) (*JWT, error) {
 		return nil, signedAccessTokenErr
 	}
 
-	refreshToken, signedRefreshTokenErr := s.generateRefreshToken(user, func() time.Time {
+	refreshToken, signedRefreshTokenErr := s.generateRefreshToken(sessionID, user, func() time.Time {
 		return now
 	})
 
@@ -205,20 +212,35 @@ func (s *userService) GenerateJWT(user UserModel) (*JWT, error) {
 
 func (s *userService) SetAuthCookies(w http.ResponseWriter, jwt JWT) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     "auth.token",
+		Name:     core.IdentityCookie,
 		Value:    jwt.AccessToken.Value,
 		HttpOnly: true,
+		Domain:   fmt.Sprintf(".%v", s.config.GetHost()),
+		Secure:   s.config.IsHTTPS(),
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
 		Expires:  jwt.AccessToken.ExpiredAt,
 	})
+}
 
+func (s *userService) ClearAuthCookies(w http.ResponseWriter, sessionManager *scs.SessionManager) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     "auth.refresh",
-		Value:    jwt.RefreshToken.Value,
+		Name:     core.IdentityCookie,
 		HttpOnly: true,
+		Domain:   fmt.Sprintf(".%v", s.config.GetHost()),
+		Secure:   s.config.IsHTTPS(),
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
-		Expires:  jwt.RefreshToken.ExpiredAt,
+		MaxAge:   -1,
+	})
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     sessionManager.Cookie.Name,
+		HttpOnly: sessionManager.Cookie.HttpOnly,
+		SameSite: sessionManager.Cookie.SameSite,
+		Path:     sessionManager.Cookie.Path,
+		Domain:   sessionManager.Cookie.Domain,
+		Secure:   sessionManager.Cookie.Secure,
+		MaxAge:   -1,
 	})
 }

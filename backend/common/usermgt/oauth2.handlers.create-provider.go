@@ -71,12 +71,11 @@ func NewCreateOAuth2Provider(p CreateOAuth2ProviderHandlerParams) *createOAuth2P
 	}
 }
 
-func (h *createOAuth2ProviderHandler) Pattern() string {
-	return "POST /api/v1/providers"
-}
-
-func (h *createOAuth2ProviderHandler) IsPrivateRoute() bool {
-	return true
+func (h *createOAuth2ProviderHandler) Config() *core.HTTPRouteConfig {
+	return &core.HTTPRouteConfig{
+		Pattern:   "POST /api/v1/providers",
+		IsPrivate: true,
+	}
 }
 
 // ServeHTTP processes incoming HTTP requests for creating new OAuth2 providers.

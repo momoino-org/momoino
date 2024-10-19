@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 	"wano-island/common/core"
+	"wano-island/common/security"
 	"wano-island/common/showmgt"
 	"wano-island/common/usermgt"
 	"wano-island/console/modules/filesystem"
@@ -25,6 +26,7 @@ func main() {
 
 	app := fx.New(
 		// Common
+		core.NewSessionModule(),
 		core.NewEncryptionModule(),
 		core.NewI18nModule(resourceFS),
 		core.NewValidationModule(),
@@ -33,6 +35,7 @@ func main() {
 		core.NewRequestModule(),
 		core.NewDatabaseModule(),
 		core.NewTranslationModule(),
+		security.NewSecurityModule(),
 		usermgt.NewUserMgtModule(),
 		showmgt.NewShowMgtModule(),
 

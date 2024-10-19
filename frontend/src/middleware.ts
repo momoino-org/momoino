@@ -1,70 +1,81 @@
 'use server';
 
-import { NextMiddleware, NextRequest, NextResponse } from 'next/server';
-import { match } from 'path-to-regexp';
-import { isEmpty } from 'radash';
-import { isAccessTokenValid } from '@/internal/core/auth/server';
+import { NextMiddleware, NextResponse } from 'next/server';
+import { chain } from 'radash';
+import { frontendOrigin } from './internal/core/config';
+import { injectCsrfToken } from '@/internal/core/csrf/server';
+import {
+  canRenewAccessToken,
+  injectNewAccessToken,
+  isAccessTokenValid,
+} from '@/internal/core/auth/server';
 
-const isSignInRoute = match('/auth/*segments');
-const privateRoutes = [match('/admin{/*path}')];
+const homeURL = new URL('/', frontendOrigin);
+const signInURL = new URL('/auth/signin', frontendOrigin);
 
-const signInMiddleware: NextMiddleware = async (request: NextRequest) => {
-  const redirectTo = request.nextUrl.searchParams.get('redirectTo');
-
-  if (isEmpty(redirectTo)) {
-    request.nextUrl.searchParams.set('redirectTo', '/');
-    return NextResponse.redirect(request.nextUrl);
+const signInMiddleware: NextMiddleware = async (request) => {
+  if (await isAccessTokenValid(request)) {
+    return chain(NextResponse.redirect, injectCsrfToken)(homeURL);
   }
 
-  // Don't need to call api get user profile if "auth.token" cookie does not exist
-  const accessToken = request.cookies.get('auth.token');
-  if (accessToken === undefined) {
-    return NextResponse.next();
+  try {
+    if (await canRenewAccessToken(request)) {
+      return chain(NextResponse.redirect, injectCsrfToken, async (response) =>
+        injectNewAccessToken(request, await response),
+      )(homeURL);
+    }
+  } catch (err) {
+    return chain(NextResponse.next, injectCsrfToken)();
   }
 
-  // If user is authenticated, redirect to the specified redirectTo URL
-  if (await isAccessTokenValid()) {
-    const redirectURL = new URL(redirectTo!, request.url);
-    return NextResponse.redirect(redirectURL);
-  }
-
-  // If user is not authenticated, redirect to the sign-in page
-  return NextResponse.next();
+  return chain(NextResponse.next, injectCsrfToken)();
 };
 
-const privateRouteMiddleware: NextMiddleware = async (request: NextRequest) => {
-  const route = privateRoutes.find(
-    (r) => r(request.nextUrl.pathname) !== false,
-  );
-
-  if (route) {
-    const signInURL = new URL('/auth/signin', request.url);
-    signInURL.searchParams.set('redirectTo', request.nextUrl.pathname);
-
-    // Don't need to call api get user profile if "auth.token" cookie does not exist
-    const accessToken = request.cookies.get('auth.token');
-    if (accessToken === undefined) {
-      return NextResponse.redirect(signInURL);
-    }
-
-    if (await isAccessTokenValid()) {
-      return NextResponse.next();
-    }
-
-    return NextResponse.redirect(signInURL);
+const protectedRouteMiddleware: NextMiddleware = async (request) => {
+  if (await isAccessTokenValid(request)) {
+    return chain(NextResponse.next, injectCsrfToken)();
   }
 
-  return NextResponse.next();
+  try {
+    if (await canRenewAccessToken(request)) {
+      return chain(NextResponse.next, injectCsrfToken, async (response) =>
+        injectNewAccessToken(request, await response),
+      )();
+    }
+  } catch (err) {
+    return chain(NextResponse.redirect, injectCsrfToken)(signInURL);
+  }
+
+  return chain(NextResponse.redirect, injectCsrfToken)(signInURL);
 };
 
 export const middleware: NextMiddleware = async (request, event) => {
-  if (request.nextUrl.pathname.startsWith('/_next')) {
-    return NextResponse.next();
-  }
+  const { pathname } = request.nextUrl;
 
-  if (isSignInRoute(request.nextUrl.pathname) !== false) {
+  if (pathname === '/auth/signin') {
     return signInMiddleware(request, event);
   }
 
-  return privateRouteMiddleware(request, event);
+  return protectedRouteMiddleware(request, event);
+};
+
+export const config = {
+  matcher: [
+    {
+      source: '/auth/signin',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'next-action' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
+    {
+      source: '/admin/:path*',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'next-action' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
+  ],
 };

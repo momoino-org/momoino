@@ -70,12 +70,11 @@ func NewChangePasswordHandler(params ChangePasswordHandlerParams) *changePasswor
 	}
 }
 
-func (h *changePasswordHandler) Pattern() string {
-	return "POST /api/v1/profile/change-password"
-}
-
-func (h *changePasswordHandler) IsPrivateRoute() bool {
-	return true
+func (h *changePasswordHandler) Config() *core.HTTPRouteConfig {
+	return &core.HTTPRouteConfig{
+		Pattern:   "POST /api/v1/profile/change-password",
+		IsPrivate: true,
+	}
 }
 
 // ServeHTTP handles incoming HTTP requests for changing passwords.

@@ -1,6 +1,8 @@
+'use client';
+
 import { useEffect } from 'react';
 import { z } from 'zod';
-import { toast } from '@/internal/core/ui';
+import { notification } from '@/internal/core/ui';
 
 const AuthenticationMessageDataSchema = z
   .object({
@@ -35,7 +37,7 @@ export function useOAuth2Listener() {
           'Failed to authenticate. Please try again.',
           data.data.payload.details,
         );
-        toast({
+        notification.toast({
           severity: data.data.payload.status,
           message: 'Failed to authenticate. Please try again.',
         });

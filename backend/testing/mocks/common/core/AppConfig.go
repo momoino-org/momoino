@@ -389,6 +389,53 @@ func (_c *MockAppConfig_GetSecretKey_Call) RunAndReturn(run func() []byte) *Mock
 	return _c
 }
 
+// GetSessionConfig provides a mock function with given fields:
+func (_m *MockAppConfig) GetSessionConfig() *core.SessionConfig {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetSessionConfig")
+	}
+
+	var r0 *core.SessionConfig
+	if rf, ok := ret.Get(0).(func() *core.SessionConfig); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.SessionConfig)
+		}
+	}
+
+	return r0
+}
+
+// MockAppConfig_GetSessionConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetSessionConfig'
+type MockAppConfig_GetSessionConfig_Call struct {
+	*mock.Call
+}
+
+// GetSessionConfig is a helper method to define mock.On call
+func (_e *MockAppConfig_Expecter) GetSessionConfig() *MockAppConfig_GetSessionConfig_Call {
+	return &MockAppConfig_GetSessionConfig_Call{Call: _e.mock.On("GetSessionConfig")}
+}
+
+func (_c *MockAppConfig_GetSessionConfig_Call) Run(run func()) *MockAppConfig_GetSessionConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockAppConfig_GetSessionConfig_Call) Return(_a0 *core.SessionConfig) *MockAppConfig_GetSessionConfig_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockAppConfig_GetSessionConfig_Call) RunAndReturn(run func() *core.SessionConfig) *MockAppConfig_GetSessionConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // IsDevelopment provides a mock function with given fields:
 func (_m *MockAppConfig) IsDevelopment() bool {
 	ret := _m.Called()

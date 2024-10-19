@@ -47,6 +47,7 @@
 				"buildFlags": "-ldflags='-X wano-island/common/core.AppVersion=1.0.0 -X wano-island/common/core.CompatibleVersion= -X wano-island/common/core.AppRevision=000000'",
 				"env": {
           "APP_MODE": "development",
+          "APP_HOST": "http://localhost",
           "APP_SECRET_KEY": "eLPgQbF,g!Yz)6E%9Ghj5.KZMWvw$!9y",
 					"APP_DATABASE_HOST": "localhost",
 					"APP_DATABASE_USERNAME": "momoino-console",
@@ -56,13 +57,15 @@
 					"APP_DATABASE_MAX_ATTEMPTS": "3",
           "APP_JWT_RSA_PUBLIC_KEY": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhK9sd1UY0IjSGe0JBE2E\n1PJFn06bdfmjJOfkQEFsE4o0ddTitq19+ToDc1ZSMGudzB8VVSGHiQGLQfK9gpsG\nMKIrXpP/toCEKsIP8nCoB0+SQanlIvS6nMXO4QsX/6oCThKEts0Gsd3hXug7Wp+e\nn/JIuWnp3la3gKX/O+iLtEf9PZ9NDPMMLf0eBk69voYamQR3QnNvHUMMTBcjm76o\nEZnAM3WzDl+XvI1rU9slNOS1gvJ79Eq0VMqbZ2RgMJF07w7qwPdOfn1+Qcu0AxLs\nRS/LwANgyQHu+wGPP4OQr+tQaxvc+dmc1g0kQuM4Q9IU4nhGItbBRyD7hyoYCV3F\nWQIDAQAB\n-----END PUBLIC KEY-----",
           "APP_JWT_RSA_PRIVATE_KEY": "-----BEGIN RSA PRIVATE KEY-----\nMIIEogIBAAKCAQEAhK9sd1UY0IjSGe0JBE2E1PJFn06bdfmjJOfkQEFsE4o0ddTi\ntq19+ToDc1ZSMGudzB8VVSGHiQGLQfK9gpsGMKIrXpP/toCEKsIP8nCoB0+SQanl\nIvS6nMXO4QsX/6oCThKEts0Gsd3hXug7Wp+en/JIuWnp3la3gKX/O+iLtEf9PZ9N\nDPMMLf0eBk69voYamQR3QnNvHUMMTBcjm76oEZnAM3WzDl+XvI1rU9slNOS1gvJ7\n9Eq0VMqbZ2RgMJF07w7qwPdOfn1+Qcu0AxLsRS/LwANgyQHu+wGPP4OQr+tQaxvc\n+dmc1g0kQuM4Q9IU4nhGItbBRyD7hyoYCV3FWQIDAQABAoIBAGpphkPuK4iTMm04\nfRLGWNGvu8aX9HYZT445rAUccuD45jnaEjkPywgmTr4hbKkIpfUeuK0dxuVKJ7Us\nSHCGg+BdLwsbBuoHB/iCyudVEm1Kk7G13965BzDUM6aojwasAk067NTueYAMwsKq\n3W9AtKbyWQDawIVgZqr2dkxFpEVgjOUESifXI4ZqVatAz3xwaMdNNTb9ny0K/gIy\nB93lEzPRr/oOI7C1nI3GKICGDDgfiriFyjw934KbYUt1t+sj0diOaavquEnKkOD5\ns9Nl+kIjWwfsW7ccB9G09ZqtmTZ0YfUz7Vit9EL3nPi3alWwfjSssgENGk9PcE4g\n9EPk8AECgYEA0Us/ZPvDEOoU21kwMASNST9b1Wi+wB7HBpqKGUGMLTR/o4G3R+21\nNQSQ5C+vB7q2Gbo5/Zap3JL++bOmadyROYpUQo0+kLf4kzwAIRciQWQ1/KqbVZuW\nFnYcXagc3ndWZcG9FhSjSQ3KNJI14rtzG5/D6+nY3+G1veWDcpI4DqECgYEAokuZ\nRFrnI7kL5L5PcPvSwzUUlQyofxfXEY14Gy+BpsXa5HMY5/ofcyU7Jy1MFRHavfS/\nplV77LfEcW4dzLWXCoyM0seIj2KZXJadkmPnj6RHrL1PPoQykoyMUWN7872KvqmT\nShFr4UxzaLa7+FewoBVfxBABQQiifrb/ZZ39U7kCgYAtzgEe0ba8Ue6knt1b9PMS\n78niZ90vYM0AFfxZUK4kCpRQrYf2NwDsjIZFWmY9E9DcypP8eufL/WPONFIcYwhp\nhmuwcQcbVxgQ6RXCKDT4CL2EAbajQrzTR6Anoy5GRenjtUXzuiqOR3VUkhc2+v1T\nM2EGlZRAUz6aQ8vD3FpmYQKBgE1JJPapN1MKpwBKJHiQY0C0gVWtTnwfdTqVnPGN\nQPeTVvbdXKnzsZBa1X2Fk6qg8wLsj2t9X+NNa838e1Jl00Shw9oITR7C/Hdb/jOd\nQcNknwFCsX764z5okdWcQ4XB6FV9WXe3LiF/D6J5CrBryd+h7hXm7UH0A7XGHX9d\nqip5AoGAYvyv+rNZj3cLKhq3WKCiFF9QxoJoqNzs2uUiR82p4K1+GSvF2kHbsC4Y\nmf///JRCiti6LRKcYS4ngwJsPWZlghezJXjVnnxfYLFmjemc9Ua+8o4xnUPPaXMJ\n1t6Ldn7t6ju8lVIZla/fd2IiGl7YeltdWOhpbLVy/GX5lKSSCK0=\n-----END RSA PRIVATE KEY-----\n",
-          "APP_JWT_ACCESS_TOKEN_EXPIRES_IN": "5m",
+          "APP_JWT_ACCESS_TOKEN_EXPIRES_IN": "1m",
           "APP_JWT_REFRESH_TOKEN_EXPIRES_IN": "24h",
           "APP_CORS_ALLOWED_ORIGINS": "https://* http://*",
           "APP_CORS_ALLOWED_HEADERS": "*",
-          "APP_CORS_EXPOSED_HEADERS": "*",
+          "APP_CORS_EXPOSED_HEADERS": "* X-Csrf-Token",
           "APP_CORS_ALLOW_CREDENTIALS": "true",
-          "APP_CORS_MAX_AGE": "300"
+          "APP_CORS_MAX_AGE": "300",
+          "APP_SESSION_LIFETIME": "336h",
+          "APP_SESSION_IDLE_TIMEOUT": "168h",
 				}
 			},
       {

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"wano-island/common/core"
 
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/render"
 	"github.com/gorilla/schema"
 	"github.com/samber/lo"
@@ -25,6 +26,7 @@ type googleProvider struct {
 	logger                   *slog.Logger
 	config                   core.AppConfig
 	db                       *gorm.DB
+	sessionManager           *scs.SessionManager
 	schemaDecoder            *schema.Decoder
 	userService              UserService
 	userRepository           UserRepository
@@ -37,6 +39,7 @@ type GoogleProviderHandlerParams struct {
 	Logger                   *slog.Logger
 	Config                   core.AppConfig
 	DB                       *gorm.DB
+	SessionManager           *scs.SessionManager
 	SchemaDecoder            *schema.Decoder
 	UserService              UserService
 	UserRepository           UserRepository
@@ -81,6 +84,7 @@ func NewGoogleProvider(p GoogleProviderHandlerParams) *googleProvider {
 		logger:                   p.Logger,
 		config:                   p.Config,
 		db:                       p.DB,
+		sessionManager:           p.SessionManager,
 		schemaDecoder:            p.SchemaDecoder,
 		userService:              p.UserService,
 		userRepository:           p.UserRepository,
@@ -284,7 +288,15 @@ func (p *googleProvider) CallbackHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	jwt, err := p.userService.GenerateJWT(*userModel)
+	if renewTokenErr := p.sessionManager.RenewToken(r.Context()); renewTokenErr != nil {
+		p.logger.ErrorContext(reqCtx, "Cannot renew session token", core.DetailsLogAttr(renewTokenErr))
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
+
+		return
+	}
+
+	jwt, err := p.userService.GenerateJWT(p.sessionManager.Token(reqCtx), *userModel)
 	if err != nil {
 		p.logger.ErrorContext(r.Context(), "Something went wrong when creating jwt.", core.DetailsLogAttr(err))
 		render.Status(r, http.StatusInternalServerError)
@@ -293,8 +305,11 @@ func (p *googleProvider) CallbackHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	p.sessionManager.Put(r.Context(), core.UIDKey, userModel.ID.String())
 	p.userService.SetAuthCookies(w, *jwt)
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, responseBuilder.Build())
+	render.JSON(w, r, responseBuilder.Data(&LoginResponse{
+		AccessToken: jwt.AccessToken.Value,
+	}).Build())
 }

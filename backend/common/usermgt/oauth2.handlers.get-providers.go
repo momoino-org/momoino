@@ -39,12 +39,11 @@ func NewGetOAuth2ProvidersHandler(params GetOAuth2ProvidersHandlerParams) *getOA
 	}
 }
 
-func (h *getOAuth2ProvidersHandler) Pattern() string {
-	return "GET /api/v1/providers"
-}
-
-func (h *getOAuth2ProvidersHandler) IsPrivateRoute() bool {
-	return true
+func (h *getOAuth2ProvidersHandler) Config() *core.HTTPRouteConfig {
+	return &core.HTTPRouteConfig{
+		Pattern:   "GET /api/v1/providers",
+		IsPrivate: true,
+	}
 }
 
 func (h *getOAuth2ProvidersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

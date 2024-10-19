@@ -18,6 +18,8 @@ func NewUserMgtModule() fx.Option {
 			core.AsRoute(NewLoginHandler),
 			core.AsRoute(NewProfileHandler),
 			core.AsRoute(NewChangePasswordHandler),
+			core.AsRoute(NewRenewSessionHandler),
+			core.AsRoute(NewCreateLoginSessionHandler),
 
 			// OAuth2
 			fx.Annotate(NewGoogleProvider, fx.As(new(OAuth2Provider)), fx.ResultTags(`name:"google_provider"`)),

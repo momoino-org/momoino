@@ -1,3 +1,5 @@
+'use client';
+
 import { ReadonlyURLSearchParams } from 'next/navigation';
 import { useCallback } from 'react';
 import { AuthenticationMessageData } from '../useOAuth2Listener';

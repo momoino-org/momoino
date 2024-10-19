@@ -1,4 +1,3 @@
-//nolint:dupl // This is different with OAuth2CallbackHandler
 package usermgt
 
 import (
@@ -41,12 +40,10 @@ func NewOAuth2LoginHandler(params OAuth2LoginHandlerParams) *oauth2LoginHandler 
 	}
 }
 
-func (h *oauth2LoginHandler) Pattern() string {
-	return "GET /api/v1/login/providers/{provider}"
-}
-
-func (h *oauth2LoginHandler) IsPrivateRoute() bool {
-	return false
+func (h *oauth2LoginHandler) Config() *core.HTTPRouteConfig {
+	return &core.HTTPRouteConfig{
+		Pattern: "GET /api/v1/login/providers/{provider}",
+	}
 }
 
 // ServeHTTP processes the incoming HTTP request and delegates authorization to the appropriate OAuth2 provider.

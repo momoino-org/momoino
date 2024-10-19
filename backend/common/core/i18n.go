@@ -33,6 +33,10 @@ const (
 	MsgCannotCreateTheShow                  = "E-0007"
 	MsgRouteNotFound                        = "E-R404"
 	MsgInternalServerError                  = "U-0000"
+	MsgInvalidSession                       = "E_INVALID_SESSION"
+	MsgCannotCreateSession                  = "E_CANNOT_CREATE_SESSION"
+	MsgCannotDestroySession                 = "E_CANNOT_DESTROY_SESSION"
+	MsgInvalidCsrf                          = "E_INVALID_CSRF"
 
 	// OAuth2 related messages.
 	MsgOAuth2ProviderUnavailable = "E-OAUTH2-0001"
