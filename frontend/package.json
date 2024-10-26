@@ -27,7 +27,7 @@
     "jwt-decode": "^4.0.0",
     "ky": "^1.7.2",
     "next": "14.2.15",
-    "next-intl": "^3.21.1",
+    "next-intl": "^3.23.5",
     "path-to-regexp": "^8.2.0",
     "radash": "^12.1.0",
     "react": "^18",
