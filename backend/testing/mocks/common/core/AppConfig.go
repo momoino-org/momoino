@@ -205,6 +205,51 @@ func (_c *MockAppConfig_GetDatabaseConfig_Call) RunAndReturn(run func() *core.Da
 	return _c
 }
 
+// GetHost provides a mock function with given fields:
+func (_m *MockAppConfig) GetHost() string {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetHost")
+	}
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
+// MockAppConfig_GetHost_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetHost'
+type MockAppConfig_GetHost_Call struct {
+	*mock.Call
+}
+
+// GetHost is a helper method to define mock.On call
+func (_e *MockAppConfig_Expecter) GetHost() *MockAppConfig_GetHost_Call {
+	return &MockAppConfig_GetHost_Call{Call: _e.mock.On("GetHost")}
+}
+
+func (_c *MockAppConfig_GetHost_Call) Run(run func()) *MockAppConfig_GetHost_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockAppConfig_GetHost_Call) Return(_a0 string) *MockAppConfig_GetHost_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockAppConfig_GetHost_Call) RunAndReturn(run func() string) *MockAppConfig_GetHost_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetJWTConfig provides a mock function with given fields:
 func (_m *MockAppConfig) GetJWTConfig() *core.JWTConfig {
 	ret := _m.Called()
@@ -477,6 +522,51 @@ func (_c *MockAppConfig_IsDevelopment_Call) Return(_a0 bool) *MockAppConfig_IsDe
 }
 
 func (_c *MockAppConfig_IsDevelopment_Call) RunAndReturn(run func() bool) *MockAppConfig_IsDevelopment_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// IsHTTPS provides a mock function with given fields:
+func (_m *MockAppConfig) IsHTTPS() bool {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for IsHTTPS")
+	}
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
+// MockAppConfig_IsHTTPS_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IsHTTPS'
+type MockAppConfig_IsHTTPS_Call struct {
+	*mock.Call
+}
+
+// IsHTTPS is a helper method to define mock.On call
+func (_e *MockAppConfig_Expecter) IsHTTPS() *MockAppConfig_IsHTTPS_Call {
+	return &MockAppConfig_IsHTTPS_Call{Call: _e.mock.On("IsHTTPS")}
+}
+
+func (_c *MockAppConfig_IsHTTPS_Call) Run(run func()) *MockAppConfig_IsHTTPS_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *MockAppConfig_IsHTTPS_Call) Return(_a0 bool) *MockAppConfig_IsHTTPS_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockAppConfig_IsHTTPS_Call) RunAndReturn(run func() bool) *MockAppConfig_IsHTTPS_Call {
 	_c.Call.Return(run)
 	return _c
 }

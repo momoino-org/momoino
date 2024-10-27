@@ -8,6 +8,8 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
+	scs "github.com/alexedwards/scs/v2"
+
 	usermgt "wano-island/common/usermgt"
 )
 
@@ -22,6 +24,40 @@ type MockUserService_Expecter struct {
 
 func (_m *MockUserService) EXPECT() *MockUserService_Expecter {
 	return &MockUserService_Expecter{mock: &_m.Mock}
+}
+
+// ClearAuthCookies provides a mock function with given fields: w, sessionManager
+func (_m *MockUserService) ClearAuthCookies(w http.ResponseWriter, sessionManager *scs.SessionManager) {
+	_m.Called(w, sessionManager)
+}
+
+// MockUserService_ClearAuthCookies_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ClearAuthCookies'
+type MockUserService_ClearAuthCookies_Call struct {
+	*mock.Call
+}
+
+// ClearAuthCookies is a helper method to define mock.On call
+//   - w http.ResponseWriter
+//   - sessionManager *scs.SessionManager
+func (_e *MockUserService_Expecter) ClearAuthCookies(w interface{}, sessionManager interface{}) *MockUserService_ClearAuthCookies_Call {
+	return &MockUserService_ClearAuthCookies_Call{Call: _e.mock.On("ClearAuthCookies", w, sessionManager)}
+}
+
+func (_c *MockUserService_ClearAuthCookies_Call) Run(run func(w http.ResponseWriter, sessionManager *scs.SessionManager)) *MockUserService_ClearAuthCookies_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(http.ResponseWriter), args[1].(*scs.SessionManager))
+	})
+	return _c
+}
+
+func (_c *MockUserService_ClearAuthCookies_Call) Return() *MockUserService_ClearAuthCookies_Call {
+	_c.Call.Return()
+	return _c
+}
+
+func (_c *MockUserService_ClearAuthCookies_Call) RunAndReturn(run func(http.ResponseWriter, *scs.SessionManager)) *MockUserService_ClearAuthCookies_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // ComparePassword provides a mock function with given fields: ctx, password, hasedPassword
