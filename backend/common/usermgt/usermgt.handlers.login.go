@@ -2,6 +2,7 @@ package usermgt
 
 import (
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"wano-island/common/core"
@@ -18,14 +19,14 @@ import (
 // including decoding the request, validating user credentials, and generating
 // JWT tokens for authenticated users.
 type loginHandler struct {
-	config                   core.AppConfig
-	logger                   *slog.Logger
-	db                       *gorm.DB
-	userService              UserService
-	userRepository           UserRepository
-	jwtConfig                *core.JWTConfig
-	sessionManager           *scs.SessionManager
-	shortLivedSessionManager *scs.SessionManager
+	config              core.AppConfig
+	logger              *slog.Logger
+	db                  *gorm.DB
+	userService         UserService
+	userRepository      UserRepository
+	jwtConfig           *core.JWTConfig
+	sessionManager      *scs.SessionManager
+	loginSessionManager *scs.SessionManager
 }
 
 // LoginHandlerParams holds the parameters required to create a new loginHandler.
@@ -33,13 +34,13 @@ type loginHandler struct {
 // management of dependencies.
 type LoginHandlerParams struct {
 	fx.In
-	Logger                   *slog.Logger
-	Config                   core.AppConfig
-	SessionManager           *scs.SessionManager
-	ShortLivedSessionManager *scs.SessionManager `name:"shortLivedSessionManager"`
-	DB                       *gorm.DB
-	UserService              UserService
-	UserRepository           UserRepository
+	Logger              *slog.Logger
+	Config              core.AppConfig
+	SessionManager      *scs.SessionManager
+	LoginSessionManager *scs.SessionManager `name:"loginSessionManager"`
+	DB                  *gorm.DB
+	UserService         UserService
+	UserRepository      UserRepository
 }
 
 // LoginRequestBody defines the structure of the request body for login requests.
@@ -72,14 +73,14 @@ var _ core.HTTPRoute = (*loginHandler)(nil)
 //   - A pointer to the newly created loginHandler.
 func NewLoginHandler(params LoginHandlerParams) *loginHandler {
 	handler := loginHandler{
-		config:                   params.Config,
-		logger:                   params.Logger,
-		sessionManager:           params.SessionManager,
-		shortLivedSessionManager: params.ShortLivedSessionManager,
-		db:                       params.DB,
-		userService:              params.UserService,
-		userRepository:           params.UserRepository,
-		jwtConfig:                params.Config.GetJWTConfig(),
+		config:              params.Config,
+		logger:              params.Logger,
+		sessionManager:      params.SessionManager,
+		loginSessionManager: params.LoginSessionManager,
+		db:                  params.DB,
+		userService:         params.UserService,
+		userRepository:      params.UserRepository,
+		jwtConfig:           params.Config.GetJWTConfig(),
 	}
 
 	return &handler
@@ -89,7 +90,6 @@ func (h *loginHandler) Config() *core.HTTPRouteConfig {
 	return &core.HTTPRouteConfig{
 		Pattern: "POST /api/v1/login",
 		Wrappers: []func(http.Handler) http.Handler{
-			// h.shortLivedSessionManager.LoadAndSave,
 			h.sessionManager.LoadAndSave,
 		},
 	}
@@ -106,21 +106,30 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	responseBuilder := core.NewResponseBuilder(r)
 
-	shortLivedSessionCookie, getShortLivedSessionCookieErr := r.Cookie(core.LoginSessionCookie)
-	if getShortLivedSessionCookieErr != nil {
+	loginSessionCookie, getLoginSessionCookieErr := r.Cookie(core.LoginSessionCookie)
+	if getLoginSessionCookieErr != nil {
 		h.logger.ErrorContext(ctx,
-			"Cannot get short lived session cookie",
-			core.DetailsLogAttr(getShortLivedSessionCookieErr))
-		render.Status(r, http.StatusBadRequest)
+			fmt.Sprintf("Cannot get cookie: %v", core.LoginSessionCookie),
+			core.DetailsLogAttr(getLoginSessionCookieErr))
+		render.Status(r, http.StatusForbidden)
 		render.JSON(w, r, responseBuilder.MessageID(core.MsgInvalidSession).Build())
 
 		return
 	}
 
-	shortLivedSessionCtx, loadShortLivedSessionErr := h.shortLivedSessionManager.Load(ctx, shortLivedSessionCookie.Value)
-	if loadShortLivedSessionErr != nil {
-		h.logger.ErrorContext(ctx, "Cannot load short lived session", core.DetailsLogAttr(loadShortLivedSessionErr))
-		render.Status(r, http.StatusBadRequest)
+	_, found, findSessionErr := h.loginSessionManager.Store.Find(loginSessionCookie.Value)
+	if !found || findSessionErr != nil {
+		h.logger.ErrorContext(ctx, "Session not found", core.DetailsLogAttr(findSessionErr))
+		render.Status(r, http.StatusForbidden)
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgInvalidSession).Build())
+
+		return
+	}
+
+	loginSessionCtx, loadLoginSessionErr := h.loginSessionManager.Load(ctx, loginSessionCookie.Value)
+	if loadLoginSessionErr != nil {
+		h.logger.ErrorContext(ctx, "Cannot load login session", core.DetailsLogAttr(loadLoginSessionErr))
+		render.Status(r, http.StatusForbidden)
 		render.JSON(w, r, responseBuilder.MessageID(core.MsgInvalidSession).Build())
 
 		return
@@ -170,8 +179,8 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if destroyShortSessionErr := h.shortLivedSessionManager.Destroy(shortLivedSessionCtx); destroyShortSessionErr != nil {
-		h.logger.ErrorContext(ctx, "Cannot destroy short live session", core.DetailsLogAttr(destroyShortSessionErr))
+	if destroyShortSessionErr := h.loginSessionManager.Destroy(loginSessionCtx); destroyShortSessionErr != nil {
+		h.logger.ErrorContext(ctx, "Cannot destroy login session", core.DetailsLogAttr(destroyShortSessionErr))
 		render.Status(r, http.StatusInternalServerError)
 		render.JSON(w, r, responseBuilder.MessageID(core.MsgCannotDestroySession).Build())
 
@@ -185,7 +194,24 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		MaxAge: -1,
 	})
 
-	if renewTokenErr := h.sessionManager.RenewToken(ctx); renewTokenErr != nil {
+	sessionCookie, err := r.Cookie(core.SessionCookie)
+	if err != nil {
+		sessionCookie = &http.Cookie{
+			Name:  core.SessionCookie,
+			Value: "",
+		}
+	}
+
+	sessionCtx, err := h.sessionManager.Load(ctx, sessionCookie.Value)
+	if err != nil {
+		h.logger.ErrorContext(ctx, "Cannot load session token", core.DetailsLogAttr(err))
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgCannotCreateSession).Build())
+
+		return
+	}
+
+	if renewTokenErr := h.sessionManager.RenewToken(sessionCtx); renewTokenErr != nil {
 		h.logger.ErrorContext(ctx, "Cannot renew session token", core.DetailsLogAttr(renewTokenErr))
 		render.Status(r, http.StatusInternalServerError)
 		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
@@ -202,7 +228,17 @@ func (h *loginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.sessionManager.Put(r.Context(), core.UIDKey, loggedUser.ID.String())
+	h.sessionManager.Put(sessionCtx, core.UIDKey, loggedUser.ID.String())
+	token, expiredTime, err := h.sessionManager.Commit(sessionCtx)
+
+	if err != nil {
+		render.Status(r, http.StatusInternalServerError)
+		render.JSON(w, r, responseBuilder.MessageID(core.MsgInternalServerError).Build())
+
+		return
+	}
+
+	h.sessionManager.WriteSessionCookie(ctx, w, token, expiredTime)
 	h.userService.SetAuthCookies(w, *jwt)
 
 	render.Status(r, http.StatusOK)

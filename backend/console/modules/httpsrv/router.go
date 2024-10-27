@@ -6,9 +6,7 @@ import (
 	"slices"
 	"time"
 	"wano-island/common/core"
-	"wano-island/common/usermgt"
 
-	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -16,19 +14,15 @@ import (
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"github.com/samber/lo"
 	"go.uber.org/fx"
-	"gorm.io/gorm"
 )
 
 type RouteParams struct {
 	fx.In
 
-	Config         core.AppConfig
-	Logger         *slog.Logger
-	SessionManager *scs.SessionManager
-	Routes         []core.HTTPRoute `group:"http_routes"`
-	I18nBundle     *i18n.Bundle
-	DB             *gorm.DB
-	UserRepository usermgt.UserRepository
+	Config     core.AppConfig
+	Logger     *slog.Logger
+	Routes     []core.HTTPRoute `group:"http_routes"`
+	I18nBundle *i18n.Bundle
 }
 
 // separatePublicAndPrivateRoutes divides a slice of HTTP routes into two separate slices

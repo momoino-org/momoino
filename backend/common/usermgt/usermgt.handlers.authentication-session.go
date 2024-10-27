@@ -10,20 +10,20 @@ import (
 )
 
 type createLoginSessionHandler struct {
-	sessionManager           *scs.SessionManager
-	shortLivedSessionManager *scs.SessionManager
+	sessionManager      *scs.SessionManager
+	loginSessionManager *scs.SessionManager
 }
 
 type CreateLoginSessionHandlerParams struct {
 	fx.In
 	SessionManager           *scs.SessionManager
-	ShortLivedSessionManager *scs.SessionManager `name:"shortLivedSessionManager"`
+	ShortLivedSessionManager *scs.SessionManager `name:"loginSessionManager"`
 }
 
 func NewCreateLoginSessionHandler(params CreateLoginSessionHandlerParams) *createLoginSessionHandler {
 	return &createLoginSessionHandler{
-		sessionManager:           params.SessionManager,
-		shortLivedSessionManager: params.ShortLivedSessionManager,
+		sessionManager:      params.SessionManager,
+		loginSessionManager: params.ShortLivedSessionManager,
 	}
 }
 
@@ -31,7 +31,7 @@ func (h *createLoginSessionHandler) Config() *core.HTTPRouteConfig {
 	return &core.HTTPRouteConfig{
 		Pattern: "POST /api/v1/authentication/session",
 		Wrappers: []func(http.Handler) http.Handler{
-			h.shortLivedSessionManager.LoadAndSave,
+			h.loginSessionManager.LoadAndSave,
 			h.sessionManager.LoadAndSave,
 		},
 	}
@@ -42,7 +42,7 @@ func (h *createLoginSessionHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 	responseBuilder := core.NewResponseBuilder(r)
 
 	// Clean current session to start fresh session
-	if destroySessionErr := h.shortLivedSessionManager.RenewToken(reqCtx); destroySessionErr != nil {
+	if destroySessionErr := h.loginSessionManager.RenewToken(reqCtx); destroySessionErr != nil {
 		render.Status(r, http.StatusInternalServerError)
 		render.JSON(w, r, responseBuilder.MessageID(core.MsgCannotDestroySession).Build())
 

@@ -3,7 +3,6 @@ package usermgt
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"time"
@@ -215,7 +214,7 @@ func (s *userService) SetAuthCookies(w http.ResponseWriter, jwt JWT) {
 		Name:     core.IdentityCookie,
 		Value:    jwt.AccessToken.Value,
 		HttpOnly: true,
-		Domain:   fmt.Sprintf(".%v", s.config.GetHost()),
+		Domain:   s.config.GetHost(),
 		Secure:   s.config.IsHTTPS(),
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
@@ -227,7 +226,7 @@ func (s *userService) ClearAuthCookies(w http.ResponseWriter, sessionManager *sc
 	http.SetCookie(w, &http.Cookie{
 		Name:     core.IdentityCookie,
 		HttpOnly: true,
-		Domain:   fmt.Sprintf(".%v", s.config.GetHost()),
+		Domain:   s.config.GetHost(),
 		Secure:   s.config.IsHTTPS(),
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",

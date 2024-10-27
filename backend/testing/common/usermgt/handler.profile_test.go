@@ -8,7 +8,6 @@ import (
 	"wano-island/common/core"
 	"wano-island/common/usermgt"
 	"wano-island/console/modules/httpsrv"
-	mockcore "wano-island/testing/mocks/common/core"
 	mockusermgt "wano-island/testing/mocks/common/usermgt"
 	"wano-island/testing/testutils"
 
@@ -23,21 +22,17 @@ import (
 var _ = Describe("handler.profile.go", func() {
 	var (
 		db             *gorm.DB
-		config         *mockcore.MockAppConfig
 		userRepository *mockusermgt.MockUserRepository
 		router         http.Handler
 	)
 
 	BeforeEach(func() {
 		testutils.DetectLeakyGoroutines()
+		testutils.ConfigureMinimumEnvVariables()
 		db, _ = testutils.CreateTestDBInstance()
 
-		config = mockcore.NewMockAppConfig(GinkgoT())
-		config.EXPECT().GetAppVersion().Return("1.0.0")
-		config.EXPECT().GetRevision().Return("testing")
-		config.EXPECT().GetMode().Return(core.TestingMode)
-		config.EXPECT().IsTesting().Return(true)
-		config.EXPECT().GetCorsConfig().Return(&core.CorsConfig{})
+		config, err := core.NewAppConfig()
+		Expect(err).NotTo(HaveOccurred())
 
 		userRepository = mockusermgt.NewMockUserRepository(GinkgoT())
 
@@ -74,7 +69,6 @@ var _ = Describe("handler.profile.go", func() {
 	})
 
 	It("returns a user profile if there is valid access token", func(ctx SpecContext) {
-		config.EXPECT().GetJWTConfig().Return(testutils.GetJWTConfig())
 		userRepository.EXPECT().
 			FindUserByID(mock.Anything, mock.Anything, uuid.MustParse("019135f7-6265-7ef8-8920-57280736f6c0")).
 			Return(&usermgt.UserModel{

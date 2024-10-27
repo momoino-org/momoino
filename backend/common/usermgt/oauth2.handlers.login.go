@@ -1,3 +1,4 @@
+//nolint:dupl // This is different with OAuth2CallbackHandler
 package usermgt
 
 import (

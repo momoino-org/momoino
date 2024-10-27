@@ -1,3 +1,4 @@
+//nolint:dupl // This is different with OAuth2LoginHandler
 package usermgt
 
 import (
