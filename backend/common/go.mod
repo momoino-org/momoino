@@ -18,7 +18,7 @@ require (
 	github.com/spf13/viper v1.19.0
 	go.uber.org/fx v1.23.0
 	golang.org/x/crypto v0.28.0
-	golang.org/x/oauth2 v0.23.0
+	golang.org/x/oauth2 v0.24.0
 	golang.org/x/text v0.20.0
 	google.golang.org/api v0.200.0
 	gopkg.in/yaml.v3 v3.0.1
