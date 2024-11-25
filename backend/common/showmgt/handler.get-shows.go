@@ -32,12 +32,11 @@ func NewGetShowsHandler(p GetShowsHandlerParams) *getShowsHandler {
 	}
 }
 
-func (h *getShowsHandler) Pattern() string {
-	return "GET /api/v1/shows"
-}
-
-func (h *getShowsHandler) IsPrivateRoute() bool {
-	return true
+func (h *getShowsHandler) Config() *core.HTTPRouteConfig {
+	return &core.HTTPRouteConfig{
+		Pattern:        "GET /api/v1/shows",
+		IsPrivate: true,
+	}
 }
 
 func (h *getShowsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

@@ -20,7 +20,7 @@ import {
   Provider,
 } from '../../service';
 import { EmptyResponse } from '@/internal/core/http';
-import { toast, useModalContext } from '@/internal/core/ui';
+import { notification, useModalContext } from '@/internal/core/ui';
 
 export function ProviderCreationDialog() {
   const t = useTranslations();
@@ -44,7 +44,7 @@ export function ProviderCreationDialog() {
     onSuccess: async (result) => {
       const response = await EmptyResponse.strip().parseAsync(result);
 
-      toast({
+      notification.toast({
         severity: 'success',
         message: response.message,
       });

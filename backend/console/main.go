@@ -25,6 +25,7 @@ func main() {
 
 	app := fx.New(
 		// Common
+		core.NewHTTPClientModule(),
 		core.NewEncryptionModule(),
 		core.NewI18nModule(resourceFS),
 		core.NewValidationModule(),

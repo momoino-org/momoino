@@ -37,7 +37,6 @@ var _ = Describe("[handler.create-movie.go]", func() {
 		config.EXPECT().GetRevision().Return("testing")
 		config.EXPECT().GetMode().Return(core.TestingMode)
 		config.EXPECT().IsTesting().Return(true)
-		config.EXPECT().GetJWTConfig().Return(testutils.GetJWTConfig())
 		config.EXPECT().GetCorsConfig().Return(&core.CorsConfig{})
 
 		router = testutils.CreateRouter(func(rp *httpsrv.RouteParams) {
@@ -57,7 +56,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
         {
             invalid-data
         }`)))
-		router.ServeHTTP(recorder, testutils.WithFakeJWT(request))
+		router.ServeHTTP(recorder, core.WithTestAuthUser(request, core.AuthenticatedUser{}))
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -112,7 +111,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
             "isReleased": true
         }`)))
 
-		router.ServeHTTP(recorder, testutils.WithFakeJWT(request))
+		router.ServeHTTP(recorder, core.WithTestAuthUser(request, core.AuthenticatedUser{}))
 
 		var response core.Response[any]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)
@@ -168,7 +167,7 @@ var _ = Describe("[handler.create-movie.go]", func() {
             "isReleased": true
         }`)))
 
-		router.ServeHTTP(recorder, testutils.WithFakeJWT(request))
+		router.ServeHTTP(recorder, core.WithTestAuthUser(request, core.AuthenticatedUser{}))
 
 		var response core.Response[showmgt.ShowDTO]
 		_ = json.Unmarshal(recorder.Body.Bytes(), &response)

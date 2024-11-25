@@ -51,14 +51,6 @@ func CreateRouter(opt func(*httpsrv.RouteParams)) http.Handler {
 	return httpsrv.NewRouter(routeParams)
 }
 
-// WithFakeJWT adds a JWT token to the given HTTP request header.
-// The function sets the "Authorization" header with a Bearer token containing a sample JWT.
-// This token is used for testing purposes and should not be used in production.
-func WithFakeJWT(r *http.Request, opts ...func(*core.JWTCustomClaims)) *http.Request {
-	r.Header.Add(core.AuthorizationHeader, GenerateJWT(opts...))
-	return r
-}
-
 // WithFxLifeCycle is a helper function that creates and manages an fxtest.Lifecycle instance.
 // This function is useful for testing applications built using the fx framework.
 //

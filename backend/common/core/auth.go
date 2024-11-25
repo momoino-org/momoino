@@ -36,6 +36,7 @@ type AuthenticatedUser struct {
 
 type JWTCustomClaims struct {
 	jwt.RegisteredClaims
+	SessionID         string   `json:"sid"`
 	Locale            string   `json:"locale"`
 	Roles             []string `json:"roles"`
 	Permissions       []string `json:"permissions"`
@@ -46,6 +47,7 @@ type JWTCustomClaims struct {
 }
 
 const authUserCtxID authUserCtx = 0
+const testingUserCtxKey authUserCtx = 1
 
 var _ PrincipalUser = (*AuthenticatedUser)(nil)
 
@@ -57,6 +59,12 @@ func WithAuthUser(r *http.Request, user PrincipalUser) *http.Request {
 	return r.WithContext(context.WithValue(r.Context(), authUserCtxID, user))
 }
 
+// WithAuthUser adds the provided AuthUser to the given HTTP request's context.
+// This function is useful for passing the authenticated user information throughout the request handling chain.
+func WithTestAuthUser(r *http.Request, user PrincipalUser) *http.Request {
+	return r.WithContext(context.WithValue(r.Context(), testingUserCtxKey, user))
+}
+
 // GetAuthUserFromRequest retrieves the AuthUser from the given HTTP request's context.
 // If the AuthUser is found in the context, it will be returned along with a nil error.
 // If the AuthUser is not found in the context, it will return nil and an error indicating
@@ -66,6 +74,15 @@ func WithAuthUser(r *http.Request, user PrincipalUser) *http.Request {
 func GetAuthUserFromRequest(r *http.Request) (PrincipalUser, error) {
 	if authUser, ok := r.Context().Value(authUserCtxID).(PrincipalUser); ok {
 		return authUser, nil
+	}
+
+	return nil, ErrAuthUserNotFound
+}
+
+//nolint:ireturn // I need to return interface at here
+func GetTestAuthUserFromRequest(r *http.Request) (PrincipalUser, error) {
+	if testAuthUser, ok := r.Context().Value(testingUserCtxKey).(PrincipalUser); ok {
+		return testAuthUser, nil
 	}
 
 	return nil, ErrAuthUserNotFound

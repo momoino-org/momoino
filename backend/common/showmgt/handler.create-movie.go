@@ -41,12 +41,11 @@ func NewCreateMovieHandler(p CreateShowHandlerParams) *createMovieHandler {
 	}
 }
 
-func (h *createMovieHandler) Pattern() string {
-	return "POST /api/v1/shows"
-}
-
-func (h *createMovieHandler) IsPrivateRoute() bool {
-	return true
+func (h *createMovieHandler) Config() *core.HTTPRouteConfig {
+	return &core.HTTPRouteConfig{
+		Pattern:        "POST /api/v1/shows",
+		IsPrivate: true,
+	}
 }
 
 func (h *createMovieHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

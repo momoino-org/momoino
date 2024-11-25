@@ -1,13 +1,14 @@
 module wano-island/testing
 
-go 1.23
+go 1.23.2
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/go-chi/chi/v5 v5.1.0
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/go-resty/resty/v2 v2.16.2
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.1
+	github.com/jarcoal/httpmock v1.3.1
 	github.com/nicksnyder/go-i18n/v2 v2.4.1
 	github.com/onsi/ginkgo/v2 v2.21.0
 	github.com/onsi/gomega v1.36.0

@@ -40,7 +40,7 @@ jobs:
           cache: false
       - working-directory: backend
         run: |
-          go install github.com/vektra/mockery/v2@v2.46.2
+          go install github.com/vektra/mockery/v2@v2.49.0
           rm -rf mocks
           mockery
           git diff --exit-code -- ./testing/mocks

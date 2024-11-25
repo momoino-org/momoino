@@ -4,6 +4,8 @@ mockname: "{{.Mock}}{{.InterfaceName}}"
 outpkg: "mock{{.PackageName}}"
 filename: "{{.InterfaceName}}.go"
 all: true
+issue-845-fix: true
+resolve-type-alias: False
 packages:
   wano-island/common/core:
   wano-island/common/usermgt:

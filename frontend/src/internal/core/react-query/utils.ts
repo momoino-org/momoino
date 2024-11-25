@@ -4,7 +4,7 @@ import {
   isServer,
 } from '@tanstack/react-query';
 import { HTTPError } from 'ky';
-import { toast } from '@/internal/core/ui';
+import { notification } from '@/internal/core/ui';
 
 /**
  * A global variable to hold the browser-side QueryClient instance.
@@ -35,7 +35,7 @@ function makeQueryClient() {
         async onError(error) {
           if (error instanceof HTTPError) {
             const response = await error.response.json();
-            toast({
+            notification.toast({
               severity: 'error',
               message: response.message,
             });

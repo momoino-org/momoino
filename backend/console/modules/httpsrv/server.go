@@ -16,11 +16,12 @@ func newHTTPServer(
 	appLifeCycle fx.Lifecycle,
 	httpHandler http.Handler,
 	logger *slog.Logger,
+	config core.AppConfig,
 ) *http.Server {
 	const readHeaderTimeout = 5 * time.Second
 
 	srv := &http.Server{
-		Addr:              ":8080",
+		Addr:              ":8070",
 		ReadHeaderTimeout: readHeaderTimeout,
 		Handler:           httpHandler,
 	}

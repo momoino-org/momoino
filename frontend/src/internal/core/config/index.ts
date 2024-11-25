@@ -4,6 +4,11 @@
 export const isServer: boolean = typeof window === 'undefined';
 
 /**
+ * Determines whether the current environment is a client-side environment.
+ */
+export const isClient: boolean = isServer === false;
+
+/**
  * Determines whether the current environment is a production environment.
  */
 export const isProduction: boolean = process.env.NODE_ENV === 'production';

@@ -5,25 +5,12 @@ info:
   version: 1.0.0
 
 paths:
-  /api/v1/login:
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Login_RequestBody"
-      responses:
-        "200":
-          description: Login successful
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Login_200"
-
   /api/v1/profile:
     get:
+      tags:
+        - auth
       security:
-        - accessToken: []
+        - oauth2: []
       responses:
         "200":
           description: Get user profile successfully
@@ -38,46 +25,10 @@ paths:
               schema:
                 $ref: "#/components/schemas/Response"
 
-  /api/v1/profile/change-password:
-    post:
-      security:
-        - accessToken: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                currentPassword:
-                  type: string
-                newPassword:
-                  type: string
-                confirmNewPassword:
-                  type: string
-      responses:
-        "200":
-          description: Change password successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-        "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-
   /api/v1/shows:
     get:
       security:
-        - accessToken: []
+        - oauth2: []
       parameters:
         - in: query
           name: page
@@ -113,7 +64,7 @@ paths:
                 $ref: "#/components/schemas/Response"
     post:
       security:
-        - accessToken: []
+        - oauth2: []
       requestBody:
         content:
           application/json:
@@ -156,97 +107,14 @@ paths:
               schema:
                 $ref: "#/components/schemas/Response"
 
-  /api/v1/providers:
-    get:
-      tags:
-        - oauth2
-      security:
-        - accessToken: []
-      parameters:
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 1
-            default: 1
-        - in: query
-          name: pageSize
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 10
-      responses:
-        "200":
-          description: Get paginated providers.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetOAuth2Providers_200"
-        "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-
-    post:
-      tags:
-        - oauth2
-      security:
-        - accessToken: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                clientID:
-                  type: string
-                clientSecret:
-                  type: string
-                redirectURL:
-                  type: string
-                scopes:
-                  type: array
-                  items:
-                    type: string
-                isEnabled:
-                  type: boolean
-      responses:
-        "201":
-          description: Create the oauth2 provider successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CreateOAuth2Provider_201"
-        "400":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Response"
-
 components:
   securitySchemes:
-    accessToken:
-      type: apiKey
-      name: X-Auth-Access-Token
-      in: header
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: http://localhost:8080/realms/momoino/protocol/openid-connect/auth
+          tokenUrl: http://localhost:8080/realms/momoino/protocol/openid-connect/token
 
   schemas:
     Response:
@@ -298,8 +166,16 @@ components:
               properties:
                 accessToken:
                   type: string
-                refreshToken:
-                  type: string
+
+    RenewSession_200:
+      - $ref: "#/components/schemas/Response"
+      - type: object
+        properties:
+          data:
+            type: object
+            properties:
+              accessToken:
+                type: string
 
     Profile_200:
       allOf:
