@@ -1,10 +1,10 @@
-import NextAuth, { User } from "next-auth"
-import Keycloak from "next-auth/providers/keycloak"
-import { JWT } from "next-auth/jwt"
+import NextAuth, { User } from 'next-auth';
+import Keycloak from 'next-auth/providers/keycloak';
+import { JWT } from 'next-auth/jwt';
 import { decodeJwt } from 'jose';
-import { ProfileSchema } from "./internal/core/auth/shared";
+import { ProfileSchema } from './internal/core/auth/shared';
 
-declare module "next-auth" {
+declare module 'next-auth' {
   interface User {
     username?: string;
     emailVerified?: boolean;
@@ -14,7 +14,7 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
   interface JWT {
     accessToken: string;
     accessTokenExpiresAt: number;
@@ -31,9 +31,7 @@ function isExpired(deadline: number): boolean {
 }
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
-  providers: [
-    Keycloak,
-  ],
+  providers: [Keycloak],
 
   callbacks: {
     async jwt({ token, profile, account }) {
@@ -51,7 +49,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           accessToken: account.access_token!,
           accessTokenExpiresAt: account.expires_at! * 1000,
           refreshToken: account.refresh_token!,
-          refreshTokenExpiresAt: Date.now() + (Number(account.refresh_expires_in!) * 1000),
+          refreshTokenExpiresAt:
+            Date.now() + Number(account.refresh_expires_in!) * 1000,
         } satisfies JWT;
       } else if (!isExpired(token.accessTokenExpiresAt)) {
         return token;
@@ -62,23 +61,29 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
         console.debug('[START] Renew-ing access token using refresh token');
         console.debug('[OLD] Refresh token: ' + token.refreshToken);
-        const request = await fetch(`${process.env.AUTH_KEYCLOAK_ISSUER}/protocol/openid-connect/token`, {
-          method: 'post',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+        const request = await fetch(
+          `${process.env.AUTH_KEYCLOAK_ISSUER}/protocol/openid-connect/token`,
+          {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            cache: 'no-cache',
+            body: new URLSearchParams({
+              client_id: String(process.env.AUTH_KEYCLOAK_ID),
+              client_secret: String(process.env.AUTH_KEYCLOAK_SECRET),
+              grant_type: 'refresh_token',
+              refresh_token: String(token.refreshToken),
+            }),
           },
-          cache: 'no-cache',
-          body: new URLSearchParams({
-            'client_id': String(process.env.AUTH_KEYCLOAK_ID),
-            'client_secret': String(process.env.AUTH_KEYCLOAK_SECRET),
-            'grant_type': 'refresh_token',
-            'refresh_token': String(token.refreshToken),
-          }),
-        })
+        );
 
         const response = await request.json();
         if (!request.ok) {
-          console.debug('[END] Renew-ing access token using refresh token failed', response);
+          console.debug(
+            '[END] Renew-ing access token using refresh token failed',
+            response,
+          );
           throw response;
         }
         console.debug('[NEW] Refresh token: ' + response.refresh_token);
@@ -95,9 +100,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             emailVerified: t?.email_verified,
           }),
           accessToken: response.access_token!,
-          accessTokenExpiresAt: Date.now() + (Number(response.expires_in!) * 1000),
+          accessTokenExpiresAt:
+            Date.now() + Number(response.expires_in!) * 1000,
           refreshToken: response.refresh_token!,
-          refreshTokenExpiresAt: Date.now() + (Number(response.refresh_expires_in!) * 1000),
+          refreshTokenExpiresAt:
+            Date.now() + Number(response.refresh_expires_in!) * 1000,
         } satisfies JWT;
       }
     },
@@ -108,5 +115,5 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         user: token.user,
       };
     },
-  }
-})
+  },
+});

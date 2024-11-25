@@ -60,12 +60,9 @@ export default async function RootLayout({ children }: PropsWithChildren) {
               />
 
               <QueryClientProvider>
-                <SessionProvider refetchInterval={30} session={session} >
-                  <StoreProvider>{children}
-                    {children}
-                  </StoreProvider>
+                <SessionProvider refetchInterval={30} session={session}>
+                  <StoreProvider>{children}</StoreProvider>
                 </SessionProvider>
-
               </QueryClientProvider>
             </MUIThemeProvider>
           </AppRouterCacheProvider>

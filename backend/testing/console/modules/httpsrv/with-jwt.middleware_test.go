@@ -22,7 +22,7 @@ var _ = Describe("withJwtMiddleware", func() {
 
 	DescribeTable(
 		"Localizer",
-		func(path string, headers map[string]string, expectedResult string) {
+		func(path string, testUser core.PrincipalUser, expectedResult string) {
 			router := chi.NewRouter()
 			i18nBundle, _ := core.NewI18nBundle(core.I18nBundleParams{
 				LocaleFS: fstest.MapFS{
@@ -36,6 +36,7 @@ var _ = Describe("withJwtMiddleware", func() {
 			})
 
 			config := mockcore.NewMockAppConfig(GinkgoT())
+			config.EXPECT().IsTesting().Return(true)
 
 			router.Use(httpsrv.WithI18nMiddleware(i18nBundle))
 			router.Use(httpsrv.WithJwtMiddleware(i18nBundle, config, core.NewNoopLogger()))
@@ -52,32 +53,42 @@ var _ = Describe("withJwtMiddleware", func() {
 			recorder := httptest.NewRecorder()
 			request := httptest.NewRequest(http.MethodGet, path, nil)
 
-			for key, value := range headers {
-				request.Header.Add(key, value)
-			}
-
-			router.ServeHTTP(recorder, request)
+			router.ServeHTTP(recorder, core.WithTestAuthUser(request, testUser))
 
 			Expect(recorder.Body.String()).To(Equal(expectedResult))
 		},
-		// Entry(
-		// 	"should use the preferred language of the logged-in user if the request does not contain the lang query parameter",
-		// 	"/",
-		// 	map[string]string{
-		// 		core.AuthorizationHeader: testutils.GenerateJWT(func(jc *core.JWTCustomClaims) {
-		// 			jc.Locale = "vi"
-		// 		}),
-		// 	},
-		// 	"Vietnamese",
-		// ),
-		// Entry(
-		// 	//nolint:lll // This is a test case name, no need to fix
-		// 	`should always display the translated message based on the lang query parameter, even if the user is logged in with a different preferred language`,
-		// 	"/?lang=en",
-		// 	map[string]string{
-		// 		core.AuthorizationHeader: testutils.GenerateJWT(),
-		// 	},
-		// 	"English",
-		// ),
+		Entry(
+			"English should be used as the default language if the logged-in user has not defined a preferred language.",
+			"/",
+			core.AuthenticatedUser{
+				Locale: "",
+			},
+			"English",
+		),
+		Entry(
+			"should use the preferred language of the logged-in user if the request does not contain the lang query parameter",
+			"/",
+			core.AuthenticatedUser{
+				Locale: "en",
+			},
+			"English",
+		),
+		Entry(
+			"should use the preferred language of the logged-in user if the request does not contain the lang query parameter",
+			"/",
+			core.AuthenticatedUser{
+				Locale: "vi",
+			},
+			"Vietnamese",
+		),
+		Entry(
+			//nolint:lll // This is a test case name, no need to fix
+			`should always display the translated message based on the lang query parameter, even if the user is logged in with a different preferred language`,
+			"/?lang=en",
+			core.AuthenticatedUser{
+				Locale: "vi",
+			},
+			"English",
+		),
 	)
 })

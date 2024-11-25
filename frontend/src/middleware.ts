@@ -40,4 +40,4 @@ export const config = {
       missing: [{ type: 'header', key: 'x-missing', value: 'prefetch' }],
     },
   ],
-}
+};

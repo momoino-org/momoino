@@ -309,7 +309,7 @@ func initKeycloakProider(v *viper.Viper, httpClient *resty.Client) (*KeycloakPro
 	wellKnownURL := v.GetString("keycloak_well_known_url")
 	wellKnownResponse := &WellKnownResponse{}
 
-	resp, err := httpClient.R().EnableTrace().SetResult(wellKnownResponse).Get(wellKnownURL)
+	resp, err := httpClient.R().SetResult(wellKnownResponse).Get(wellKnownURL)
 	if err != nil || !resp.IsSuccess() {
 		return nil, fmt.Errorf("failed to retrieve well-known response: (status = %v) %w", resp.Status(), err)
 	}

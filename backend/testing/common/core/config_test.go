@@ -1,9 +1,12 @@
 package core_test
 
 import (
+	"net/http"
 	"wano-island/common/core"
 	"wano-island/testing/testutils"
 
+	"github.com/go-resty/resty/v2"
+	"github.com/jarcoal/httpmock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/gstruct"
@@ -11,9 +14,30 @@ import (
 )
 
 var _ = Describe("[common/core/config.go]", Ordered, func() {
+	var (
+		httpClient *resty.Client
+	)
+
 	BeforeEach(func() {
 		testutils.DetectLeakyGoroutines()
 		testutils.ConfigureMinimumEnvVariables()
+
+		httpClient = core.NewHTTPClient()
+		httpmock.ActivateNonDefault(httpClient.GetClient())
+
+		httpmock.RegisterResponder(
+			"GET",
+			"http://keycloak.test/.well-known/openid-configuration",
+			httpmock.NewJsonResponderOrPanic(
+				http.StatusOK,
+				map[string]string{
+					"issuer":   "http://localhost:8080/realms/momoino",
+					"jwks_uri": "http://localhost:8080/realms/momoino/protocol/openid-connect/certs",
+				}))
+
+		DeferCleanup(func() {
+			httpmock.DeactivateAndReset()
+		})
 	})
 
 	Context("when initializing the config module", func() {
@@ -24,17 +48,17 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 
 	Context("when the config not set in the environment", func() {
 		It("should return default values when no configuration is provided", func() {
-			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+			appCfg, err := core.NewAppConfig(httpClient)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg).NotTo(BeNil())
 
 			Expect(appCfg.GetAppVersion()).To(Equal(""))
 			Expect(appCfg.GetCompatibleVersion()).To(Equal(""))
 			Expect(appCfg.GetRevision()).To(Equal(""))
-			Expect(appCfg.GetMode()).To(Equal("development"))
-			Expect(appCfg.IsDevelopment()).To(BeTrue())
+			Expect(appCfg.GetMode()).To(Equal("testing"))
+			Expect(appCfg.IsDevelopment()).To(BeFalse())
 			Expect(appCfg.IsProduction()).To(BeFalse())
-			Expect(appCfg.IsTesting()).To(BeFalse())
+			Expect(appCfg.IsTesting()).To(BeTrue())
 			Expect(appCfg.GetDatabaseConfig()).To(PointTo(MatchFields(IgnoreMissing, Fields{
 				"Host":         Equal("localhost"),
 				"Port":         Equal(uint16(5432)),
@@ -60,7 +84,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 				t := GinkgoT()
 				t.Setenv("APP_MODE", mode)
 
-				appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+				appCfg, err := core.NewAppConfig(httpClient)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(appCfg.GetMode()).To(Equal(mode))
 			},
@@ -72,7 +96,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "staging")
 
-			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+			appCfg, err := core.NewAppConfig(httpClient)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetMode()).To(Equal("development"))
 		})
@@ -81,7 +105,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "development")
 
-			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+			appCfg, err := core.NewAppConfig(httpClient)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.IsDevelopment()).To(BeTrue())
 		})
@@ -90,7 +114,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "production")
 
-			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+			appCfg, err := core.NewAppConfig(httpClient)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.IsProduction()).To(BeTrue())
 		})
@@ -99,7 +123,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t := GinkgoT()
 			t.Setenv("APP_MODE", "testing")
 
-			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+			appCfg, err := core.NewAppConfig(httpClient)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.IsTesting()).To(BeTrue())
 		})
@@ -108,7 +132,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 	Context("when AppVesion is set", func() {
 		It("should return the value", func() {
 			core.AppVersion = "1.0.0"
-			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+			appCfg, err := core.NewAppConfig(httpClient)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetAppVersion()).To(Equal("1.0.0"))
 		})
@@ -117,7 +141,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 	Context("when CompatibleVersion is set", func() {
 		It("should return the value", func() {
 			core.CompatibleVersion = "0.5.0"
-			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+			appCfg, err := core.NewAppConfig(httpClient)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetCompatibleVersion()).To(Equal("0.5.0"))
 		})
@@ -126,7 +150,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 	Context("when AppRevision is set", func() {
 		It("should return the value", func() {
 			core.AppRevision = "12345678"
-			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+			appCfg, err := core.NewAppConfig(httpClient)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetRevision()).To(Equal("12345678"))
 		})
@@ -142,7 +166,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t.Setenv("APP_DATABASE_PASSWORD", "password")
 			t.Setenv("APP_DATABASE_MAX_ATTEMPTS", "5")
 
-			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+			appCfg, err := core.NewAppConfig(httpClient)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetDatabaseConfig()).To(PointTo(MatchFields(IgnoreMissing, Fields{
 				"Host":         Equal("127.0.0.1"),
@@ -165,7 +189,7 @@ var _ = Describe("[common/core/config.go]", Ordered, func() {
 			t.Setenv("APP_CORS_ALLOW_CREDENTIALS", "true")
 			t.Setenv("APP_CORS_MAX_AGE", "500")
 
-			appCfg, err := core.NewAppConfig(core.NewHTTPClient())
+			appCfg, err := core.NewAppConfig(httpClient)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(appCfg.GetCorsConfig()).To(PointTo(MatchFields(IgnoreMissing, Fields{
 				"AllowedOrigins":   Equal([]string{"http://localhost:3000", "http://*.localhost"}),

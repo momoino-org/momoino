@@ -3,7 +3,9 @@ import { isProduction } from '@/internal/core/config';
 
 export interface LazyLoadedSlices {}
 
-export const rootReducer = combineSlices({}).withLazyLoadedSlices<LazyLoadedSlices>();
+export const rootReducer = combineSlices(
+  {},
+).withLazyLoadedSlices<LazyLoadedSlices>();
 
 export const makeStore = () => {
   const store = configureStore({

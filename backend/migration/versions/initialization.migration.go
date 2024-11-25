@@ -3,7 +3,6 @@ package versions
 import (
 	"log/slog"
 	"wano-island/common/showmgt"
-	"wano-island/common/usermgt"
 	migrationCore "wano-island/migration/core"
 	"wano-island/migration/versions/initialization"
 
@@ -50,9 +49,6 @@ func (m *initializationMigration) BeforeMigrate(tx *gorm.DB) error {
 func (m *initializationMigration) Migrate(tx *gorm.DB) error {
 	return tx.AutoMigrate(
 		&initialization.DBMigrationModel{},
-		&usermgt.UserModel{},
-		&usermgt.OAuth2ProviderModel{},
-		&usermgt.OAuth2UserModel{},
 		&showmgt.ShowModel{},
 		&showmgt.ShowTranslationModel{},
 		&showmgt.SeasonModel{},
